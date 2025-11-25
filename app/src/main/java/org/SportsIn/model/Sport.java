@@ -1,7 +1,7 @@
 package org.SportsIn.model;
 
 /**
- * Représente un sport (ex : Foot, Muscu, Basket 3x3)
+ * Représente un sport (ex : Foot, Muscu, Basket)
  * et les règles associées pour déterminer la victoire et le scoring.
  */
 public class Sport {
@@ -11,8 +11,6 @@ public class Sport {
     private String name;          // "Football", "Musculation", ...
     private Long victoryRuleId;   // référence vers une Rule VICTORY
     private Long scoringRuleId;   // référence vers une Rule SCORING
-
-    // --- Constructeurs ---
 
     public Sport() {
     }
@@ -28,8 +26,6 @@ public class Sport {
         this.victoryRuleId = victoryRuleId;
         this.scoringRuleId = scoringRuleId;
     }
-
-    // --- Getters / Setters ---
 
     public Long getId() {
         return id;
@@ -71,7 +67,6 @@ public class Sport {
         this.scoringRuleId = scoringRuleId;
     }
 
-    // --- Utilitaire ---
 
     @Override
     public String toString() {

@@ -9,7 +9,7 @@ import java.util.List;
  * et produit un résultat une fois terminée.
  */
 public class Session {
-/*
+
     private String id;                       // identifiant unique "SESSION_42"
     private Long sportId;                    // référence vers Sport
     private String pointId;                  // identifiant du point sur la carte
@@ -127,5 +127,5 @@ public class Session {
                 ", createdAt=" + createdAt +
                 ", endedAt=" + endedAt +
                 '}';
-    }*/
+    }
 }
