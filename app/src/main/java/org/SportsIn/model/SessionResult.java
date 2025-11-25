@@ -6,6 +6,9 @@ import java.util.List;
  * Représente les données brutes envoyées pour une session de sport.
  * Le moteur se base dessus pour appliquer les règles.
  */
+
+/*TODO Il faut que ça teste la rule du sport qu'on recoit 
+Il faut recevoir un objet sport, c'est l'objet sport qui teste la rule*/
 public class SessionResult {
 
     private String sessionId;

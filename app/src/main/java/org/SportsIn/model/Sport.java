@@ -4,12 +4,12 @@ package org.SportsIn.model;
  * Représente un sport (ex : Foot, Muscu, Basket)
  * et les règles associées pour déterminer la victoire et le scoring.
  */
+/*TODO Il faut implémenter le test de la rule lié au sport */
 public class Sport {
 
     private Long id;
     private String code;          // "FOOT", "MUSCU", "BASKET_3X3"
     private String name;          // "Football", "Musculation", ...
-    private Long victoryRuleId;   // référence vers une Rule VICTORY
     private Long scoringRuleId;   // référence vers une Rule SCORING
 
     public Sport() {

@@ -8,6 +8,8 @@ import java.util.List;
  * Une session est créée sur un point, possède des participants,
  * et produit un résultat une fois terminée.
  */
+
+/* TODO:Il faut que ça crée un Sport selon le sport id, il faut que ça crée un sessionResult  */
 public class Session {
 
     private String id;                       // identifiant unique "SESSION_42"
