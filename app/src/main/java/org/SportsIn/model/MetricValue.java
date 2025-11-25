@@ -1,4 +1,4 @@
-package model;
+package org.SportsIn.model;
 
 /**
  * Représente une mesure brute enregistrée pendant une session sportive :

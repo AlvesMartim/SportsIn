@@ -1,4 +1,4 @@
-package com.noedevops.sportengine.domain.model;
+package org.SportsIn.model;
 
 import java.util.Map;
 

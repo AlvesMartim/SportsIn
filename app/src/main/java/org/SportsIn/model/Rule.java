@@ -1,4 +1,4 @@
-package main.java.org.SportsIn.model;
+package org.SportsIn.model;
 
 
 /**

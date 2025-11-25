@@ -1,6 +1,6 @@
 //Participant est l'entité qui participe a une session sport 
 
-package main.java.org.SportsIn.model;
+package org.SportsIn.model;
 
 public class Participant {
 

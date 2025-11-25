@@ -1,5 +1,4 @@
 package org.SportsIn.model;
-
 import java.util.List;
 
 public class Arene {

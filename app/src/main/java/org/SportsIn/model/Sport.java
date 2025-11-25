@@ -1,4 +1,4 @@
-package main.java.org.SportsIn.model;
+package org.SportsIn.model;
 
 /**
  * Représente un sport (ex : Foot, Muscu, Basket 3x3)
