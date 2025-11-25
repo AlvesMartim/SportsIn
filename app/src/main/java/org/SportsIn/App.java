@@ -12,8 +12,8 @@ public class App {
         SpringApplication.run(App.class, args);
     }
 
-    public Object getGreeting() {
+    /*public Object getGreeting() {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'getGreeting'");
-    }
+    }*/
 }
