@@ -4,13 +4,15 @@ package org.SportsIn.model;
  * Représente un sport (ex : Foot, Muscu, Basket)
  * et les règles associées pour déterminer la victoire et le scoring.
  */
-/*TODO Il faut implémenter le test de la rule lié au sport */
 public class Sport {
 
     private Long id;
     private String code;          // "FOOT", "MUSCU", "BASKET_3X3"
     private String name;          // "Football", "Musculation", ...
     private Long scoringRuleId;   // référence vers une Rule SCORING
+    private Long victoryRuleId;
+
+    private final RuleRepository ruleRepository = new InMemoryRuleRepository();
 
     public Sport() {
     }
@@ -25,6 +27,14 @@ public class Sport {
         this.name = name;
         this.victoryRuleId = victoryRuleId;
         this.scoringRuleId = scoringRuleId;
+    }
+
+    public EvaluationResult testRule(Session session) {
+        Rule rule = ruleRepository.findRuleById(scoringRuleId);
+        if (rule != null) {
+            return rule.evaluate(session);
+        }
+        return null;
     }
 
     public Long getId() {

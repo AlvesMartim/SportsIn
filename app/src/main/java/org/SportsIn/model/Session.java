@@ -9,11 +9,10 @@ import java.util.List;
  * et produit un résultat une fois terminée.
  */
 
-/* TODO:Il faut que ça crée un Sport selon le sport id, il faut que ça crée un sessionResult  */
 public class Session {
 
     private String id;                       // identifiant unique "SESSION_42"
-    private Long sportId;                    // référence vers Sport
+    private Sport sport;                    // référence vers Sport
     private String pointId;                  // identifiant du point sur la carte
     private SessionState state;              // ACTIVE / TERMINATED
     private LocalDateTime createdAt;         // date de création
@@ -26,21 +25,24 @@ public class Session {
 
     // --- Constructeurs ---
 
-    public Session() {}
+    public Session() {
+        this.result = new SessionResult(this, null);
+    }
 
     public Session(String id,
-                   Long sportId,
+                   Sport sport,
                    String pointId,
                    SessionState state,
                    LocalDateTime createdAt,
                    List<Participant> participants) {
 
         this.id = id;
-        this.sportId = sportId;
+        this.sport = sport;
         this.pointId = pointId;
         this.state = state;
         this.createdAt = createdAt;
         this.participants = participants;
+        this.result = new SessionResult(this, null);
     }
 
     // --- Getters / Setters ---
@@ -53,12 +55,12 @@ public class Session {
         this.id = id;
     }
 
-    public Long getSportId() {
-        return sportId;
+    public Sport getSport() {
+        return sport;
     }
 
-    public void setSportId(Long sportId) {
-        this.sportId = sportId;
+    public void setSport(Sport sport) {
+        this.sport = sport;
     }
 
     public String getPointId() {
@@ -123,7 +125,7 @@ public class Session {
     public String toString() {
         return "Session{" +
                 "id='" + id + '\'' +
-                ", sportId=" + sportId +
+                ", sport=" + sport +
                 ", pointId='" + pointId + '\'' +
                 ", state=" + state +
                 ", createdAt=" + createdAt +

@@ -1,49 +1,27 @@
 package org.SportsIn.model;
 
-import java.util.Map;
-
-/**
- * Résultat produit par le moteur après application des règles d’un sport.
- */
 public class EvaluationResult {
+    private final String winnerParticipantId;
+    private final String message;
 
-    private String winnerParticipantId;
-    private Map<String, Double> scoresByParticipant; // participantId -> score
-    private Map<String, Object> details;             // logs, calculs, debug
-
-    public EvaluationResult() {}
-
-    public EvaluationResult(String winnerParticipantId,
-                            Map<String, Double> scoresByParticipant,
-                            Map<String, Object> details) {
+    public EvaluationResult(String winnerParticipantId, String message) {
         this.winnerParticipantId = winnerParticipantId;
-        this.scoresByParticipant = scoresByParticipant;
-        this.details = details;
+        this.message = message;
     }
-
-    // --- Getters / Setters ---
 
     public String getWinnerParticipantId() {
         return winnerParticipantId;
     }
 
-    public void setWinnerParticipantId(String winnerParticipantId) {
-        this.winnerParticipantId = winnerParticipantId;
+    public String getMessage() {
+        return message;
     }
 
-    public Map<String, Double> getScoresByParticipant() {
-        return scoresByParticipant;
-    }
-
-    public void setScoresByParticipant(Map<String, Double> scoresByParticipant) {
-        this.scoresByParticipant = scoresByParticipant;
-    }
-
-    public Map<String, Object> getDetails() {
-        return details;
-    }
-
-    public void setDetails(Map<String, Object> details) {
-        this.details = details;
+    @Override
+    public String toString() {
+        return "EvaluationResult{" +
+                "winnerParticipantId='" + winnerParticipantId + '\'' +
+                ", message='" + message + '\'' +
+                '}';
     }
 }

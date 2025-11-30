@@ -6,52 +6,33 @@ import java.util.List;
  * Représente les données brutes envoyées pour une session de sport.
  * Le moteur se base dessus pour appliquer les règles.
  */
-
-/*TODO Il faut que ça teste la rule du sport qu'on recoit 
-Il faut recevoir un objet sport, c'est l'objet sport qui teste la rule*/
 public class SessionResult {
 
-    private String sessionId;
-    private Long sportId;
-    private List<Participant> participants;
+    private transient Session session;
     private List<MetricValue> metrics;
 
     public SessionResult() {}
 
-    public SessionResult(String sessionId,
-                         Long sportId,
-                         List<Participant> participants,
-                         List<MetricValue> metrics) {
-        this.sessionId = sessionId;
-        this.sportId = sportId;
-        this.participants = participants;
+    public SessionResult(Session session, List<MetricValue> metrics) {
+        this.session = session;
         this.metrics = metrics;
+    }
+
+    public EvaluationResult evaluateRules() {
+        if (session != null && session.getSport() != null) {
+            return session.getSport().testRule(session);
+        }
+        return null;
     }
 
     // --- Getters / Setters ---
 
-    public String getSessionId() {
-        return sessionId;
+    public Session getSession() {
+        return session;
     }
 
-    public void setSessionId(String sessionId) {
-        this.sessionId = sessionId;
-    }
-
-    public Long getSportId() {
-        return sportId;
-    }
-
-    public void setSportId(Long sportId) {
-        this.sportId = sportId;
-    }
-
-    public List<Participant> getParticipants() {
-        return participants;
-    }
-
-    public void setParticipants(List<Participant> participants) {
-        this.participants = participants;
+    public void setSession(Session session) {
+        this.session = session;
     }
 
     public List<MetricValue> getMetrics() {
