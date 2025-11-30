@@ -29,8 +29,14 @@ public class Sport {
         this.scoringRuleId = scoringRuleId;
     }
 
+    /**
+     * Teste la règle de VICTOIRE pour une session donnée.
+     * @param session La session à évaluer.
+     * @return Le résultat de l'évaluation.
+     */
     public EvaluationResult testRule(Session session) {
-        Rule rule = ruleRepository.findRuleById(scoringRuleId);
+        // CORRECTION : On utilise bien victoryRuleId pour déterminer le gagnant.
+        Rule rule = ruleRepository.findRuleById(victoryRuleId);
         if (rule != null) {
             return rule.evaluate(session);
         }
