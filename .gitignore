@@ -5,3 +5,18 @@
 build
 
 gradle
+
+# IntelliJ IDEA
+.idea/
+*.iml
+*.ipr
+*.iws
+out/
+
+# Fichiers générés par l'IDE
+.name
+compiler.xml
+gradle.xml
+IntelliLang.xml
+misc.xml
+vcs.xml
