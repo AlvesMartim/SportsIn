@@ -1,5 +1,7 @@
 package org.SportsIn.model.territory;
 
+import org.springframework.stereotype.Repository;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -7,6 +9,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+@Repository
 public class InMemoryZoneRepository implements ZoneRepository {
 
     private final Map<Long, Zone> database = new HashMap<>();

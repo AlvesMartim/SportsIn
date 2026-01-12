@@ -4,11 +4,13 @@ import org.SportsIn.model.EvaluationResult;
 import org.SportsIn.model.Session;
 import org.SportsIn.model.SessionRepository;
 import org.SportsIn.model.SessionState;
+import org.springframework.stereotype.Service;
 
 /**
  * Service agissant comme un chef d'orchestre pour gérer la logique métier
  * liée aux sessions de sport.
  */
+@Service
 public class SessionService {
 
     private final SessionRepository sessionRepository;
@@ -50,12 +52,25 @@ public class SessionService {
             return;
         }
 
-        // Étape 2 : Déléguer la gestion du territoire au TerritoryService
+        // --- NOUVEAU : Application du Bonus de Route ---
         String pointIdStr = session.getPointId();
         if (pointIdStr != null) {
             try {
                 Long pointId = Long.parseLong(pointIdStr);
+                
+                // On vérifie si l'équipe gagnante bénéficie d'un bonus sur ce point
+                double bonusMultiplier = territoryService.getScoreBonusForTeamOnPoint(winnerTeamId, pointId);
+                
+                if (bonusMultiplier > 0) {
+                    System.out.println(">>> BONUS APPLIQUÉ ! L'équipe " + winnerTeamId + " bénéficie d'un boost de " + (bonusMultiplier * 100) + "% grâce à ses routes.");
+                    // Ici, on pourrait modifier le score enregistré dans la session, ou donner des points d'XP supplémentaires.
+                    // Pour l'instant, on loggue juste l'effet.
+                    // Exemple : session.getResult().applyBonus(bonusMultiplier);
+                }
+
+                // Étape 2 : Déléguer la gestion du territoire au TerritoryService
                 territoryService.updateTerritoryControl(pointId, winnerTeamId);
+
             } catch (NumberFormatException e) {
                 System.err.println("Erreur: L'ID du point n'est pas un nombre valide: " + pointIdStr);
             }

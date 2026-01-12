@@ -18,6 +18,7 @@ class SessionServiceTest {
     private SessionRepository sessionRepository;
     private PointSportifRepository pointSportifRepository;
     private ZoneRepository zoneRepository;
+    private RouteRepository routeRepository;
     private TerritoryService territoryService;
 
     private Sport football;
@@ -31,9 +32,10 @@ class SessionServiceTest {
         sessionRepository = new InMemorySessionRepository();
         pointSportifRepository = new InMemoryPointSportifRepository();
         zoneRepository = new InMemoryZoneRepository();
+        routeRepository = new InMemoryRouteRepository();
 
         // Initialisation des services avec leurs dépendances
-        territoryService = new TerritoryService(pointSportifRepository, zoneRepository);
+        territoryService = new TerritoryService(pointSportifRepository, zoneRepository, routeRepository);
         sessionService = new SessionService(sessionRepository, territoryService);
 
         // Données de test

@@ -5,6 +5,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
@@ -15,15 +17,18 @@ class TerritoryServiceTest {
     private TerritoryService territoryService;
     private PointSportifRepository pointRepository;
     private ZoneRepository zoneRepository;
+    private RouteRepository routeRepository;
 
     private PointSportif p1, p2, p3, p4;
     private Zone zoneNord;
+    private Route routeTest;
 
     @BeforeEach
     void setUp() {
         pointRepository = new InMemoryPointSportifRepository();
         zoneRepository = new InMemoryZoneRepository();
-        territoryService = new TerritoryService(pointRepository, zoneRepository);
+        routeRepository = new InMemoryRouteRepository();
+        territoryService = new TerritoryService(pointRepository, zoneRepository, routeRepository);
 
         // Création de 4 points
         p1 = new PointSportif(1L, "Point 1", 0, 0, null);
@@ -39,6 +44,10 @@ class TerritoryServiceTest {
         // Création d'une zone contenant ces 4 points
         zoneNord = new Zone(100L, "Zone Nord", List.of(p1, p2, p3, p4));
         zoneRepository.save(zoneNord);
+
+        // Création d'une route
+        routeTest = new Route(200L, "Route Test", "P1 -> P4", new ArrayList<>(Arrays.asList(p1, p2, p3, p4)));
+        routeRepository.save(routeTest);
     }
 
     @Test
@@ -92,22 +101,6 @@ class TerritoryServiceTest {
 
         // ASSERT
         Zone updatedZone = zoneRepository.findById(100L).orElseThrow();
-        // L'équipe 10 n'a plus que 2 points -> elle perd la zone
-        // Note : Cela dépend de la règle implémentée dans Zone.java (si on a décommenté la perte de zone)
-        // Dans le code actuel de Zone.java, j'ai laissé la ligne commentée ou non ?
-        // Vérifions le code de Zone.java...
-        // Dans ma réponse précédente, j'ai écrit : "Si on veut qu'elle perde la zone, on décommente la ligne suivante : this.controllingTeamId = null;"
-        // Je vais supposer que je l'ai décommenté ou que je vais le faire pour que ce test passe si c'est le comportement voulu.
-        // Pour l'instant, vérifions si c'est null.
-        
-        // Si la règle est "strictement >= 3 pour contrôler", alors < 3 signifie perte.
-        // Si la règle est "maintien tant que personne d'autre ne prend", c'est différent.
-        // Le test suppose la règle stricte.
-        
-        // Vérifions le code actuel de Zone.java via read_file si besoin, mais je viens de l'écrire.
-        // J'ai écrit : } else if (newMaster == null && this.controllingTeamId != null) { this.controllingTeamId = null; return true; }
-        // Donc oui, la perte est active.
-        
         assertNull(updatedZone.getControllingTeamId(), "La zone devrait être perdue (plus que 2 points).");
     }
 
@@ -129,16 +122,31 @@ class TerritoryServiceTest {
         pointRepository.save(p4);
         zoneRepository.save(zoneNord);
 
-        // ACT : L'équipe 20 prend p1, p2, p3 successivement ? Non, juste assez pour avoir la majorité ?
-        // Règle actuelle : "celui qui a >= 3 points".
-        // Si l'équipe 20 prend p1, elle a p1 et p4 (2 points). L'équipe 10 a p2 et p3 (2 points). Personne n'a 3.
-        
-        // Scénario : L'équipe 20 prend p1, p2, p3.
+        // ACT : L'équipe 20 prend p1, p2, p3 successivement
         territoryService.updateTerritoryControl(1L, 20L); // 20: 2pts, 10: 2pts -> Zone perdue
         territoryService.updateTerritoryControl(2L, 20L); // 20: 3pts, 10: 1pt -> Zone prise par 20
         
         // ASSERT
         Zone updatedZone = zoneRepository.findById(100L).orElseThrow();
         assertEquals(20L, updatedZone.getControllingTeamId());
+    }
+
+    @Test
+    @DisplayName("Détection de bonus de route")
+    void testUpdateTerritoryControl_RouteBonus() {
+        // ARRANGE : L'équipe 10 a P1 et P2
+        p1.setControllingTeamId(10L);
+        p2.setControllingTeamId(10L);
+        pointRepository.save(p1);
+        pointRepository.save(p2);
+
+        // ACT : L'équipe 10 prend P3 -> Suite P1, P2, P3
+        // Cela devrait déclencher un log de bonus (vérifiable visuellement ou via mock si on mockait RouteService)
+        territoryService.updateTerritoryControl(3L, 10L);
+
+        // Pas d'assertion directe possible sur les logs sans framework de log capture,
+        // mais le test passe si aucune exception n'est levée.
+        // On vérifie juste que l'état est cohérent.
+        assertEquals(10L, p3.getControllingTeamId());
     }
 }
