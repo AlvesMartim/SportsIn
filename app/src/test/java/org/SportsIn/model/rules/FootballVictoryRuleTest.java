@@ -59,9 +59,9 @@ class FootballVictoryRuleTest {
         EvaluationResult verdict = rule.evaluate(session);
 
         assertNotNull(verdict);
-        // L'implémentation actuelle avec .max() peut retourner l'un ou l'autre en cas d'égalité.
-        // On vérifie juste qu'un gagnant est bien désigné.
-        assertNotNull(verdict.getWinnerParticipantId());
+        // En cas d'égalité, il ne devrait pas y avoir de gagnant unique
+        assertNull(verdict.getWinnerParticipantId());
+        assertTrue(verdict.getMessage().contains("Égalité"));
     }
 
     @Test

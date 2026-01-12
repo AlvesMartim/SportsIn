@@ -1,0 +1,116 @@
+-------------------------------------------------Quelles tables stocker dans la BD----------------------------------
+-------------------------------------------------Schéma de la Base de Données----------------------------------
+
+                    ┌──────────────┐
+                    │    EQUIPE    │
+                    ├──────────────┤
+                    │ id (PK)      │
+                    │ nom (UNIQUE) │
+                    └───┬──────┬───┘
+                        │      │
+                        │ 1    │ 1
+                        │      │
+                        │ N    │ 0..1
+                        │      │
+        ┌───────────────▼─┐    │    ┌──────────────┐
+        │     JOUEUR      │    │    │    ARENE     │
+        ├─────────────────┤    │    ├──────────────┤
+        │ id (PK)         │    │    │ id (PK)      │
+        │ pseudo (UNIQUE) │    │    │ nom          │
+        │ equipe_id (FK)──┼────┘    │ latitude     │
+        └─────────────────┘         │ longitude    │
+                                    │ equipe_      │──┐
+                                    │ controle(FK) │  │
+                                    └──────────────┘  │
+                                                      │
+                                                      │ Référence vers EQUIPE.id
+                                                      │
+                                                      └──┘
+
+┌──────────────────────┐
+│    ARENE_SPORT       │ (Table de jointure)
+├──────────────────────┤
+│ arene_id (FK, PK)    │──┐
+│ sport_type (PK)      │  │
+└──────────────────────┘  │
+                          │ Référence vers ARENE.id
+                          └──┘
+
+                    ┌──────────────┐
+                    │    SPORT     │
+                    ├──────────────┤
+                    │ id (PK)      │
+                    │ code         │
+                    │ name         │
+                    │ victory_     │
+                    │ rule_id      │
+                    │ scoring_     │
+                    │ rule_id      │
+                    └──────┬───────┘
+                           │
+                           │ 1
+                           │
+                           │ N
+                           │
+                    ┌──────▼───────┐
+                    │   SESSION   │
+                    ├─────────────┤
+                    │ id (PK)     │
+                    │ sport_id    │──┐
+                    │ point_id    │  │
+                    │ state       │  │
+                    │ created_at  │  │
+                    │ ended_at    │  │
+                    │ winner_     │  │
+                    │ participant │  │
+                    │ _id         │  │
+                    └─────────────┘  │
+                                     │ Référence vers SPORT.id
+                                     └──┘
+
+┌──────────────────────────────┐
+│    SESSION_PARTICIPANT       │ (Table de jointure)
+├──────────────────────────────┤
+│ session_id (FK, PK)         │──┐
+│ participant_id (PK)         │  │
+│ participant_type (PK)        │  │ Référence vers JOUEUR.id ou EQUIPE.id
+│ participant_name             │  │ selon participant_type
+└──────────────────────────────┘  │
+                                  │ Référence vers SESSION.id
+                                  └──┘
+
+┌──────────────────────────────┐
+│      METRIC_VALUE            │
+├──────────────────────────────┤
+│ id (PK)                      │
+│ session_id (FK)              │──┐
+│ participant_id               │  │
+│ metric_type                  │  │
+│ value                        │  │
+│ context                      │  │
+└──────────────────────────────┘  │
+                                  │ Référence vers SESSION.id
+                                  └──┘
+
+Relations principales:
+- EQUIPE 1──N JOUEUR (OneToMany)
+- EQUIPE 1──0..1 ARENE (OneToMany, nullable)
+- ARENE N──N SportType (ManyToMany via ARENE_SPORT)
+- SPORT 1──N SESSION (OneToMany)
+- SESSION N──N Participant (ManyToMany via SESSION_PARTICIPANT)
+- SESSION 1──N METRIC_VALUE (OneToMany)
+
+Tables stockées:
+✓ EQUIPE              - Entité JPA (@Entity)
+✓ JOUEUR              - Entité JPA (@Entity)
+✓ ARENE               - Entité à persister
+✓ ARENE_SPORT         - Table de jointure
+✓ SPORT               - Entité à persister
+✓ SESSION             - Entité à persister
+✓ SESSION_PARTICIPANT - Table de jointure
+✓ METRIC_VALUE        - Entité à persister
+
+Tables NON stockées:
+✗ PARTICIPANT - DTO utilisé dans Session, pas une entité persistante
+✗ RULE        - Interface, pas une entité à stocker
+✗ SESSION_RESULT - DTO calculé, pas stocké séparément

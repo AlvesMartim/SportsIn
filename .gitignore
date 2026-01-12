@@ -20,3 +20,6 @@ gradle.xml
 IntelliLang.xml
 misc.xml
 vcs.xml
+
+# Base de données SQLite
+sportsin.db

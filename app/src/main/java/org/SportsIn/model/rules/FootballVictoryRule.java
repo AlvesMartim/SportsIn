@@ -20,7 +20,7 @@ public class FootballVictoryRule implements Rule {
                 .collect(Collectors.toList());
 
         if (scores.isEmpty()) {
-            return new EvaluationResult(null, "Aucune métrique de type GOALS ou POINTS n'a été trouvée.");
+            return new EvaluationResult(null, "Impossible de déterminer un gagnant : aucune métrique de type GOALS ou POINTS n'a été trouvée.");
         }
 
         // 2. Trouver la valeur du score maximum
@@ -36,14 +36,18 @@ public class FootballVictoryRule implements Rule {
 
         // 4. Vérifier s'il y a un gagnant unique
         if (potentialWinners.size() == 1) {
+            // Un seul gagnant : victoire claire
             MetricValue winnerMetric = potentialWinners.get(0);
             String winnerId = winnerMetric.getParticipantId();
-            String message = "Le gagnant est le participant " + winnerId + " avec le score le plus élevé.";
+            String message = "Le gagnant est le participant " + winnerId;
             return new EvaluationResult(winnerId, message);
+        } else if (potentialWinners.size() > 1) {
+            // Égalité : plusieurs participants ont le même score max
+            // On retourne null pour indiquer qu'il n'y a pas de gagnant unique
+            return new EvaluationResult(null, "Égalité : " + potentialWinners.size() + " participants ont le même score maximum de " + maxScore + ".");
         } else {
-            // S'il y a 0 ou plus d'un participant avec le score max, c'est une égalité ou un cas sans gagnant.
-            String message = "Égalité. " + potentialWinners.size() + " participants ont le même score maximum de " + maxScore + ".";
-            return new EvaluationResult(null, message);
+            // Cas sans gagnant (ne devrait pas arriver normalement)
+            return new EvaluationResult(null, "Impossible de déterminer un gagnant.");
         }
     }
 }

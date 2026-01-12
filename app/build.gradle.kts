@@ -25,14 +25,23 @@ dependencies {
 
     implementation ("org.springframework.boot:spring-boot-starter-web")
     implementation ("org.springframework.boot:spring-boot-starter-data-jpa")
+    
+    // SQLite support
     runtimeOnly ("com.h2database:h2")
+    runtimeOnly ("org.xerial:sqlite-jdbc:3.44.1.0")
+    implementation ("org.hibernate.orm:hibernate-community-dialects:6.4.1.Final")
+    
+    // Jackson for JSON serialization (to avoid JsonBackReference issues)
+    implementation ("com.fasterxml.jackson.core:jackson-databind:2.16.1")
+    implementation ("com.fasterxml.jackson.core:jackson-annotations:2.16.1")
+    
     testImplementation ("org.springframework.boot:spring-boot-starter-test")
 }
 
 
 java {
     toolchain {
-        languageVersion = JavaLanguageVersion.of(21)
+        languageVersion = JavaLanguageVersion.of(17)
     }
 }
 
@@ -43,3 +52,36 @@ application {
 tasks.named<Test>("test") {
     useJUnitPlatform()
 }
+
+// Tâche pour construire le frontend avant le build
+val frontendDir = rootProject.layout.projectDirectory.dir("frontend")
+val frontendPackageJson = frontendDir.file("package.json")
+
+tasks.register("installFrontendDependencies", Exec::class) {
+    group = "build"
+    description = "Install frontend npm dependencies"
+    workingDir = rootProject.layout.projectDirectory.asFile
+    commandLine("bash", "install-frontend.sh")
+    onlyIf {
+        frontendPackageJson.asFile.exists() && !frontendDir.file("node_modules").asFile.exists()
+    }
+}
+
+tasks.register("buildFrontend", Exec::class) {
+    group = "build"
+    description = "Build the React frontend"
+    workingDir = frontendDir.asFile
+    commandLine("npm", "run", "build")
+    dependsOn("installFrontendDependencies")
+    // Ne s'exécute que si le dossier frontend existe et contient package.json et node_modules
+    onlyIf {
+        frontendPackageJson.asFile.exists() && frontendDir.file("node_modules").asFile.exists()
+    }
+}
+
+// Faire en sorte que processResources dépende de buildFrontend
+// DÉSACTIVÉ - La construction du frontend doit être faite manuellement
+// Pour activer : décommentez les lignes ci-dessous et installez Node.js dans WSL
+// tasks.named("processResources") {
+//     dependsOn("buildFrontend")
+// }

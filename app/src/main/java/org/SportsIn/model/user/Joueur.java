@@ -1,6 +1,6 @@
 package org.SportsIn.model.user;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
 
 /**
  * Représente un joueur (un utilisateur individuel).

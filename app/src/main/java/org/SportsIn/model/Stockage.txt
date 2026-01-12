@@ -1,6 +1,0 @@
--------------------------------------------------Quelles tables stocker dans la BD----------------------------------
-Arenes
-Equipes ?
-Joueurs
-Participants
-Rules
