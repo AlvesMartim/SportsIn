@@ -4,8 +4,6 @@ import org.SportsIn.model.EvaluationResult;
 import org.SportsIn.model.Session;
 import org.SportsIn.model.SessionRepository;
 import org.SportsIn.model.SessionState;
-import org.SportsIn.model.territory.PointSportif;
-import org.SportsIn.model.territory.PointSportifRepository;
 
 /**
  * Service agissant comme un chef d'orchestre pour gérer la logique métier
@@ -14,15 +12,14 @@ import org.SportsIn.model.territory.PointSportifRepository;
 public class SessionService {
 
     private final SessionRepository sessionRepository;
-    private final PointSportifRepository pointSportifRepository;
+    private final TerritoryService territoryService;
 
     /**
-     * Construit le service en lui fournissant ses dépendances (les repositories).
-     * C'est ce qu'on appelle l'injection de dépendances.
+     * Construit le service en lui fournissant ses dépendances.
      */
-    public SessionService(SessionRepository sessionRepository, PointSportifRepository pointSportifRepository) {
+    public SessionService(SessionRepository sessionRepository, TerritoryService territoryService) {
         this.sessionRepository = sessionRepository;
-        this.pointSportifRepository = pointSportifRepository;
+        this.territoryService = territoryService;
     }
 
     /**
@@ -53,17 +50,12 @@ public class SessionService {
             return;
         }
 
-        // Étape 2 : Identifier et mettre à jour le point sportif
+        // Étape 2 : Déléguer la gestion du territoire au TerritoryService
         String pointIdStr = session.getPointId();
         if (pointIdStr != null) {
             try {
                 Long pointId = Long.parseLong(pointIdStr);
-                pointSportifRepository.findById(pointId).ifPresent(point -> {
-                    System.out.println("Le point '" + point.getNom() + "' (ID: " + pointId + ") était contrôlé par l'équipe " + point.getControllingTeamId());
-                    point.setControllingTeamId(winnerTeamId);
-                    pointSportifRepository.save(point);
-                    System.out.println("Il est maintenant contrôlé par l'équipe " + winnerTeamId);
-                });
+                territoryService.updateTerritoryControl(pointId, winnerTeamId);
             } catch (NumberFormatException e) {
                 System.err.println("Erreur: L'ID du point n'est pas un nombre valide: " + pointIdStr);
             }

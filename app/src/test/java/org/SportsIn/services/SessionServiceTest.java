@@ -1,9 +1,7 @@
 package org.SportsIn.services;
 
 import org.SportsIn.model.*;
-import org.SportsIn.model.territory.InMemoryPointSportifRepository;
-import org.SportsIn.model.territory.PointSportif;
-import org.SportsIn.model.territory.PointSportifRepository;
+import org.SportsIn.model.territory.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -19,6 +17,8 @@ class SessionServiceTest {
     private SessionService sessionService;
     private SessionRepository sessionRepository;
     private PointSportifRepository pointSportifRepository;
+    private ZoneRepository zoneRepository;
+    private TerritoryService territoryService;
 
     private Sport football;
     private PointSportif cityStade;
@@ -27,16 +27,26 @@ class SessionServiceTest {
 
     @BeforeEach
     void setUp() {
+        // Initialisation des repositories
         sessionRepository = new InMemorySessionRepository();
         pointSportifRepository = new InMemoryPointSportifRepository();
-        sessionService = new SessionService(sessionRepository, pointSportifRepository);
+        zoneRepository = new InMemoryZoneRepository();
 
+        // Initialisation des services avec leurs dépendances
+        territoryService = new TerritoryService(pointSportifRepository, zoneRepository);
+        sessionService = new SessionService(sessionRepository, territoryService);
+
+        // Données de test
         football = new Sport(1L, "FOOT", "Football", 101L, null);
         cityStade = new PointSportif(42L, "City Stade de la Villette", 48.89, 2.38, List.of(football));
         equipeA = new Participant("10", "Les Aigles", ParticipantType.TEAM);
         equipeB = new Participant("12", "Les Requins", ParticipantType.TEAM);
 
         pointSportifRepository.save(cityStade);
+        
+        // Créer une zone pour les tests de conquête de zone via SessionService
+        Zone zoneTest = new Zone(200L, "Zone de Test", List.of(cityStade));
+        zoneRepository.save(zoneTest);
     }
 
     @Test
