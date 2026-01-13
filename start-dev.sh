@@ -271,5 +271,5 @@ echo ""
 echo -e "${YELLOW}Appuyez sur Ctrl+C pour arrêter tous les services${NC}"
 echo ""
 
-# Garder le script actif
+# Garder le script actif tant que les services tournent
 wait
