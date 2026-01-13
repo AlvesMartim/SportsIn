@@ -5,6 +5,13 @@
 DB_FILE="sportsin.db"
 SCHEMA_FILE="app/src/main/resources/schema.sql"
 
+# Vérifier si sqlite3 est installé
+if ! command -v sqlite3 &> /dev/null; then
+    echo "❌ Erreur: La commande 'sqlite3' n'est pas trouvée."
+    echo "   Veuillez installer SQLite3 ou laisser le backend créer la base de données au démarrage."
+    exit 1
+fi
+
 echo "Création de la base de données SQLite: $DB_FILE"
 
 # Supprimer la base de données existante si elle existe
@@ -26,4 +33,3 @@ else
     echo "Erreur: Le fichier $SCHEMA_FILE n'existe pas!"
     exit 1
 fi
-

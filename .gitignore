@@ -1,25 +1,39 @@
-# Ignore Gradle project-specific cache directory
 .gradle
+build/
+!gradle/wrapper/gradle-wrapper.jar
+!**/src/main/**/build/
+!**/src/test/**/build/
 
-# Ignore Gradle build output directory
-build
+### STS ###
+.apt_generated
+.classpath
+.factorypath
+.project
+.settings
+.springBeans
+.sts4-cache
 
-gradle
-
-# IntelliJ IDEA
-.idea/
+### IntelliJ IDEA ###
+.idea
+*.iws
 *.iml
 *.ipr
-*.iws
 out/
+!**/src/main/**/out/
+!**/src/test/**/out/
 
-# Fichiers générés par l'IDE
-.name
-compiler.xml
-gradle.xml
-IntelliLang.xml
-misc.xml
-vcs.xml
+### NetBeans ###
+/nbproject/private/
+/nbbuild/
+/dist/
+/nbdist/
+/.nb-gradle/
 
-# Base de données SQLite
-sportsin.db
+### VS Code ###
+.vscode/
+
+### Node.js ###
+node_modules/
+npm-debug.log
+yarn-error.log
+.node_local/
