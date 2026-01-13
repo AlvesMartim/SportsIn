@@ -9,25 +9,45 @@ Pour chaque écran, vous trouverez :
 
 ---
 
-## 1. Écran : Classement des Équipes (`TeamListPage.jsx`)
-**🚨 Priorité : Haute (Manquant)**
+## 1. Écran : Gestion d'Équipe (Rejoindre / Créer)
+**🚨 Priorité : Haute (Bloquant pour le gameplay)**
 
 ### À quoi ça sert ?
-C'est le cœur de la compétition. Les joueurs doivent pouvoir voir quelles équipes existent, qui domine le territoire, et choisir une équipe à rejoindre s'ils sont seuls. Sans ça, on ne sait pas contre qui on joue.
+Actuellement, la page "Mon équipe" affiche juste un bouton inactif si on n'a pas d'équipe. Il faut rendre ce processus fonctionnel. Le joueur doit pouvoir choisir son camp pour commencer à jouer.
 
 ### Ce qu'il faut faire
-*   Créer une page qui liste toutes les équipes inscrites.
-*   Afficher pour chaque équipe : son **Nom**, sa **Couleur**, et idéalement son nombre de joueurs (si dispo).
-*   Ajouter un bouton "Rejoindre" (si l'utilisateur n'a pas d'équipe).
+Dans la page `TeamPage.jsx` (ou via une nouvelle page dédiée), gérer le cas où le joueur n'a pas d'équipe :
+
+**Option A : Rejoindre une équipe existante**
+*   Afficher la liste des équipes disponibles (`equipeAPI.getAll()`).
+*   Ajouter un bouton "Rejoindre" à côté de chaque équipe.
+*   Action : Mettre à jour le profil du joueur avec l'ID de l'équipe choisie (`joueurAPI.update(id, { equipe: { id: ... } })`).
+
+**Option B : Créer une nouvelle équipe**
+*   Afficher un formulaire simple : "Nom de l'équipe" et "Couleur".
+*   Action : Créer l'équipe (`equipeAPI.create(...)`), puis assigner le joueur à cette nouvelle équipe.
 
 ### Technique
-*   **Fichier :** `src/pages/TeamListPage.jsx`
-*   **API :** `equipeAPI.getAll()`
-*   **Données reçues :** Liste d'objets `[{ id, nom, couleur, ... }]`.
+*   **Fichier :** `src/pages/TeamPage.jsx` (à modifier) ou créer `src/pages/TeamSelectionPage.jsx`.
+*   **APIs :** `equipeAPI.getAll()`, `equipeAPI.create()`, `joueurAPI.update()`.
 
 ---
 
+## 2. Écran : La Carte des Parcours (`MapPage.jsx` - Amélioration)
+**🚨 Priorité : Moyenne**
 
+### À quoi ça sert ?
+Afficher les routes Bonus
+### Ce qu'il faut faire
+*   En plus des marqueurs (Arènes), récupérer les "Routes" (itinéraires).
+*   Tracer ces itinéraires sur la carte sous forme de lignes colorées.
+
+### Technique
+*   **Fichier :** `src/pages/MapPage.jsx`
+*   **API :** `routeAPI.getAll()`
+*   **Composant :** Utiliser `<Polyline positions={...} />` de la librairie `react-leaflet`.
+
+---
 
 ## 3. Écran : Séance en cours (`ActiveSessionPage.jsx`)
 **🚨 Priorité : Haute**
