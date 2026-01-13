@@ -250,8 +250,7 @@ npm install
 npm run dev
 # 👉 Frontend accessible à http://localhost:5173
 
-# 5. Tester la connexion
-# Accédez à http://localhost:5173/api-test
+
 ```
 
 ## 🧪 Page de Test

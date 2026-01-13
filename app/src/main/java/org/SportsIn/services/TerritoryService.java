@@ -10,7 +10,6 @@ import org.SportsIn.model.territory.RouteRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.ArrayList;
 
 /**
  * Service responsable de la logique de conquête de territoire (Points et Zones).

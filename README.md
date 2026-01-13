@@ -12,7 +12,7 @@
 ```
 
 Cela démarre automatiquement :
-- ✅ La base de données SQLite
+- ✅ La base de données SQLite (en la recréeant si déjà crée)
 - ✅ Le backend Spring Boot (port 8080)
 - ✅ Le frontend React (port 5173)
 
