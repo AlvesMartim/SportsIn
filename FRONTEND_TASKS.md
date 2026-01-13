@@ -33,19 +33,23 @@ Dans la page `TeamPage.jsx` (ou via une nouvelle page dédiée), gérer le cas o
 
 ---
 
-## 2. Écran : La Carte des Parcours (`MapPage.jsx` - Amélioration)
+## 2. Écran : La Carte des Parcours et Zones (`MapPage.jsx` - Amélioration)
 **🚨 Priorité : Moyenne**
 
 ### À quoi ça sert ?
-Afficher les routes Bonus
+Actuellement, on ne voit que des points (stades, gymnases). Il faut implémenter la feature des routes bonus. De plus, le jeu gère des **Zones** (regroupement de points) qui peuvent être contrôlées par une équipe.
+
 ### Ce qu'il faut faire
-*   En plus des marqueurs (Arènes), récupérer les "Routes" (itinéraires).
-*   Tracer ces itinéraires sur la carte sous forme de lignes colorées.
+*   **Routes :** Récupérer les "Routes" (itinéraires) et les tracer sur la carte sous forme de lignes colorées.
+*   **Zones :** Récupérer les "Zones" et afficher leur contour (polygone) ou un indicateur visuel montrant quelle équipe contrôle la zone (ex: couleur de fond semi-transparente).
 
 ### Technique
 *   **Fichier :** `src/pages/MapPage.jsx`
-*   **API :** `routeAPI.getAll()`
-*   **Composant :** Utiliser `<Polyline positions={...} />` de la librairie `react-leaflet`.
+*   **API Routes :** `routeAPI.getAll()`
+*   **API Zones :** `zoneAPI.getAll()` (Nouvelle API ajoutée)
+*   **Composants :** 
+    *   `<Polyline positions={...} />` pour les routes.
+    *   `<Polygon positions={...} color={...} />` pour les zones (si les coordonnées sont dispos) ou des marqueurs spéciaux.
 
 ---
 
