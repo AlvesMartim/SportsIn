@@ -4,6 +4,14 @@ build/
 !**/src/main/**/build/
 !**/src/test/**/build/
 
+### Logs et PID ###
+backend.log
+frontend.log
+*.pid
+
+### Sqlite ###
+*.db
+
 ### STS ###
 .apt_generated
 .classpath
