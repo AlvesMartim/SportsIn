@@ -3,6 +3,7 @@ package org.SportsIn.model.user;
 import jakarta.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 
 /**
  * Représente une équipe dans le jeu.
@@ -24,6 +25,7 @@ public class Equipe {
     // se répercutent sur les joueurs associés.
     // FetchType.LAZY est une optimisation pour ne pas charger tous les joueurs inutilement.
     @OneToMany(mappedBy = "equipe", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JsonManagedReference  // ← Côté "parent" de la relation bidirectionnelle
     private List<Joueur> membres = new ArrayList<>();
 
     // --- Constructeurs ---

@@ -1,6 +1,7 @@
 package org.SportsIn.model.user;
 
 import jakarta.persistence.*;
+import com.fasterxml.jackson.annotation.JsonBackReference;
 
 /**
  * Représente un joueur (un utilisateur individuel).
@@ -20,6 +21,7 @@ public class Joueur {
     // qui stockera la clé étrangère vers l'équipe.
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "equipe_id")
+    @JsonBackReference  // ← Côté "enfant" de la relation bidirectionnelle
     private Equipe equipe;
 
     // --- Constructeurs ---
