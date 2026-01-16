@@ -1,4 +1,4 @@
-[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
+[z![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 [![CI](https://github.com/<OWNER>/<REPO>/actions/workflows/ci.yml/badge.svg)](https://github.com/<OWNER>/<REPO>/actions/workflows/ci.yml)
 
 # 🏆 SportsIn - Plateforme de Gestion des Équipes Sportives
@@ -73,3 +73,5 @@ ARNAUD Noé
 HASHANI Art 
 MOUMEN MOKHTARY Aya
 
+#test 
+aya
