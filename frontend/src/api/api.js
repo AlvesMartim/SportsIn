@@ -10,14 +10,16 @@ const API_BASE_URL = '/api'; // Utilise le proxy Vite
  */
 const fetchAPI = async (endpoint, options = {}) => {
   const url = `${API_BASE_URL}${endpoint}`;
-  const defaultOptions = {
-    headers: {
-      'Content-Type': 'application/json',
-    },
+  const token = localStorage.getItem('insport_token');
+
+  const headers = {
+    'Content-Type': 'application/json',
+    ...(token ? { 'Authorization': `Bearer ${token}` } : {}),
+    ...options.headers,
   };
 
   try {
-    const response = await fetch(url, { ...defaultOptions, ...options });
+    const response = await fetch(url, { ...options, headers });
     
     if (!response.ok) {
       const errorData = await response.text();
@@ -34,6 +36,21 @@ const fetchAPI = async (endpoint, options = {}) => {
     console.error('Erreur API:', error);
     throw error;
   }
+};
+
+/**
+ * ========== AUTH ==========
+ */
+export const authAPI = {
+  login: async (email, password) => fetchAPI('/auth/login', {
+    method: 'POST',
+    body: JSON.stringify({ email, password })
+  }),
+  register: async (pseudo, email, password) => fetchAPI('/auth/register', {
+    method: 'POST',
+    body: JSON.stringify({ pseudo, email, password })
+  }),
+  getProfile: async (id) => fetchAPI(`/auth/me/${id}`),
 };
 
 /**
@@ -108,11 +125,46 @@ export const metricValueAPI = {
   delete: async (id) => fetchAPI(`/metrics/${id}`, { method: 'DELETE' }),
 };
 
+/**
+ * ========== ROUTE ==========
+ */
+export const routeAPI = {
+  getAll: async () => fetchAPI('/routes'),
+};
+
+/**
+ * ========== ZONE ==========
+ */
+export const zoneAPI = {
+  getAll: async () => fetchAPI('/zones'),
+  getById: async (id) => fetchAPI(`/zones/${id}`),
+  getByPointId: async (pointId) => fetchAPI(`/zones/point/${pointId}`),
+};
+
+/**
+ * ========== GAME ==========
+ */
+export const gameAPI = {
+  getAll: async () => fetchAPI('/games'),
+  getById: async (id) => fetchAPI(`/games/${id}`),
+  getWaiting: async () => fetchAPI('/games/waiting'),
+  getWaitingAtPoint: async (pointId) => fetchAPI(`/games/point/${pointId}/waiting`),
+  create: async (data) => fetchAPI('/games', { method: 'POST', body: JSON.stringify(data) }),
+  join: async (id, opponentTeamId) => fetchAPI(`/games/${id}/join`, { method: 'POST', body: JSON.stringify({ opponentTeamId }) }),
+  start: async (id) => fetchAPI(`/games/${id}/start`, { method: 'POST' }),
+  complete: async (id, winnerTeamId) => fetchAPI(`/games/${id}/complete`, { method: 'POST', body: JSON.stringify({ winnerTeamId }) }),
+  delete: async (id) => fetchAPI(`/games/${id}`, { method: 'DELETE' }),
+};
+
 export default {
+  authAPI,
   equipeAPI,
   joueurAPI,
   areneAPI,
   sportAPI,
   sessionAPI,
   metricValueAPI,
+  routeAPI,
+  zoneAPI,
+  gameAPI,
 };

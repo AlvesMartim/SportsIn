@@ -1,79 +1,58 @@
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "../context/AuthContext.jsx";
 
 function Header() {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
 
   function handleLogout() {
     logout();
     navigate("/login");
   }
 
+  const isActive = (path) => location.pathname === path;
+
+  const navLinks = [
+    { path: "/", label: "Accueil", icon: "🏠" },
+    { path: "/map", label: "Carte", icon: "🗺️" },
+    { path: "/team", label: "Équipe", icon: "👥" },
+    { path: "/history", label: "Historique", icon: "📜" },
+  ];
+
   return (
-    <header
-      style={{
-        height: "56px",
-        padding: "0 20px",
-        backgroundColor: "#111",
-        color: "white",
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "space-between",
-        boxShadow: "0 2px 4px rgba(0,0,0,0.3)",
-        zIndex: 2000,
-      }}
-    >
+    <header className="navbar">
       {/* Logo / titre */}
-      <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-        <span
-          style={{
-            width: 24,
-            height: 24,
-            borderRadius: "50%",
-            background:
-              "linear-gradient(135deg, #e53935 0%, #1e88e5 100%)",
-          }}
-        />
-        <span style={{ fontWeight: 700, letterSpacing: "0.03em" }}>
-          InSport
-        </span>
-      </div>
+      <Link to="/" className="navbar-left" style={{ textDecoration: "none" }}>
+        <div className="nav-logo">⚡</div>
+        <span className="nav-title">SportsIn</span>
+      </Link>
 
-      {/* Liens + user */}
-      <nav
-        style={{
-          display: "flex",
-          alignItems: "center",
-          gap: "16px",
-          fontSize: "0.9rem",
-        }}
-      >
-        <Link to="/map" style={{ color: "white" }}>
-          Carte
-        </Link>
-        <Link to="/profile" style={{ color: "white" }}>
-          Profil
-        </Link>
+      {/* Navigation centrale */}
+      <nav className="nav-links">
+        {navLinks.map((link) => (
+          <Link
+            key={link.path}
+            to={link.path}
+            className={`nav-link ${isActive(link.path) ? "active" : ""}`}
+          >
+            <span style={{ marginRight: "6px" }}>{link.icon}</span>
+            {link.label}
+          </Link>
+        ))}
+      </nav>
 
-        <span style={{ opacity: 0.8 }}>
-          {user ? user.email : "Invité"}
-        </span>
-
-        <button
-          onClick={handleLogout}
-          style={{
-            padding: "6px 12px",
-            borderRadius: "999px",
-            border: "1px solid #444",
-            backgroundColor: "#222",
-            color: "white",
-            cursor: "pointer",
-          }}
-        >
+      {/* User section */}
+      <div className="nav-user">
+        {user && (
+          <span className="nav-email">
+            {user.username || user.email}
+          </span>
+        )}
+        <button className="nav-logout" onClick={handleLogout}>
           Déconnexion
         </button>
-      </nav>
+      </div>
     </header>
   );
 }

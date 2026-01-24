@@ -10,5 +10,8 @@ import java.util.Optional;
 @Repository
 public interface JoueurRepository extends JpaRepository<Joueur, Long> {
     Optional<Joueur> findByPseudo(String pseudo);
+    Optional<Joueur> findByEmail(String email);
+    boolean existsByEmail(String email);
+    boolean existsByPseudo(String pseudo);
     List<Joueur> findByEquipeId(Long equipeId);
 }
