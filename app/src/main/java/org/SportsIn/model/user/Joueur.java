@@ -2,6 +2,7 @@ package org.SportsIn.model.user;
 
 import jakarta.persistence.*;
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 /**
  * Représente un joueur (un utilisateur individuel).
@@ -15,6 +16,13 @@ public class Joueur {
 
     @Column(nullable = false, unique = true)
     private String pseudo;
+
+    @Column(nullable = false, unique = true)
+    private String email;
+
+    @Column(nullable = false)
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
+    private String password;
 
     // Plusieurs joueurs peuvent appartenir à la même équipe.
     // @JoinColumn spécifie la colonne de la base de données (dans la table Joueur)
@@ -32,10 +40,14 @@ public class Joueur {
     public Joueur() {
     }
 
-
-
     public Joueur(String pseudo) {
         this.pseudo = pseudo;
+    }
+
+    public Joueur(String pseudo, String email, String password) {
+        this.pseudo = pseudo;
+        this.email = email;
+        this.password = password;
     }
 
     // --- Getters et Setters ---
@@ -62,6 +74,22 @@ public class Joueur {
 
     public void setEquipe(Equipe equipe) {
         this.equipe = equipe;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
     }
 
     @Override

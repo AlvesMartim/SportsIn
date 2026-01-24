@@ -1,4 +1,5 @@
 import { createContext, useContext, useEffect, useState } from "react";
+import { authAPI } from "../api/api.js";
 
 const AuthContext = createContext(null);
 
@@ -19,14 +20,39 @@ export function AuthProvider({ children }) {
   }, []);
 
   async function login(email, password) {
-    const fakeToken = "FAKE_TOKEN";
-    const fakeUser = { id: 1, email, username: "Player1" };
+    const response = await authAPI.login(email, password);
 
-    setToken(fakeToken);
-    setUser(fakeUser);
+    if (!response.success) {
+      throw new Error(response.error || "Erreur de connexion");
+    }
 
-    localStorage.setItem("insport_token", fakeToken);
-    localStorage.setItem("insport_user", JSON.stringify(fakeUser));
+    const { token: newToken, user: userData } = response;
+
+    setToken(newToken);
+    setUser(userData);
+
+    localStorage.setItem("insport_token", newToken);
+    localStorage.setItem("insport_user", JSON.stringify(userData));
+
+    return userData;
+  }
+
+  async function register(pseudo, email, password) {
+    const response = await authAPI.register(pseudo, email, password);
+
+    if (!response.success) {
+      throw new Error(response.error || "Erreur lors de l'inscription");
+    }
+
+    const { token: newToken, user: userData } = response;
+
+    setToken(newToken);
+    setUser(userData);
+
+    localStorage.setItem("insport_token", newToken);
+    localStorage.setItem("insport_user", JSON.stringify(userData));
+
+    return userData;
   }
 
   function logout() {
@@ -34,6 +60,7 @@ export function AuthProvider({ children }) {
     setToken(null);
     localStorage.removeItem("insport_token");
     localStorage.removeItem("insport_user");
+    localStorage.removeItem("insport_team_id");
   }
 
   const value = {
@@ -42,6 +69,7 @@ export function AuthProvider({ children }) {
     isAuthenticated: !!token,
     loading,
     login,
+    register,
     logout,
   };
 
