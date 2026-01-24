@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { gameAPI, equipeAPI } from "../api/api.js";
+import { gameAPI } from "../api/api.js";
 
 function GameLobbyPage() {
   const { gameId } = useParams();
@@ -12,8 +12,12 @@ function GameLobbyPage() {
   const [starting, setStarting] = useState(false);
 
   // Pour rejoindre en tant qu'adversaire
-  const [availableTeams, setAvailableTeams] = useState([]);
   const [joining, setJoining] = useState(false);
+
+  // Timer et timeout pour l'attente
+  const [waitTime, setWaitTime] = useState(0);
+  const [cancelling, setCancelling] = useState(false);
+  const TIMEOUT_SECONDS = 120; // 2 minutes
 
   const loadGame = useCallback(async () => {
     try {
@@ -45,18 +49,31 @@ function GameLobbyPage() {
     return () => clearInterval(interval);
   }, [loadGame]);
 
+  // Timer pour afficher le temps d'attente
   useEffect(() => {
-    // Charger les équipes disponibles pour rejoindre
-    const loadTeams = async () => {
-      try {
-        const teams = await equipeAPI.getAll();
-        setAvailableTeams(teams);
-      } catch (err) {
-        console.error(err);
-      }
-    };
-    loadTeams();
-  }, []);
+    if (game?.state !== "WAITING") return;
+
+    const timer = setInterval(() => {
+      setWaitTime((prev) => prev + 1);
+    }, 1000);
+
+    return () => clearInterval(timer);
+  }, [game?.state]);
+
+  // Annuler la recherche et supprimer le game
+  const handleCancelSearch = async () => {
+    try {
+      setCancelling(true);
+      await gameAPI.delete(gameId);
+      navigate("/");
+    } catch (err) {
+      setError("Erreur lors de l'annulation");
+      console.error(err);
+    } finally {
+      setCancelling(false);
+    }
+  };
+
 
   const handleJoinGame = async (teamId) => {
     try {
@@ -284,19 +301,51 @@ function GameLobbyPage() {
           ) : (
             <div style={waitingStyle}>
               <div style={pulseStyle}></div>
-              <p style={{ opacity: 0.7 }}>En attente d'un adversaire...</p>
+              <p style={{ opacity: 0.7, marginBottom: "8px" }}>
+                Recherche d'une équipe adverse...
+              </p>
+              <p style={{
+                fontSize: "14px",
+                opacity: 0.5,
+                fontFamily: "monospace"
+              }}>
+                ⏱️ {Math.floor(waitTime / 60)}:{(waitTime % 60).toString().padStart(2, "0")}
+              </p>
+              {waitTime >= TIMEOUT_SECONDS && (
+                <p style={{
+                  color: "#ff9800",
+                  fontSize: "14px",
+                  marginTop: "12px"
+                }}>
+                  La recherche prend plus de temps que prévu...
+                </p>
+              )}
             </div>
           )}
         </div>
 
         {/* Actions */}
+        {isWaiting && isCreator && (
+          <button
+            style={{
+              ...buttonStyle,
+              background: "linear-gradient(135deg, #757575 0%, #616161 100%)",
+              marginBottom: "12px"
+            }}
+            onClick={handleCancelSearch}
+            disabled={cancelling}
+          >
+            {cancelling ? "Annulation..." : "❌ Annuler la recherche"}
+          </button>
+        )}
+
         {isMatched && isCreator && (
           <button
             style={buttonStyle}
             onClick={handleStartGame}
             disabled={starting}
           >
-            {starting ? "Démarrage..." : "Démarrer le match !"}
+            {starting ? "Démarrage..." : "🎮 Démarrer le match !"}
           </button>
         )}
 
@@ -322,15 +371,25 @@ function GameLobbyPage() {
           </div>
         )}
 
-        {/* Info sur l'arène */}
-        {game?.pointId && (
-          <div style={{ ...cardStyle, marginTop: "20px" }}>
-            <p style={{ margin: 0, fontSize: "12px", opacity: 0.7 }}>ARÈNE</p>
-            <p style={{ margin: "8px 0 0", fontWeight: "600" }}>
-              {game.pointId}
-            </p>
-          </div>
-        )}
+        {/* Info sur la partie */}
+        <div style={{ ...cardStyle, marginTop: "20px" }}>
+          {game?.sport?.code && (
+            <div style={{ marginBottom: "16px" }}>
+              <p style={{ margin: 0, fontSize: "12px", opacity: 0.7 }}>SPORT</p>
+              <p style={{ margin: "8px 0 0", fontWeight: "600", fontSize: "18px" }}>
+                🏆 {game.sport.code}
+              </p>
+            </div>
+          )}
+          {game?.pointId && (
+            <div>
+              <p style={{ margin: 0, fontSize: "12px", opacity: 0.7 }}>ARÈNE</p>
+              <p style={{ margin: "8px 0 0", fontWeight: "600" }}>
+                📍 {game.pointId}
+              </p>
+            </div>
+          )}
+        </div>
       </main>
 
       <style>{`

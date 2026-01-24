@@ -67,13 +67,34 @@ function CreateGamePage() {
       return;
     }
 
+    if (!selectedSport) {
+      setError("Veuillez sélectionner un sport pour le matchmaking");
+      return;
+    }
+
     try {
       setCreating(true);
       setError(null);
 
+      // 1. Chercher d'abord un game existant compatible (auto-match)
+      const waitingGames = await gameAPI.getWaitingAtPoint(selectedArena);
+      const compatibleGame = waitingGames.find(
+        (g) =>
+          g.sport?.code === selectedSport &&
+          g.creatorTeam?.id !== playerTeam.id
+      );
+
+      if (compatibleGame) {
+        // 2. Rejoindre le game existant automatiquement
+        await gameAPI.join(compatibleGame.id, playerTeam.id);
+        navigate(`/game/lobby/${compatibleGame.id}`);
+        return;
+      }
+
+      // 3. Sinon créer un nouveau game et attendre
       const gameData = {
         pointId: selectedArena,
-        sport: selectedSport ? { code: selectedSport } : null,
+        sport: { code: selectedSport },
         creatorTeam: playerTeam,
       };
 
@@ -201,24 +222,31 @@ function CreateGamePage() {
               )}
             </div>
 
-            {/* Sport (si disponible) */}
-            {sports.length > 0 && selectedArenaData && (
-              <div className="create-game-card">
-                <span className="create-game-label">Sport (optionnel)</span>
+            {/* Sport (obligatoire pour le matchmaking) */}
+            <div className="create-game-card">
+              <span className="create-game-label">Sport</span>
+              {sports.length > 0 ? (
                 <select
                   className="select"
                   value={selectedSport}
                   onChange={(e) => setSelectedSport(e.target.value)}
+                  required
                 >
-                  <option value="">Tous les sports</option>
+                  <option value="">-- Choisir un sport --</option>
                   {sports.map((sport) => (
                     <option key={sport.id || sport.code} value={sport.code}>
                       {sport.nom || sport.code}
                     </option>
                   ))}
                 </select>
-              </div>
-            )}
+              ) : (
+                <div className="create-game-warning-inline">
+                  <span>⚠️</span>
+                  <span>Chargement des sports en cours...</span>
+                </div>
+              )}
+              <p className="create-game-hint">Le sport est requis pour trouver un adversaire compatible</p>
+            </div>
 
             {/* Preview */}
             {selectedArenaData && (
