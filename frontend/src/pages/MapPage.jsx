@@ -8,7 +8,7 @@ import markerIcon2x from "leaflet/dist/images/marker-icon-2x.png";
 import markerIcon from "leaflet/dist/images/marker-icon.png";
 import markerShadow from "leaflet/dist/images/marker-shadow.png";
 
-import { areneAPI, routeAPI, zoneAPI, gameAPI, equipeAPI } from "../api/api.js";
+import { areneAPI, routeAPI, zoneAPI, gameAPI, equipeAPI, missionAPI } from "../api/api.js";
 import { useAuth } from "../context/AuthContext.jsx";
 import Header from "../components/Header.jsx";
 import "../styles/map.css";
@@ -40,6 +40,16 @@ const areneIcon = L.icon({
   shadowSize: [41, 41],
 });
 
+const areneMissionIcon = L.icon({
+  iconUrl: "https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-gold.png",
+  shadowUrl: markerShadow,
+  iconSize: [30, 49],
+  iconAnchor: [15, 49],
+  popupAnchor: [1, -40],
+  shadowSize: [41, 41],
+  className: "mission-marker",
+});
+
 const CENTER_FRANCE = [46.2276, 2.2137];
 
 function MapController({ playerLocation, onRecenter }) {
@@ -69,6 +79,24 @@ const TEAM_COLORS = {
 
 const getTeamColor = (teamId) => TEAM_COLORS[teamId] || TEAM_COLORS.default;
 
+const MISSION_TYPE_LABELS = {
+  RECAPTURE_RECENT_LOSS: "Reconquête",
+  BREAK_ROUTE: "Rupture de route",
+  DIVERSITY_SPORT: "Diversité sport",
+};
+const formatMissionType = (type) => MISSION_TYPE_LABELS[type] || type;
+
+const formatTimeRemaining = (endsAt) => {
+  if (!endsAt) return "";
+  const diff = new Date(endsAt) - new Date();
+  if (diff <= 0) return "Expiré";
+  const hours = Math.floor(diff / 3_600_000);
+  const days = Math.floor(hours / 24);
+  if (days > 0) return `${days}j ${hours % 24}h`;
+  const mins = Math.floor((diff % 3_600_000) / 60_000);
+  return `${hours}h ${mins}min`;
+};
+
 function MapPage() {
   const { user } = useAuth();
   const navigate = useNavigate();
@@ -86,6 +114,8 @@ function MapPage() {
   const [showArenas, setShowArenas] = useState(true);
   const [launchingGame, setLaunchingGame] = useState(null);
   const [showLegend, setShowLegend] = useState(false);
+  const [missions, setMissions] = useState([]);
+  const [missionsByArena, setMissionsByArena] = useState({});
 
   const handleLaunchGame = async (arene) => {
     const teamId = localStorage.getItem("insport_team_id");
@@ -135,15 +165,39 @@ function MapPage() {
     async function fetchData() {
       try {
         setLoading(true);
-        const [arenesData, routesData, zonesData] = await Promise.all([
+        const teamId = localStorage.getItem("insport_team_id");
+
+        const [arenesData, routesData, zonesData, missionsData] = await Promise.all([
           areneAPI.getAll().catch(() => []),
           routeAPI.getAll().catch(() => []),
           zoneAPI.getAll().catch(() => []),
+          teamId ? missionAPI.getByTeam(teamId, "ACTIVE").catch(() => []) : Promise.resolve([]),
         ]);
 
         setArenes(Array.isArray(arenesData) ? arenesData : []);
         setRoutes(Array.isArray(routesData) ? routesData : []);
         setZones(Array.isArray(zonesData) ? zonesData : []);
+
+        const mList = Array.isArray(missionsData) ? missionsData : [];
+        setMissions(mList);
+
+        // Construire un index arenaId -> missions[]
+        // On fetche le détail de chaque mission pour avoir le payload avec arenaId
+        const arenaMap = {};
+        const details = await Promise.all(
+          mList.map((m) => missionAPI.getById(m.id).catch(() => null))
+        );
+        for (const detail of details) {
+          if (!detail || !detail.payload) continue;
+          const arenaId = detail.payload.arenaId || detail.payload.pointId;
+          if (arenaId != null) {
+            const key = String(arenaId);
+            if (!arenaMap[key]) arenaMap[key] = [];
+            arenaMap[key].push(detail);
+          }
+        }
+        setMissionsByArena(arenaMap);
+
         setError(null);
       } catch (err) {
         setError(`Erreur: ${err.message}`);
@@ -226,32 +280,73 @@ function MapPage() {
             );
           })}
 
-          {showArenas && arenes.map((arene) => (
-            <Marker key={arene.id} position={[arene.latitude, arene.longitude]} icon={areneIcon}>
-              <Popup className="map-popup map-popup--arena">
-                <div className="map-popup-content">
-                  <h4>{arene.nom || `Arène ${arene.id}`}</h4>
-                  {arene.sportsDisponibles?.length > 0 && (
-                    <div className="map-popup-sports">
-                      {arene.sportsDisponibles.map((sport) => (
-                        <span key={sport} className="map-popup-sport">{sport}</span>
-                      ))}
-                    </div>
-                  )}
-                  {arene.controllingTeamId && (
-                    <p className="map-popup-meta">Contrôlée par Équipe {arene.controllingTeamId}</p>
-                  )}
-                  <button
-                    className="map-popup-action"
-                    onClick={() => handleLaunchGame(arene)}
-                    disabled={launchingGame === arene.id}
-                  >
-                    {launchingGame === arene.id ? "Création..." : "⚔️ Lancer un jeu"}
-                  </button>
-                </div>
-              </Popup>
-            </Marker>
-          ))}
+          {showArenas && arenes.map((arene) => {
+            const arenaMissions = missionsByArena[String(arene.id)] || [];
+            const hasMission = arenaMissions.length > 0;
+
+            return (
+              <Marker
+                key={arene.id}
+                position={[arene.latitude, arene.longitude]}
+                icon={hasMission ? areneMissionIcon : areneIcon}
+              >
+                <Popup className={`map-popup map-popup--arena${hasMission ? " map-popup--mission" : ""}`} maxWidth={320}>
+                  <div className="map-popup-content">
+                    {/* Section 1 : Infos arène */}
+                    <h4>{arene.nom || `Arène ${arene.id}`}</h4>
+                    {arene.sportsDisponibles?.length > 0 && (
+                      <div className="map-popup-sports">
+                        {arene.sportsDisponibles.map((sport) => (
+                          <span key={sport} className="map-popup-sport">{sport}</span>
+                        ))}
+                      </div>
+                    )}
+                    {arene.controllingTeamId && (
+                      <p className="map-popup-meta">Contrôlée par Équipe {arene.controllingTeamId}</p>
+                    )}
+                    <button
+                      className="map-popup-action"
+                      onClick={() => handleLaunchGame(arene)}
+                      disabled={launchingGame === arene.id}
+                    >
+                      {launchingGame === arene.id ? "Création..." : "⚔️ Lancer un jeu"}
+                    </button>
+
+                    {/* Section 2 : Missions actives sur cette arène */}
+                    {hasMission && (
+                      <div className="map-popup-missions">
+                        <div className="map-popup-missions-header">Missions actives</div>
+                        {arenaMissions.map((mission) => (
+                          <div key={mission.id} className="map-popup-mission-card">
+                            <div className="map-popup-mission-type">{formatMissionType(mission.type)}</div>
+                            <div className="map-popup-mission-title">{mission.title}</div>
+                            {mission.description && (
+                              <div className="map-popup-mission-desc">{mission.description}</div>
+                            )}
+                            <div className="map-popup-mission-progress">
+                              <div className="map-popup-mission-bar">
+                                <div
+                                  className="map-popup-mission-bar-fill"
+                                  style={{ width: `${Math.min(100, (mission.progressCurrent / mission.progressTarget) * 100)}%` }}
+                                />
+                              </div>
+                              <span>{mission.progressCurrent}/{mission.progressTarget}</span>
+                            </div>
+                            <div className="map-popup-mission-footer">
+                              <span className="map-popup-mission-reward">+{mission.rewardTeamPoints} pts</span>
+                              <span className="map-popup-mission-timer">
+                                {formatTimeRemaining(mission.endsAt)}
+                              </span>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                </Popup>
+              </Marker>
+            );
+          })}
         </MapContainer>
 
         {/* Status bar */}
