@@ -2,11 +2,13 @@ package org.SportsIn.services;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.SportsIn.model.Arene;
 import org.SportsIn.model.Session;
 import org.SportsIn.model.SessionRepository;
 import org.SportsIn.model.SessionState;
 import org.SportsIn.model.mission.*;
 import org.SportsIn.model.territory.*;
+import org.SportsIn.repository.AreneRepository;
 import org.SportsIn.repository.EquipeRepository;
 import org.SportsIn.repository.MissionRepository;
 import org.springframework.stereotype.Service;
@@ -28,28 +30,25 @@ public class MissionEvaluationService {
 
     private final MissionRepository missionRepository;
     private final EquipeRepository equipeRepository;
+    private final AreneRepository areneRepository;
     private final PointSportifRepository pointRepository;
     private final RouteRepository routeRepository;
     private final SessionRepository sessionRepository;
-    private final TerritoryService territoryService;
 
     public MissionEvaluationService(MissionRepository missionRepository,
                                     EquipeRepository equipeRepository,
+                                    AreneRepository areneRepository,
                                     PointSportifRepository pointRepository,
                                     RouteRepository routeRepository,
-                                    SessionRepository sessionRepository,
-                                    TerritoryService territoryService) {
+                                    SessionRepository sessionRepository) {
         this.missionRepository = missionRepository;
         this.equipeRepository = equipeRepository;
+        this.areneRepository = areneRepository;
         this.pointRepository = pointRepository;
         this.routeRepository = routeRepository;
         this.sessionRepository = sessionRepository;
-        this.territoryService = territoryService;
     }
 
-    /**
-     * Évalue une mission spécifique et met à jour son statut.
-     */
     @Transactional
     public Mission evaluateMission(Long missionId) {
         Mission mission = missionRepository.findById(missionId)
@@ -59,7 +58,6 @@ public class MissionEvaluationService {
             return mission;
         }
 
-        // Vérifier expiration d'abord
         if (mission.isExpired()) {
             mission.setStatus(MissionStatus.EXPIRED);
             mission.setLastEvaluatedAt(Instant.now().toString());
@@ -77,9 +75,6 @@ public class MissionEvaluationService {
         return missionRepository.save(mission);
     }
 
-    /**
-     * Évalue toutes les missions actives d'une équipe.
-     */
     @Transactional
     public void evaluateActiveMissionsForTeam(Long teamId) {
         List<Mission> activeMissions = missionRepository.findActiveByTeam(teamId);
@@ -88,9 +83,6 @@ public class MissionEvaluationService {
         }
     }
 
-    /**
-     * Expire toutes les missions actives dont la date de fin est dépassée.
-     */
     @Transactional
     public void expireActiveMissions() {
         String now = Instant.now().toString();
@@ -102,9 +94,6 @@ public class MissionEvaluationService {
         }
     }
 
-    /**
-     * Évalue toutes les missions actives (toutes équipes).
-     */
     @Transactional
     public void evaluateAllActiveMissions() {
         List<Mission> allActive = missionRepository.findAllActive();
@@ -122,17 +111,31 @@ public class MissionEvaluationService {
     }
 
     /**
-     * RECAPTURE: SUCCESS si l'équipe contrôle à nouveau le point payload.pointId
+     * RECAPTURE: SUCCESS si l'équipe contrôle l'arène (arenaId) ou le point (pointId).
      */
     private boolean evaluateRecapture(Mission mission, Map<String, Object> payload) {
+        // D'abord essayer avec arenaId (nouveau format, String)
+        Object arenaIdObj = payload.get("arenaId");
+        if (arenaIdObj != null) {
+            String arenaId = arenaIdObj.toString();
+            Optional<Arene> areneOpt = areneRepository.findById(arenaId);
+            if (areneOpt.isPresent()) {
+                Arene arene = areneOpt.get();
+                if (arene.getControllingTeam() != null
+                        && mission.getTeamId().equals(arene.getControllingTeam().getId())) {
+                    mission.setProgressCurrent(1);
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        // Fallback: pointId (ancien format, Long) pour compatibilité in-memory
         Long pointId = toLong(payload.get("pointId"));
         if (pointId == null) return false;
-
         Optional<PointSportif> pointOpt = pointRepository.findById(pointId);
         if (pointOpt.isEmpty()) return false;
-
-        PointSportif point = pointOpt.get();
-        if (mission.getTeamId().equals(point.getControllingTeamId())) {
+        if (mission.getTeamId().equals(pointOpt.get().getControllingTeamId())) {
             mission.setProgressCurrent(1);
             return true;
         }
@@ -140,25 +143,26 @@ public class MissionEvaluationService {
     }
 
     /**
-     * DIVERSITY: SUCCESS si une session du sport payload.sportId a été terminée
-     * dans la zone/point après startsAt.
+     * DIVERSITY: SUCCESS si une session du sport (sportCode) a été terminée
+     * sur l'arène (arenaId) après startsAt.
      */
     private boolean evaluateDiversity(Mission mission, Map<String, Object> payload) {
-        Long sportId = toLong(payload.get("sportId"));
-        Object pointIdObj = payload.get("pointId");
-        if (sportId == null) return false;
+        Object arenaIdObj = payload.get("arenaId");
+        Object sportCodeObj = payload.get("sportCode");
+        if (sportCodeObj == null) return false;
+        String sportCode = sportCodeObj.toString();
 
         Instant startsAt = mission.getStartsAtInstant();
         List<Session> terminated = sessionRepository.findByState(SessionState.TERMINATED);
 
         for (Session s : terminated) {
             if (s.getSport() == null || s.getEndedAt() == null) continue;
-            if (!sportId.equals(s.getSport().getId())) continue;
+            if (!sportCode.equals(s.getSport().getCode())) continue;
 
-            // Vérifier le point si spécifié
-            if (pointIdObj != null) {
-                String expectedPointId = pointIdObj.toString();
-                if (!expectedPointId.equals(s.getPointId())) continue;
+            // Vérifier l'arène si spécifié
+            if (arenaIdObj != null) {
+                String expectedArenaId = arenaIdObj.toString();
+                if (!expectedArenaId.equals(s.getPointId())) continue;
             }
 
             Instant endedInstant = s.getEndedAt().atZone(java.time.ZoneId.systemDefault()).toInstant();
@@ -171,20 +175,32 @@ public class MissionEvaluationService {
     }
 
     /**
-     * BREAK_ROUTE: SUCCESS si l'équipe contrôle au moins 1 point appartenant
-     * à la route payload.routeId (cassant le combo adverse).
+     * BREAK_ROUTE: SUCCESS si l'équipe contrôle l'arène (arenaId) ou un point de la route.
      */
     private boolean evaluateBreakRoute(Mission mission, Map<String, Object> payload) {
+        // D'abord essayer avec arenaId (nouveau format)
+        Object arenaIdObj = payload.get("arenaId");
+        if (arenaIdObj != null) {
+            String arenaId = arenaIdObj.toString();
+            Optional<Arene> areneOpt = areneRepository.findById(arenaId);
+            if (areneOpt.isPresent()) {
+                Arene arene = areneOpt.get();
+                if (arene.getControllingTeam() != null
+                        && mission.getTeamId().equals(arene.getControllingTeam().getId())) {
+                    mission.setProgressCurrent(1);
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        // Fallback: routeId (ancien format) pour compatibilité in-memory
         Long routeId = toLong(payload.get("routeId"));
         if (routeId == null) return false;
-
         Optional<Route> routeOpt = routeRepository.findById(routeId);
         if (routeOpt.isEmpty()) return false;
-
-        Route route = routeOpt.get();
-        boolean teamControlsAPoint = route.getPoints().stream()
+        boolean teamControlsAPoint = routeOpt.get().getPoints().stream()
                 .anyMatch(p -> mission.getTeamId().equals(p.getControllingTeamId()));
-
         if (teamControlsAPoint) {
             mission.setProgressCurrent(1);
             return true;
@@ -192,28 +208,20 @@ public class MissionEvaluationService {
         return false;
     }
 
-    /**
-     * Marque la mission comme SUCCESS, attribue les récompenses à l'équipe,
-     * et déclenche le hook de recompute route si applicable.
-     */
     private void completeMissionSuccess(Mission mission) {
         mission.setStatus(MissionStatus.SUCCESS);
         mission.setCompletedAt(Instant.now().toString());
 
-        // Attribuer les récompenses
         equipeRepository.findById(mission.getTeamId()).ifPresent(equipe -> {
             equipe.setPoints(equipe.getPoints() + mission.getRewardTeamPoints());
             equipe.setXp(equipe.getXp() + mission.getRewardTeamXp());
             equipeRepository.save(equipe);
         });
 
-        // Hook: recompute route si mission BREAK_ROUTE
         if (mission.getType() == MissionType.BREAK_ROUTE) {
             Map<String, Object> payload = parsePayload(mission.getPayloadJson());
             Long routeId = toLong(payload.get("routeId"));
             if (routeId != null) {
-                // TODO: appeler routeService.recompute(routeId) quand le service le supportera.
-                // Pour l'instant, on log un message et on recalcule les bonus via TerritoryService.
                 System.out.println(">>> HOOK: Route " + routeId + " combo cassé par équipe " + mission.getTeamId());
             }
         }

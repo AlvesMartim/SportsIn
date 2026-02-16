@@ -156,6 +156,19 @@ export const gameAPI = {
   delete: async (id) => fetchAPI(`/games/${id}`, { method: 'DELETE' }),
 };
 
+/**
+ * ========== MISSION ==========
+ */
+export const missionAPI = {
+  getByTeam: async (teamId, status) => {
+    const query = status ? `?status=${status}` : '';
+    return fetchAPI(`/teams/${teamId}/missions${query}`);
+  },
+  getById: async (missionId) => fetchAPI(`/missions/${missionId}`),
+  generate: async (teamId) => fetchAPI(`/teams/${teamId}/missions/generate`, { method: 'POST' }),
+  refresh: async (missionId) => fetchAPI(`/missions/${missionId}/refresh`, { method: 'POST' }),
+};
+
 export default {
   authAPI,
   equipeAPI,
@@ -167,4 +180,5 @@ export default {
   routeAPI,
   zoneAPI,
   gameAPI,
+  missionAPI,
 };
