@@ -4,7 +4,9 @@
 -- Table EQUIPE
 CREATE TABLE IF NOT EXISTS equipe (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
-    nom TEXT NOT NULL UNIQUE
+    nom TEXT NOT NULL UNIQUE,
+    points INTEGER NOT NULL DEFAULT 0,
+    xp INTEGER NOT NULL DEFAULT 0
 );
 
 -- Table JOUEUR
@@ -77,6 +79,28 @@ CREATE TABLE IF NOT EXISTS metric_value (
     FOREIGN KEY (session_id) REFERENCES session(id) ON DELETE CASCADE
 );
 
+-- Table MISSION (Feature 5: Missions dynamiques de conquête / défense)
+CREATE TABLE IF NOT EXISTS mission (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    team_id INTEGER NOT NULL,
+    type TEXT NOT NULL CHECK (type IN ('RECAPTURE_RECENT_LOSS', 'BREAK_ROUTE', 'DIVERSITY_SPORT')),
+    status TEXT NOT NULL DEFAULT 'ACTIVE' CHECK (status IN ('ACTIVE', 'SUCCESS', 'FAILED', 'EXPIRED')),
+    title TEXT NOT NULL,
+    description TEXT,
+    priority TEXT NOT NULL DEFAULT 'MEDIUM' CHECK (priority IN ('LOW', 'MEDIUM', 'HIGH')),
+    reward_team_points INTEGER NOT NULL DEFAULT 0,
+    reward_team_xp INTEGER NOT NULL DEFAULT 0,
+    created_at TEXT NOT NULL,
+    starts_at TEXT NOT NULL,
+    ends_at TEXT NOT NULL,
+    completed_at TEXT,
+    payload_json TEXT,
+    progress_current INTEGER NOT NULL DEFAULT 0,
+    progress_target INTEGER NOT NULL DEFAULT 1,
+    last_evaluated_at TEXT,
+    FOREIGN KEY (team_id) REFERENCES equipe(id) ON DELETE CASCADE
+);
+
 -- Index pour améliorer les performances des requêtes fréquentes
 CREATE INDEX IF NOT EXISTS idx_joueur_equipe_id ON joueur(equipe_id);
 CREATE INDEX IF NOT EXISTS idx_arene_equipe_controle ON arene(equipe_controle);
@@ -84,4 +108,7 @@ CREATE INDEX IF NOT EXISTS idx_session_sport_id ON session(sport_id);
 CREATE INDEX IF NOT EXISTS idx_session_state ON session(state);
 CREATE INDEX IF NOT EXISTS idx_metric_value_session_id ON metric_value(session_id);
 CREATE INDEX IF NOT EXISTS idx_session_participant_session_id ON session_participant(session_id);
+CREATE INDEX IF NOT EXISTS idx_mission_team_id ON mission(team_id);
+CREATE INDEX IF NOT EXISTS idx_mission_status ON mission(status);
+CREATE INDEX IF NOT EXISTS idx_mission_team_status ON mission(team_id, status);
 

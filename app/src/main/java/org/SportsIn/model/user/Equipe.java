@@ -19,6 +19,12 @@ public class Equipe {
     @Column(nullable = false, unique = true)
     private String nom;
 
+    @Column(nullable = false)
+    private int points = 0;
+
+    @Column(nullable = false)
+    private int xp = 0;
+
     // Une équipe peut avoir plusieurs joueurs.
     // mappedBy = "equipe" indique que c'est l'entité Joueur qui gère la relation.
     // CascadeType.ALL signifie que les opérations (création, suppression) sur l'équipe
@@ -64,6 +70,22 @@ public class Equipe {
 
     public void setMembres(List<Joueur> membres) {
         this.membres = membres;
+    }
+
+    public int getPoints() {
+        return points;
+    }
+
+    public void setPoints(int points) {
+        this.points = points;
+    }
+
+    public int getXp() {
+        return xp;
+    }
+
+    public void setXp(int xp) {
+        this.xp = xp;
     }
 
     // --- Méthodes utilitaires ---
