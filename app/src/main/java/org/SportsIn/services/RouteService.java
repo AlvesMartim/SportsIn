@@ -1,6 +1,6 @@
 package org.SportsIn.services;
 
-import org.SportsIn.model.territory.PointSportif;
+import org.SportsIn.model.Arene;
 import org.SportsIn.model.territory.Route;
 import org.SportsIn.model.territory.RouteBonus;
 
@@ -12,8 +12,8 @@ import java.util.List;
  */
 public class RouteService {
 
-    // Seuil minimal de points consécutifs pour déclencher un bonus
-    private static final int MIN_CONSECUTIVE_POINTS_FOR_BONUS = 3;
+    // Seuil minimal d'arènes consécutives pour déclencher un bonus
+    private static final int MIN_CONSECUTIVE_ARENES_FOR_BONUS = 3;
 
     /**
      * Calcule les bonus actifs pour une équipe donnée sur une liste de routes.
@@ -26,11 +26,9 @@ public class RouteService {
         List<RouteBonus> bonuses = new ArrayList<>();
 
         for (Route route : routes) {
-            int maxConsecutive = getMaxConsecutivePoints(route, teamId);
+            int maxConsecutive = getMaxConsecutiveArenes(route, teamId);
 
-            if (maxConsecutive >= MIN_CONSECUTIVE_POINTS_FOR_BONUS) {
-                // Exemple de règle : 10% de bonus si >= 3 points
-                // On pourrait complexifier la règle ici ou la sortir dans une stratégie
+            if (maxConsecutive >= MIN_CONSECUTIVE_ARENES_FOR_BONUS) {
                 double bonusValue = 0.10; 
                 bonuses.add(new RouteBonus(teamId, route, maxConsecutive, "SCORE_MULTIPLIER", bonusValue));
             }
@@ -40,23 +38,23 @@ public class RouteService {
     }
 
     /**
-     * Détermine le nombre maximum de points consécutifs contrôlés par une équipe sur une route.
+     * Détermine le nombre maximum d'arènes consécutives contrôlées par une équipe sur une route.
      *
      * @param route La route à analyser.
      * @param teamId L'ID de l'équipe.
-     * @return Le nombre maximum de points consécutifs.
+     * @return Le nombre maximum d'arènes consécutives.
      */
-    public int getMaxConsecutivePoints(Route route, Long teamId) {
-        List<PointSportif> points = route.getPoints();
-        if (points == null || points.isEmpty()) {
+    public int getMaxConsecutiveArenes(Route route, Long teamId) {
+        List<Arene> arenes = route.getArenes();
+        if (arenes == null || arenes.isEmpty()) {
             return 0;
         }
 
         int maxConsecutive = 0;
         int currentConsecutive = 0;
 
-        for (PointSportif point : points) {
-            if (teamId.equals(point.getControllingTeamId())) {
+        for (Arene arene : arenes) {
+            if (teamId.equals(arene.getControllingTeamId())) {
                 currentConsecutive++;
             } else {
                 if (currentConsecutive > maxConsecutive) {

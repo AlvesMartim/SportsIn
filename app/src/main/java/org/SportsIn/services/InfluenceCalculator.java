@@ -16,7 +16,7 @@ public class InfluenceCalculator {
                 .toList();
     }
 
-    public double computeTotalModifier(Long teamId, Long pointId) {
+    public double computeTotalModifier(Long teamId, String pointId) {
         double modifier = 0.0;
         for (InfluenceModifier mod : modifiers) {
             modifier = mod.apply(teamId, pointId, modifier);

@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext.jsx";
-import { equipeAPI, joueurAPI, areneAPI } from "../api/api.js";
+import { equipeAPI, joueurAPI, areneAPI, progressionAPI } from "../api/api.js";
 import Header from "../components/Header.jsx";
 import "../styles/team.css";
 
@@ -15,6 +15,8 @@ function TeamPage() {
   const [teamMembers, setTeamMembers] = useState([]);
   const [controlledArenas, setControlledArenas] = useState([]);
   const [availableTeams, setAvailableTeams] = useState([]);
+
+  const [progression, setProgression] = useState(null);
 
   const [showCreateForm, setShowCreateForm] = useState(false);
   const [newTeamName, setNewTeamName] = useState("");
@@ -55,6 +57,13 @@ function TeamPage() {
 
           const arenas = await areneAPI.getByEquipe(savedTeamId);
           setControlledArenas(arenas);
+
+          try {
+            const prog = await progressionAPI.getProgression(savedTeamId);
+            setProgression(prog);
+          } catch (e) {
+            console.warn('Progression non disponible:', e);
+          }
         } catch (e) {
           localStorage.removeItem("insport_team_id");
           setAvailableTeams(teams);
@@ -178,8 +187,12 @@ function TeamPage() {
                   <span className="team-stat__label">Arènes</span>
                 </div>
                 <div className="team-stat">
-                  <span className="team-stat__value">--</span>
-                  <span className="team-stat__label">Victoires</span>
+                  <span className="team-stat__value">{progression ? progression.level : '--'}</span>
+                  <span className="team-stat__label">Niveau</span>
+                </div>
+                <div className="team-stat">
+                  <span className="team-stat__value">{progression ? progression.xp : '--'}</span>
+                  <span className="team-stat__label">XP</span>
                 </div>
               </div>
             </div>
@@ -233,6 +246,40 @@ function TeamPage() {
                 </ul>
               </div>
             )}
+
+            {/* Progression */}
+            <div className="team-card">
+              <div className="team-card__header">
+                <h3>Progression</h3>
+                {progression && <span className="badge badge-primary">Niv. {progression.level}</span>}
+              </div>
+              {progression ? (
+                <div style={{ marginBottom: 16 }}>
+                  <div style={{ display: "flex", justifyContent: "space-between", fontSize: "0.85rem", color: "var(--gray-400)", marginBottom: 6 }}>
+                    <span>{progression.xp} XP</span>
+                    {progression.level < (progression.maxLevel || 10) ? (
+                      <span>{progression.xpForNextLevel} XP avant niv. {progression.level + 1}</span>
+                    ) : (
+                      <span>Niveau max 🏆</span>
+                    )}
+                  </div>
+                  <div style={{ width: "100%", height: 10, background: "rgba(255,255,255,0.08)", borderRadius: 999, overflow: "hidden" }}>
+                    <div style={{
+                      height: "100%",
+                      borderRadius: 999,
+                      background: "linear-gradient(90deg, #8b5cf6, #a78bfa)",
+                      width: progression.level >= (progression.maxLevel || 10) ? "100%" : "50%",
+                      transition: "width 0.6s ease",
+                    }} />
+                  </div>
+                </div>
+              ) : (
+                <p style={{ color: "var(--gray-500)", textAlign: "center" }}>Chargement...</p>
+              )}
+              <button className="btn btn-secondary w-full" onClick={() => navigate("/progression")}>
+                📈 Voir la progression et les perks
+              </button>
+            </div>
 
             <button className="btn btn-danger w-full" onClick={handleLeaveTeam}>
               Quitter l'équipe

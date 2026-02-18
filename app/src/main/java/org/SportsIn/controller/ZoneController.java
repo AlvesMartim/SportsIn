@@ -31,8 +31,8 @@ public class ZoneController {
                 .orElseGet(() -> ResponseEntity.notFound().build());
     }
 
-    @GetMapping("/point/{pointId}")
-    public ResponseEntity<List<Zone>> getByPointId(@NonNull @PathVariable Long pointId) {
-        return ResponseEntity.ok(zoneService.getZonesByPointId(pointId));
+    @GetMapping("/arene/{areneId}")
+    public ResponseEntity<List<Zone>> getByAreneId(@NonNull @PathVariable String areneId) {
+        return ResponseEntity.ok(zoneService.getZonesByAreneId(areneId));
     }
 }

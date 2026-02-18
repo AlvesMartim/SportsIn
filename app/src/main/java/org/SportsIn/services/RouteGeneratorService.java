@@ -1,6 +1,6 @@
 package org.SportsIn.services;
 
-import org.SportsIn.model.territory.PointSportif;
+import org.SportsIn.model.Arene;
 import org.SportsIn.model.territory.Route;
 import org.SportsIn.utils.GeoUtils;
 
@@ -15,63 +15,56 @@ import java.util.Set;
 public class RouteGeneratorService {
 
     /**
-     * Génère des routes en reliant les points les plus proches (Algorithme Greedy Nearest Neighbor).
+     * Génère des routes en reliant les arènes les plus proches (Algorithme Greedy Nearest Neighbor).
      *
-     * @param allPoints Liste de tous les points disponibles.
-     * @param maxJumpDistanceKm Distance maximale entre deux points pour les relier (ex: 1.5 km).
-     * @param minPointsPerRoute Taille minimale d'une route pour être validée (ex: 3 points).
+     * @param allArenes Liste de toutes les arènes disponibles.
+     * @param maxJumpDistanceKm Distance maximale entre deux arènes pour les relier (ex: 1.5 km).
+     * @param minArenesPerRoute Taille minimale d'une route pour être validée (ex: 3 arènes).
      * @return Liste des routes générées.
      */
-    public List<Route> generateRoutes(List<PointSportif> allPoints, double maxJumpDistanceKm, int minPointsPerRoute) {
+    public List<Route> generateRoutes(List<Arene> allArenes, double maxJumpDistanceKm, int minArenesPerRoute) {
         List<Route> routes = new ArrayList<>();
-        Set<Long> visitedPoints = new HashSet<>();
+        Set<String> visitedArenes = new HashSet<>();
         long routeIdCounter = 1;
 
-        // On essaie de démarrer une route à partir de chaque point non visité
-        for (PointSportif startPoint : allPoints) {
-            if (visitedPoints.contains(startPoint.getId())) {
+        for (Arene startArene : allArenes) {
+            if (visitedArenes.contains(startArene.getId())) {
                 continue;
             }
 
-            List<PointSportif> currentRoutePoints = new ArrayList<>();
-            currentRoutePoints.add(startPoint);
-            visitedPoints.add(startPoint.getId());
+            List<Arene> currentRouteArenes = new ArrayList<>();
+            currentRouteArenes.add(startArene);
+            visitedArenes.add(startArene.getId());
 
-            PointSportif currentPoint = startPoint;
+            Arene currentArene = startArene;
 
-            // On étend la route tant qu'on trouve un voisin proche
             while (true) {
-                PointSportif nearestNeighbor = findNearestUnvisitedNeighbor(currentPoint, allPoints, visitedPoints, maxJumpDistanceKm);
+                Arene nearestNeighbor = findNearestUnvisitedNeighbor(currentArene, allArenes, visitedArenes, maxJumpDistanceKm);
 
                 if (nearestNeighbor != null) {
-                    currentRoutePoints.add(nearestNeighbor);
-                    visitedPoints.add(nearestNeighbor.getId());
-                    currentPoint = nearestNeighbor; // On avance
+                    currentRouteArenes.add(nearestNeighbor);
+                    visitedArenes.add(nearestNeighbor.getId());
+                    currentArene = nearestNeighbor;
                 } else {
-                    break; // Plus de voisin, fin de la route
+                    break;
                 }
             }
 
-            // Si la route est assez longue, on la garde
-            if (currentRoutePoints.size() >= minPointsPerRoute) {
-                String routeName = "Route " + routeIdCounter + " (" + startPoint.getNom() + " -> " + currentPoint.getNom() + ")";
-                Route route = new Route(routeIdCounter++, routeName, "Générée automatiquement", currentRoutePoints);
+            if (currentRouteArenes.size() >= minArenesPerRoute) {
+                String routeName = "Route " + routeIdCounter + " (" + startArene.getNom() + " -> " + currentArene.getNom() + ")";
+                Route route = new Route(routeIdCounter++, routeName, "Générée automatiquement", currentRouteArenes);
                 routes.add(route);
-            } else {
-                // Optionnel : Si la route est trop courte, on pourrait "libérer" les points (retirer de visitedPoints)
-                // pour qu'ils puissent être pris par une autre route partant d'ailleurs.
-                // Pour simplifier ici, on considère qu'ils sont isolés.
             }
         }
 
         return routes;
     }
 
-    private PointSportif findNearestUnvisitedNeighbor(PointSportif current, List<PointSportif> allPoints, Set<Long> visited, double maxDist) {
-        PointSportif nearest = null;
+    private Arene findNearestUnvisitedNeighbor(Arene current, List<Arene> allArenes, Set<String> visited, double maxDist) {
+        Arene nearest = null;
         double minDistance = Double.MAX_VALUE;
 
-        for (PointSportif candidate : allPoints) {
+        for (Arene candidate : allArenes) {
             if (candidate.getId().equals(current.getId()) || visited.contains(candidate.getId())) {
                 continue;
             }

@@ -1,134 +1,136 @@
 package org.SportsIn.services;
 
+import org.SportsIn.model.Arene;
+import org.SportsIn.model.user.Equipe;
 import org.SportsIn.model.territory.*;
+import org.SportsIn.repository.AreneRepository;
+import org.SportsIn.repository.EquipeRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 class TerritoryServiceTest {
 
     private TerritoryService territoryService;
-    private PointSportifRepository pointRepository;
+    private InMemoryAreneRepository areneRepository;
+    private InMemoryEquipeRepository equipeRepository;
     private ZoneRepository zoneRepository;
     private RouteRepository routeRepository;
 
-    private PointSportif p1, p2, p3, p4;
+    private Equipe team10;
+    private Equipe team20;
+    private Arene a1, a2, a3, a4;
     private Zone zoneNord;
     private Route routeTest;
 
     @BeforeEach
     void setUp() {
-        pointRepository = new InMemoryPointSportifRepository();
+        areneRepository = new InMemoryAreneRepository();
+        equipeRepository = new InMemoryEquipeRepository();
         zoneRepository = new InMemoryZoneRepository();
         routeRepository = new InMemoryRouteRepository();
         InfluenceCalculator influenceCalculator = new InfluenceCalculator(
                 List.of(new RouteInfluenceModifier(routeRepository)));
-        territoryService = new TerritoryService(pointRepository, zoneRepository, routeRepository, influenceCalculator);
+        territoryService = new TerritoryService(areneRepository, equipeRepository, zoneRepository, routeRepository, influenceCalculator);
 
-        // Création de 4 points
-        p1 = new PointSportif(1L, "Point 1", 0, 0, null);
-        p2 = new PointSportif(2L, "Point 2", 0, 0, null);
-        p3 = new PointSportif(3L, "Point 3", 0, 0, null);
-        p4 = new PointSportif(4L, "Point 4", 0, 0, null);
+        // Création des équipes
+        team10 = new Equipe("Équipe 10");
+        team10.setId(10L);
+        equipeRepository.save(team10);
 
-        pointRepository.save(p1);
-        pointRepository.save(p2);
-        pointRepository.save(p3);
-        pointRepository.save(p4);
+        team20 = new Equipe("Équipe 20");
+        team20.setId(20L);
+        equipeRepository.save(team20);
 
-        // Création d'une zone contenant ces 4 points
-        zoneNord = new Zone(100L, "Zone Nord", List.of(p1, p2, p3, p4));
+        // Création de 4 arènes
+        a1 = new Arene("a1", "Arène 1", 0, 0);
+        a2 = new Arene("a2", "Arène 2", 0, 0);
+        a3 = new Arene("a3", "Arène 3", 0, 0);
+        a4 = new Arene("a4", "Arène 4", 0, 0);
+
+        areneRepository.save(a1);
+        areneRepository.save(a2);
+        areneRepository.save(a3);
+        areneRepository.save(a4);
+
+        // Création d'une zone contenant ces 4 arènes
+        zoneNord = new Zone(100L, "Zone Nord", List.of(a1, a2, a3, a4));
         zoneRepository.save(zoneNord);
 
         // Création d'une route
-        routeTest = new Route(200L, "Route Test", "P1 -> P4", new ArrayList<>(Arrays.asList(p1, p2, p3, p4)));
+        routeTest = new Route(200L, "Route Test", "A1 -> A4", new ArrayList<>(Arrays.asList(a1, a2, a3, a4)));
         routeRepository.save(routeTest);
     }
 
     @Test
-    @DisplayName("Conquête d'un point simple")
-    void testUpdateTerritoryControl_SimplePointConquest() {
-        // ACT
-        territoryService.updateTerritoryControl(1L, 10L); // L'équipe 10 prend le point 1
+    @DisplayName("Conquête d'une arène simple")
+    void testUpdateTerritoryControl_SimpleAreneConquest() {
+        territoryService.updateTerritoryControl("a1", 10L);
 
-        // ASSERT
-        PointSportif updatedP1 = pointRepository.findById(1L).orElseThrow();
-        assertEquals(10L, updatedP1.getControllingTeamId());
+        Arene updatedA1 = areneRepository.findById("a1").orElseThrow();
+        assertEquals(10L, updatedA1.getControllingTeamId());
         
-        // La zone ne doit pas être contrôlée (seulement 1 point)
+        // La zone ne doit pas être contrôlée (seulement 1 arène)
         Zone updatedZone = zoneRepository.findById(100L).orElseThrow();
         assertNull(updatedZone.getControllingTeamId());
     }
 
     @Test
-    @DisplayName("Conquête d'une zone (3 points)")
+    @DisplayName("Conquête d'une zone (3 arènes)")
     void testUpdateTerritoryControl_ZoneConquest() {
-        // ARRANGE : L'équipe 10 a déjà 2 points
-        p1.setControllingTeamId(10L);
-        p2.setControllingTeamId(10L);
-        pointRepository.save(p1);
-        pointRepository.save(p2);
+        a1.setControllingTeam(team10);
+        a2.setControllingTeam(team10);
+        areneRepository.save(a1);
+        areneRepository.save(a2);
 
-        // ACT : L'équipe 10 prend le 3ème point
-        territoryService.updateTerritoryControl(3L, 10L);
+        territoryService.updateTerritoryControl("a3", 10L);
 
-        // ASSERT
         Zone updatedZone = zoneRepository.findById(100L).orElseThrow();
-        assertEquals(10L, updatedZone.getControllingTeamId(), "La zone devrait être contrôlée par l'équipe 10 (3 points).");
+        assertEquals(10L, updatedZone.getControllingTeamId(), "La zone devrait être contrôlée par l'équipe 10 (3 arènes).");
     }
 
     @Test
-    @DisplayName("Perte d'une zone (passage sous 3 points)")
+    @DisplayName("Perte d'une zone (passage sous 3 arènes)")
     void testUpdateTerritoryControl_ZoneLoss() {
-        // ARRANGE : L'équipe 10 contrôle la zone avec 3 points
-        p1.setControllingTeamId(10L);
-        p2.setControllingTeamId(10L);
-        p3.setControllingTeamId(10L);
+        a1.setControllingTeam(team10);
+        a2.setControllingTeam(team10);
+        a3.setControllingTeam(team10);
         zoneNord.setControllingTeamId(10L);
         
-        pointRepository.save(p1);
-        pointRepository.save(p2);
-        pointRepository.save(p3);
+        areneRepository.save(a1);
+        areneRepository.save(a2);
+        areneRepository.save(a3);
         zoneRepository.save(zoneNord);
 
-        // ACT : L'équipe 20 prend un des points de l'équipe 10
-        territoryService.updateTerritoryControl(3L, 20L);
+        territoryService.updateTerritoryControl("a3", 20L);
 
-        // ASSERT
         Zone updatedZone = zoneRepository.findById(100L).orElseThrow();
-        assertNull(updatedZone.getControllingTeamId(), "La zone devrait être perdue (plus que 2 points).");
+        assertNull(updatedZone.getControllingTeamId(), "La zone devrait être perdue (plus que 2 arènes).");
     }
 
     @Test
     @DisplayName("Changement de propriétaire de zone")
     void testUpdateTerritoryControl_ZoneOwnerChange() {
-        // ARRANGE : L'équipe 10 a 3 points, l'équipe 20 a 0 point.
-        p1.setControllingTeamId(10L);
-        p2.setControllingTeamId(10L);
-        p3.setControllingTeamId(10L);
+        a1.setControllingTeam(team10);
+        a2.setControllingTeam(team10);
+        a3.setControllingTeam(team10);
         zoneNord.setControllingTeamId(10L);
         
-        // L'équipe 20 a déjà le point 4
-        p4.setControllingTeamId(20L);
+        a4.setControllingTeam(team20);
         
-        pointRepository.save(p1);
-        pointRepository.save(p2);
-        pointRepository.save(p3);
-        pointRepository.save(p4);
+        areneRepository.save(a1);
+        areneRepository.save(a2);
+        areneRepository.save(a3);
+        areneRepository.save(a4);
         zoneRepository.save(zoneNord);
 
-        // ACT : L'équipe 20 prend p1, p2, p3 successivement
-        territoryService.updateTerritoryControl(1L, 20L); // 20: 2pts, 10: 2pts -> Zone perdue
-        territoryService.updateTerritoryControl(2L, 20L); // 20: 3pts, 10: 1pt -> Zone prise par 20
+        territoryService.updateTerritoryControl("a1", 20L);
+        territoryService.updateTerritoryControl("a2", 20L);
         
-        // ASSERT
         Zone updatedZone = zoneRepository.findById(100L).orElseThrow();
         assertEquals(20L, updatedZone.getControllingTeamId());
     }
@@ -136,19 +138,98 @@ class TerritoryServiceTest {
     @Test
     @DisplayName("Détection de bonus de route")
     void testUpdateTerritoryControl_RouteBonus() {
-        // ARRANGE : L'équipe 10 a P1 et P2
-        p1.setControllingTeamId(10L);
-        p2.setControllingTeamId(10L);
-        pointRepository.save(p1);
-        pointRepository.save(p2);
+        a1.setControllingTeam(team10);
+        a2.setControllingTeam(team10);
+        areneRepository.save(a1);
+        areneRepository.save(a2);
 
-        // ACT : L'équipe 10 prend P3 -> Suite P1, P2, P3
-        // Cela devrait déclencher un log de bonus (vérifiable visuellement ou via mock si on mockait RouteService)
-        territoryService.updateTerritoryControl(3L, 10L);
+        territoryService.updateTerritoryControl("a3", 10L);
 
-        // Pas d'assertion directe possible sur les logs sans framework de log capture,
-        // mais le test passe si aucune exception n'est levée.
-        // On vérifie juste que l'état est cohérent.
-        assertEquals(10L, p3.getControllingTeamId());
+        assertEquals(10L, a3.getControllingTeamId());
+    }
+
+    // ========== IN-MEMORY STUBS ==========
+
+    static class InMemoryAreneRepository implements AreneRepository {
+        private final Map<String, Arene> db = new LinkedHashMap<>();
+
+        @Override public List<Arene> findByControllingTeam_Id(Long teamId) {
+            return db.values().stream()
+                    .filter(a -> a.getControllingTeam() != null && teamId.equals(a.getControllingTeam().getId()))
+                    .toList();
+        }
+        @Override public List<Arene> findBySportsDisponiblesContaining(String sport) {
+            return db.values().stream()
+                    .filter(a -> a.getSportsDisponibles() != null && a.getSportsDisponibles().contains(sport))
+                    .toList();
+        }
+        @Override public <S extends Arene> S save(S entity) { db.put(entity.getId(), entity); return entity; }
+        @Override public Optional<Arene> findById(String id) { return Optional.ofNullable(db.get(id)); }
+        @Override public boolean existsById(String id) { return db.containsKey(id); }
+        @Override public List<Arene> findAll() { return new ArrayList<>(db.values()); }
+        @Override public <S extends Arene> List<S> saveAll(Iterable<S> entities) { entities.forEach(this::save); return List.of(); }
+        @Override public List<Arene> findAllById(Iterable<String> ids) { return List.of(); }
+        @Override public long count() { return db.size(); }
+        @Override public void deleteById(String id) { db.remove(id); }
+        @Override public void delete(Arene entity) { db.remove(entity.getId()); }
+        @Override public void deleteAllById(Iterable<? extends String> ids) {}
+        @Override public void deleteAll(Iterable<? extends Arene> entities) {}
+        @Override public void deleteAll() { db.clear(); }
+        @Override public void flush() {}
+        @Override public <S extends Arene> S saveAndFlush(S entity) { return save(entity); }
+        @Override public <S extends Arene> List<S> saveAllAndFlush(Iterable<S> entities) { return List.of(); }
+        @Override public void deleteAllInBatch(Iterable<Arene> entities) {}
+        @Override public void deleteAllByIdInBatch(Iterable<String> ids) {}
+        @Override public void deleteAllInBatch() {}
+        @Override public Arene getOne(String id) { return db.get(id); }
+        @Override public Arene getById(String id) { return db.get(id); }
+        @Override public Arene getReferenceById(String id) { return db.get(id); }
+        @Override public <S extends Arene> Optional<S> findOne(org.springframework.data.domain.Example<S> example) { return Optional.empty(); }
+        @Override public <S extends Arene> List<S> findAll(org.springframework.data.domain.Example<S> example) { return List.of(); }
+        @Override public <S extends Arene> List<S> findAll(org.springframework.data.domain.Example<S> example, org.springframework.data.domain.Sort sort) { return List.of(); }
+        @Override public <S extends Arene> org.springframework.data.domain.Page<S> findAll(org.springframework.data.domain.Example<S> example, org.springframework.data.domain.Pageable pageable) { return org.springframework.data.domain.Page.empty(); }
+        @Override public <S extends Arene> long count(org.springframework.data.domain.Example<S> example) { return 0; }
+        @Override public <S extends Arene> boolean exists(org.springframework.data.domain.Example<S> example) { return false; }
+        @Override public <S extends Arene, R> R findBy(org.springframework.data.domain.Example<S> example, java.util.function.Function<org.springframework.data.repository.query.FluentQuery.FetchableFluentQuery<S>, R> queryFunction) { return null; }
+        @Override public List<Arene> findAll(org.springframework.data.domain.Sort sort) { return findAll(); }
+        @Override public org.springframework.data.domain.Page<Arene> findAll(org.springframework.data.domain.Pageable pageable) { return org.springframework.data.domain.Page.empty(); }
+    }
+
+    static class InMemoryEquipeRepository implements EquipeRepository {
+        private final Map<Long, Equipe> db = new LinkedHashMap<>();
+
+        @Override public Optional<Equipe> findByNom(String nom) {
+            return db.values().stream().filter(e -> e.getNom().equals(nom)).findFirst();
+        }
+        @Override public <S extends Equipe> S save(S entity) { db.put(entity.getId(), entity); return entity; }
+        @Override public Optional<Equipe> findById(Long id) { return Optional.ofNullable(db.get(id)); }
+        @Override public boolean existsById(Long id) { return db.containsKey(id); }
+        @Override public List<Equipe> findAll() { return new ArrayList<>(db.values()); }
+        @Override public <S extends Equipe> List<S> saveAll(Iterable<S> entities) { entities.forEach(this::save); return List.of(); }
+        @Override public List<Equipe> findAllById(Iterable<Long> ids) { return List.of(); }
+        @Override public long count() { return db.size(); }
+        @Override public void deleteById(Long id) { db.remove(id); }
+        @Override public void delete(Equipe entity) { db.remove(entity.getId()); }
+        @Override public void deleteAllById(Iterable<? extends Long> ids) {}
+        @Override public void deleteAll(Iterable<? extends Equipe> entities) {}
+        @Override public void deleteAll() { db.clear(); }
+        @Override public void flush() {}
+        @Override public <S extends Equipe> S saveAndFlush(S entity) { return save(entity); }
+        @Override public <S extends Equipe> List<S> saveAllAndFlush(Iterable<S> entities) { return List.of(); }
+        @Override public void deleteAllInBatch(Iterable<Equipe> entities) {}
+        @Override public void deleteAllByIdInBatch(Iterable<Long> ids) {}
+        @Override public void deleteAllInBatch() {}
+        @Override public Equipe getOne(Long id) { return db.get(id); }
+        @Override public Equipe getById(Long id) { return db.get(id); }
+        @Override public Equipe getReferenceById(Long id) { return db.get(id); }
+        @Override public <S extends Equipe> Optional<S> findOne(org.springframework.data.domain.Example<S> example) { return Optional.empty(); }
+        @Override public <S extends Equipe> List<S> findAll(org.springframework.data.domain.Example<S> example) { return List.of(); }
+        @Override public <S extends Equipe> List<S> findAll(org.springframework.data.domain.Example<S> example, org.springframework.data.domain.Sort sort) { return List.of(); }
+        @Override public <S extends Equipe> org.springframework.data.domain.Page<S> findAll(org.springframework.data.domain.Example<S> example, org.springframework.data.domain.Pageable pageable) { return org.springframework.data.domain.Page.empty(); }
+        @Override public <S extends Equipe> long count(org.springframework.data.domain.Example<S> example) { return 0; }
+        @Override public <S extends Equipe> boolean exists(org.springframework.data.domain.Example<S> example) { return false; }
+        @Override public <S extends Equipe, R> R findBy(org.springframework.data.domain.Example<S> example, java.util.function.Function<org.springframework.data.repository.query.FluentQuery.FetchableFluentQuery<S>, R> queryFunction) { return null; }
+        @Override public List<Equipe> findAll(org.springframework.data.domain.Sort sort) { return findAll(); }
+        @Override public org.springframework.data.domain.Page<Equipe> findAll(org.springframework.data.domain.Pageable pageable) { return org.springframework.data.domain.Page.empty(); }
     }
 }

@@ -1,7 +1,18 @@
 import React from "react";
+import { useNavigate } from "react-router-dom";
 
 function PointModal({ point, onClose }) {
+  const navigate = useNavigate();
+
   if (!point) return null;
+
+  const handleCreateSession = () => {
+    navigate(`/game/create?pointId=${point.id}`);
+  };
+
+  const handleViewSessions = () => {
+    navigate(`/sessions?pointId=${point.id}`);
+  };
 
   return (
     <div
@@ -84,6 +95,7 @@ function PointModal({ point, onClose }) {
           }}
         >
           <button
+            onClick={handleCreateSession}
             style={{
               padding: "12px 20px",
               background: "#111",
@@ -98,6 +110,7 @@ function PointModal({ point, onClose }) {
           </button>
 
           <button
+            onClick={handleViewSessions}
             style={{
               padding: "12px 20px",
               background: "#111",

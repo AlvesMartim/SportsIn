@@ -1,10 +1,12 @@
 package org.SportsIn.model;
 
 import org.SportsIn.model.rules.FootballVictoryRule;
+import org.springframework.stereotype.Repository;
 
 import java.util.HashMap;
 import java.util.Map;
 
+@Repository
 public class InMemoryRuleRepository implements RuleRepository {
 
     private final Map<Long, Rule> rules = new HashMap<>();

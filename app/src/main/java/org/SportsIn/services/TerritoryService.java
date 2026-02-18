@@ -1,34 +1,38 @@
 package org.SportsIn.services;
 
-import org.SportsIn.model.territory.PointSportif;
-import org.SportsIn.model.territory.PointSportifRepository;
+import org.SportsIn.model.Arene;
 import org.SportsIn.model.territory.Zone;
 import org.SportsIn.model.territory.ZoneRepository;
 import org.SportsIn.model.territory.Route;
 import org.SportsIn.model.territory.RouteBonus;
 import org.SportsIn.model.territory.RouteRepository;
+import org.SportsIn.repository.AreneRepository;
+import org.SportsIn.repository.EquipeRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 
 /**
- * Service responsable de la logique de conquête de territoire (Points et Zones).
+ * Service responsable de la logique de conquête de territoire (Arènes et Zones).
  */
 @Service
 public class TerritoryService {
 
-    private final PointSportifRepository pointRepository;
+    private final AreneRepository areneRepository;
+    private final EquipeRepository equipeRepository;
     private final ZoneRepository zoneRepository;
     private final RouteRepository routeRepository;
     private final RouteService routeService;
     private final RouteGeneratorService routeGeneratorService;
     private final InfluenceCalculator influenceCalculator;
 
-    public TerritoryService(PointSportifRepository pointRepository,
+    public TerritoryService(AreneRepository areneRepository,
+                            EquipeRepository equipeRepository,
                             ZoneRepository zoneRepository,
                             RouteRepository routeRepository,
                             InfluenceCalculator influenceCalculator) {
-        this.pointRepository = pointRepository;
+        this.areneRepository = areneRepository;
+        this.equipeRepository = equipeRepository;
         this.zoneRepository = zoneRepository;
         this.routeRepository = routeRepository;
         this.routeService = new RouteService();
@@ -37,20 +41,20 @@ public class TerritoryService {
     }
 
     /**
-     * Génère et initialise les routes automatiquement à partir des points existants.
-     * @param maxJumpDistanceKm Distance max entre deux points.
-     * @param minPointsPerRoute Nombre min de points pour former une route.
+     * Génère et initialise les routes automatiquement à partir des arènes existantes.
+     * @param maxJumpDistanceKm Distance max entre deux arènes.
+     * @param minArenesPerRoute Nombre min d'arènes pour former une route.
      */
-    public void initializeRoutesAutomatically(double maxJumpDistanceKm, int minPointsPerRoute) {
-        List<PointSportif> allPoints = pointRepository.findAll();
-        List<Route> generatedRoutes = routeGeneratorService.generateRoutes(allPoints, maxJumpDistanceKm, minPointsPerRoute);
+    public void initializeRoutesAutomatically(double maxJumpDistanceKm, int minArenesPerRoute) {
+        List<Arene> allArenes = areneRepository.findAll();
+        List<Route> generatedRoutes = routeGeneratorService.generateRoutes(allArenes, maxJumpDistanceKm, minArenesPerRoute);
         
         routeRepository.deleteAll();
         routeRepository.saveAll(generatedRoutes);
         
         System.out.println(">>> Routes générées automatiquement : " + generatedRoutes.size());
         for (Route r : generatedRoutes) {
-            System.out.println("    - " + r.getNom() + " (" + r.getPoints().size() + " points)");
+            System.out.println("    - " + r.getNom() + " (" + r.getArenes().size() + " arènes)");
         }
     }
 
@@ -63,51 +67,50 @@ public class TerritoryService {
     }
 
     /**
-     * Récupère le bonus de score applicable pour une équipe sur un point donné.
+     * Récupère le bonus de score applicable pour une équipe sur une arène donnée.
      * @param teamId L'ID de l'équipe.
-     * @param pointId L'ID du point où se déroule l'action.
+     * @param areneId L'ID de l'arène où se déroule l'action.
      * @return Le multiplicateur de bonus (ex: 0.10 pour +10%). Retourne 0.0 si aucun bonus.
      */
-    public double getScoreBonusForTeamOnPoint(Long teamId, Long pointId) {
-        return influenceCalculator.computeTotalModifier(teamId, pointId);
+    public double getScoreBonusForTeamOnPoint(Long teamId, String areneId) {
+        return influenceCalculator.computeTotalModifier(teamId, areneId);
     }
 
     /**
-     * Appelé lorsqu'une équipe gagne une session sur un point.
-     * Met à jour le point et vérifie si cela déclenche la capture d'une zone.
+     * Appelé lorsqu'une équipe gagne une session sur une arène.
+     * Met à jour l'arène et vérifie si cela déclenche la capture d'une zone.
      *
-     * @param pointId L'ID du point concerné.
+     * @param areneId L'ID de l'arène concernée.
      * @param winningTeamId L'ID de l'équipe gagnante.
      */
-    public void updateTerritoryControl(Long pointId, Long winningTeamId) {
-        // 1. Mettre à jour le point
-        pointRepository.findById(pointId).ifPresent(point -> {
-            Long oldOwner = point.getControllingTeamId();
+    public void updateTerritoryControl(String areneId, Long winningTeamId) {
+        areneRepository.findById(areneId).ifPresent(arene -> {
+            Long oldOwner = arene.getControllingTeamId();
             
-            // Si l'équipe contrôle déjà le point, pas besoin de recalculer les zones
-            // sauf si on veut gérer des compteurs de défense, mais ici c'est simple.
             if (winningTeamId.equals(oldOwner)) {
-                System.out.println("Point " + point.getNom() + " défendu avec succès par l'équipe " + winningTeamId);
+                System.out.println("Arène " + arene.getNom() + " défendue avec succès par l'équipe " + winningTeamId);
                 return;
             }
 
-            System.out.println("Point " + point.getNom() + " (ID: " + pointId + ") passe de l'équipe " + oldOwner + " à l'équipe " + winningTeamId);
-            point.setControllingTeamId(winningTeamId);
-            pointRepository.save(point);
+            System.out.println("Arène " + arene.getNom() + " (ID: " + areneId + ") passe de l'équipe " + oldOwner + " à l'équipe " + winningTeamId);
+            
+            equipeRepository.findById(winningTeamId).ifPresent(equipe -> {
+                arene.setControllingTeam(equipe);
+                areneRepository.save(arene);
+            });
 
-            // 2. Vérifier les zones impactées
-            checkZonesImpactedByPoint(pointId);
+            // Vérifier les zones impactées
+            checkZonesImpactedByArene(areneId);
 
-            // 3. Vérifier les bonus de route
+            // Vérifier les bonus de route
             checkRouteBonuses(winningTeamId);
         });
     }
 
-    private void checkZonesImpactedByPoint(Long pointId) {
-        List<Zone> impactedZones = zoneRepository.findZonesByPointId(pointId);
+    private void checkZonesImpactedByArene(String areneId) {
+        List<Zone> impactedZones = zoneRepository.findZonesByAreneId(areneId);
         
         for (Zone zone : impactedZones) {
-            Long oldZoneOwner = zone.getControllingTeamId();
             boolean changed = zone.updateZoneControl();
             
             if (changed) {
@@ -117,7 +120,7 @@ public class TerritoryService {
                 if (newZoneOwner != null) {
                     System.out.println(">>> ZONE CONQUISE ! La zone '" + zone.getNom() + "' est maintenant contrôlée par l'équipe " + newZoneOwner);
                 } else {
-                    System.out.println(">>> ZONE PERDUE ! La zone '" + zone.getNom() + "' est redevenue neutre/contestée (plus d'équipe avec 3 points).");
+                    System.out.println(">>> ZONE PERDUE ! La zone '" + zone.getNom() + "' est redevenue neutre/contestée.");
                 }
             }
         }
@@ -132,7 +135,7 @@ public class TerritoryService {
             System.out.println(">>> BONUS DE ROUTE ACTIFS pour l'équipe " + teamId + " :");
             for (RouteBonus bonus : bonuses) {
                 System.out.println("   - Route: " + bonus.getRoute().getNom() + 
-                                   " | Points consécutifs: " + bonus.getConsecutivePoints() + 
+                                   " | Arènes consécutives: " + bonus.getConsecutivePoints() + 
                                    " | Bonus: " + bonus.getBonusType() + " (" + (bonus.getBonusValue() * 100) + "%)");
             }
         }

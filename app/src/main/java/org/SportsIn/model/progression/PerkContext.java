@@ -5,7 +5,7 @@ import java.util.Map;
 public record PerkContext(
     Long teamId,
     Long opponentTeamId,
-    Long targetPointId,
+    String targetPointId,
     double baseInfluence,
     Map<String, Object> parameters
 ) {}

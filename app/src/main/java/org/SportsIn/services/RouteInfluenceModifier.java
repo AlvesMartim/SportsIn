@@ -19,7 +19,7 @@ public class RouteInfluenceModifier implements InfluenceModifier {
     }
 
     @Override
-    public double apply(Long teamId, Long pointId, double currentModifier) {
+    public double apply(Long teamId, String pointId, double currentModifier) {
         List<Route> allRoutes = routeRepository.findAll();
         if (allRoutes.isEmpty()) return currentModifier;
 
@@ -27,8 +27,8 @@ public class RouteInfluenceModifier implements InfluenceModifier {
         double routeBonus = 0.0;
 
         for (RouteBonus bonus : bonuses) {
-            boolean pointIsOnRoute = bonus.getRoute().getPoints().stream()
-                    .anyMatch(p -> p.getId().equals(pointId));
+            boolean pointIsOnRoute = bonus.getRoute().getArenes().stream()
+                    .anyMatch(a -> a.getId().equals(pointId));
             if (pointIsOnRoute && "SCORE_MULTIPLIER".equals(bonus.getBonusType())) {
                 routeBonus += bonus.getBonusValue();
             }

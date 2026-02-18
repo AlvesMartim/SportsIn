@@ -28,10 +28,10 @@ public class PerkInfluenceModifier implements InfluenceModifier {
     }
 
     @Override
-    public double apply(Long teamId, Long pointId, double currentModifier) {
+    public double apply(Long teamId, String pointId, double currentModifier) {
         String now = Instant.now().toString();
         List<ActivePerk> perksOnPoint = activePerkRepository.findActiveOnTarget(
-                pointId.toString(), now);
+                pointId, now);
 
         double perkModifier = 0.0;
 
@@ -52,8 +52,12 @@ public class PerkInfluenceModifier implements InfluenceModifier {
                     def.getParametersAsMap()
             );
 
-            // Le shield reduit l'influence adverse, pas celle du proprietaire
-            if (!activePerk.getTeamId().equals(teamId)) {
+            boolean isOwnPerk = activePerk.getTeamId().equals(teamId);
+            boolean isBoost = "INFLUENCE_BOOST".equals(def.getEffectType());
+            boolean isReduction = "INFLUENCE_REDUCTION".equals(def.getEffectType());
+
+            // Le boost s'applique au proprietaire, le shield reduit l'influence adverse
+            if ((isBoost && isOwnPerk) || (isReduction && !isOwnPerk)) {
                 perkModifier += strategy.computeInfluenceModifier(context);
             }
         }

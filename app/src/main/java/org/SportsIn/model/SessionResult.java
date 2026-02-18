@@ -18,13 +18,6 @@ public class SessionResult {
         this.metrics = metrics;
     }
 
-    public EvaluationResult evaluateRules() {
-        if (session != null && session.getSport() != null) {
-            return session.getSport().testRule(session);
-        }
-        return null;
-    }
-
     // --- Getters / Setters ---
 
     public Session getSession() {

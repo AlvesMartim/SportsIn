@@ -16,7 +16,9 @@ function Header() {
   const navLinks = [
     { path: "/", label: "Accueil", icon: "🏠" },
     { path: "/map", label: "Carte", icon: "🗺️" },
+    { path: "/missions", label: "Missions", icon: "🎯" },
     { path: "/team", label: "Équipe", icon: "👥" },
+    { path: "/progression", label: "Progression", icon: "📈" },
     { path: "/history", label: "Historique", icon: "📜" },
   ];
 

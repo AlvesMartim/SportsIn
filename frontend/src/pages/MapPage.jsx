@@ -236,9 +236,9 @@ function MapPage() {
           )}
 
           {showZones && zones.map((zone) => {
-            const points = zone.points || [];
-            if (points.length < 3) return null;
-            const positions = points.map((p) => [p.latitude, p.longitude]);
+            const arenes = zone.arenes || [];
+            if (arenes.length < 3) return null;
+            const positions = arenes.map((a) => [a.latitude, a.longitude]);
             const color = getTeamColor(zone.controllingTeamId);
 
             return (
@@ -260,9 +260,9 @@ function MapPage() {
           })}
 
           {showRoutes && routes.map((route) => {
-            const points = route.points || [];
-            if (points.length < 2) return null;
-            const positions = points.map((p) => [p.latitude, p.longitude]);
+            const arenes = route.arenes || [];
+            if (arenes.length < 2) return null;
+            const positions = arenes.map((a) => [a.latitude, a.longitude]);
 
             return (
               <Polyline

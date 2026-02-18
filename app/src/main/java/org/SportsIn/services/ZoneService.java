@@ -24,7 +24,7 @@ public class ZoneService {
         return zoneRepository.findById(id);
     }
 
-    public List<Zone> getZonesByPointId(Long pointId) {
-        return zoneRepository.findZonesByPointId(pointId);
+    public List<Zone> getZonesByAreneId(String areneId) {
+        return zoneRepository.findZonesByAreneId(areneId);
     }
 }

@@ -2,7 +2,7 @@ package org.SportsIn.model;
 
 /**
  * Représente un sport (ex : Foot, Muscu, Basket)
- * et les règles associées pour déterminer la victoire et le scoring.
+ * et les références vers les règles de victoire et de scoring.
  */
 public class Sport {
 
@@ -11,8 +11,6 @@ public class Sport {
     private String name;          // "Football", "Musculation", ...
     private Long scoringRuleId;   // référence vers une Rule SCORING
     private Long victoryRuleId;
-
-    private final RuleRepository ruleRepository = new InMemoryRuleRepository();
 
     public Sport() {
     }
@@ -27,20 +25,6 @@ public class Sport {
         this.name = name;
         this.victoryRuleId = victoryRuleId;
         this.scoringRuleId = scoringRuleId;
-    }
-
-    /**
-     * Teste la règle de VICTOIRE pour une session donnée.
-     * @param session La session à évaluer.
-     * @return Le résultat de l'évaluation.
-     */
-    public EvaluationResult testRule(Session session) {
-        // CORRECTION : On utilise bien victoryRuleId pour déterminer le gagnant.
-        Rule rule = ruleRepository.findRuleById(victoryRuleId);
-        if (rule != null) {
-            return rule.evaluate(session);
-        }
-        return null;
     }
 
     public Long getId() {
