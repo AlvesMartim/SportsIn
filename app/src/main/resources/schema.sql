@@ -101,6 +101,35 @@ CREATE TABLE IF NOT EXISTS mission (
     FOREIGN KEY (team_id) REFERENCES equipe(id) ON DELETE CASCADE
 );
 
+-- Table PERK_DEFINITION (Feature 6: catalogue des perks débloquables)
+CREATE TABLE IF NOT EXISTS perk_definition (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    code TEXT NOT NULL UNIQUE,
+    name TEXT NOT NULL,
+    description TEXT,
+    effect_type TEXT NOT NULL,
+    required_level INTEGER NOT NULL DEFAULT 1,
+    duration_seconds INTEGER NOT NULL,
+    cooldown_seconds INTEGER NOT NULL DEFAULT 0,
+    max_active_instances INTEGER NOT NULL DEFAULT 1,
+    stackable INTEGER NOT NULL DEFAULT 0,
+    parameters_json TEXT
+);
+
+-- Table ACTIVE_PERK (Feature 6: instances de perks actifs par équipe)
+CREATE TABLE IF NOT EXISTS active_perk (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    team_id INTEGER NOT NULL,
+    perk_definition_id INTEGER NOT NULL,
+    target_id TEXT,
+    activated_at TEXT NOT NULL,
+    expires_at TEXT NOT NULL,
+    last_used_at TEXT,
+    usage_count INTEGER NOT NULL DEFAULT 0,
+    FOREIGN KEY (team_id) REFERENCES equipe(id) ON DELETE CASCADE,
+    FOREIGN KEY (perk_definition_id) REFERENCES perk_definition(id) ON DELETE CASCADE
+);
+
 -- Index pour améliorer les performances des requêtes fréquentes
 CREATE INDEX IF NOT EXISTS idx_joueur_equipe_id ON joueur(equipe_id);
 CREATE INDEX IF NOT EXISTS idx_arene_equipe_controle ON arene(equipe_controle);
@@ -111,4 +140,8 @@ CREATE INDEX IF NOT EXISTS idx_session_participant_session_id ON session_partici
 CREATE INDEX IF NOT EXISTS idx_mission_team_id ON mission(team_id);
 CREATE INDEX IF NOT EXISTS idx_mission_status ON mission(status);
 CREATE INDEX IF NOT EXISTS idx_mission_team_status ON mission(team_id, status);
+CREATE INDEX IF NOT EXISTS idx_active_perk_team ON active_perk(team_id);
+CREATE INDEX IF NOT EXISTS idx_active_perk_target ON active_perk(target_id);
+CREATE INDEX IF NOT EXISTS idx_active_perk_expires ON active_perk(expires_at);
+CREATE INDEX IF NOT EXISTS idx_perk_definition_level ON perk_definition(required_level);
 

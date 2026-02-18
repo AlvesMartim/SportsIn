@@ -15,13 +15,14 @@ public class SessionService {
 
     private final SessionRepository sessionRepository;
     private final TerritoryService territoryService;
+    private final XpGrantService xpGrantService;
 
-    /**
-     * Construit le service en lui fournissant ses dépendances.
-     */
-    public SessionService(SessionRepository sessionRepository, TerritoryService territoryService) {
+    public SessionService(SessionRepository sessionRepository,
+                          TerritoryService territoryService,
+                          XpGrantService xpGrantService) {
         this.sessionRepository = sessionRepository;
         this.territoryService = territoryService;
+        this.xpGrantService = xpGrantService;
     }
 
     /**
@@ -52,7 +53,20 @@ public class SessionService {
             return;
         }
 
-        // --- NOUVEAU : Application du Bonus de Route ---
+        // --- Attribution d'XP de match ---
+        xpGrantService.grantMatchXp(winnerTeamId, true);
+        // Attribuer XP de participation aux perdants
+        for (var participant : session.getParticipants()) {
+            try {
+                Long participantId = Long.parseLong(participant.getId());
+                if (!participantId.equals(winnerTeamId)) {
+                    xpGrantService.grantMatchXp(participantId, false);
+                }
+            } catch (NumberFormatException ignored) {
+            }
+        }
+
+        // --- Application du Bonus d'influence ---
         String pointIdStr = session.getPointId();
         if (pointIdStr != null) {
             try {

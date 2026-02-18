@@ -35,8 +35,12 @@ class SessionServiceTest {
         routeRepository = new InMemoryRouteRepository();
 
         // Initialisation des services avec leurs dépendances
-        territoryService = new TerritoryService(pointSportifRepository, zoneRepository, routeRepository);
-        sessionService = new SessionService(sessionRepository, territoryService);
+        InfluenceCalculator influenceCalculator = new InfluenceCalculator(
+                List.of(new RouteInfluenceModifier(routeRepository)));
+        territoryService = new TerritoryService(pointSportifRepository, zoneRepository, routeRepository, influenceCalculator);
+        // XpGrantService avec des repos null — les tests ne vérifient pas l'XP
+        XpGrantService xpGrantService = new XpGrantService(null, null, null);
+        sessionService = new SessionService(sessionRepository, territoryService, xpGrantService);
 
         // Données de test
         football = new Sport(1L, "FOOT", "Football", 101L, null);

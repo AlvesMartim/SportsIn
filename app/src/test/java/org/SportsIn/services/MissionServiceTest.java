@@ -48,7 +48,9 @@ class MissionServiceTest {
         pointRepository = new InMemoryPointSportifRepository();
         zoneRepository = new InMemoryZoneRepository();
         routeRepository = new InMemoryRouteRepository();
-        territoryService = new TerritoryService(pointRepository, zoneRepository, routeRepository);
+        InfluenceCalculator influenceCalculator = new InfluenceCalculator(
+                List.of(new RouteInfluenceModifier(routeRepository)));
+        territoryService = new TerritoryService(pointRepository, zoneRepository, routeRepository, influenceCalculator);
 
         generationService = new MissionGenerationService(
                 missionRepository, pointRepository, zoneRepository, routeRepository, sessionRepository);
