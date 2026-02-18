@@ -1,12 +1,12 @@
 package org.SportsIn.services;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.SportsIn.model.Arene;
 import org.SportsIn.model.Session;
 import org.SportsIn.model.SessionRepository;
 import org.SportsIn.model.SessionState;
-import org.SportsIn.model.Sport;
 import org.SportsIn.model.mission.*;
-import org.SportsIn.model.territory.*;
+import org.SportsIn.repository.AreneRepository;
 import org.SportsIn.repository.MissionRepository;
 import org.springframework.stereotype.Service;
 
@@ -16,7 +16,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 /**
- * Génère des missions dynamiques pour les équipes basées sur l'état du territoire,
+ * Génère des missions dynamiques pour les équipes basées sur l'état des arènes,
  * l'historique des sessions, et les sports peu joués.
  */
 @Service
@@ -26,27 +26,20 @@ public class MissionGenerationService {
     private static final ObjectMapper MAPPER = new ObjectMapper();
 
     private final MissionRepository missionRepository;
-    private final PointSportifRepository pointRepository;
-    private final ZoneRepository zoneRepository;
-    private final RouteRepository routeRepository;
+    private final AreneRepository areneRepository;
     private final SessionRepository sessionRepository;
 
     public MissionGenerationService(MissionRepository missionRepository,
-                                    PointSportifRepository pointRepository,
-                                    ZoneRepository zoneRepository,
-                                    RouteRepository routeRepository,
+                                    AreneRepository areneRepository,
                                     SessionRepository sessionRepository) {
         this.missionRepository = missionRepository;
-        this.pointRepository = pointRepository;
-        this.zoneRepository = zoneRepository;
-        this.routeRepository = routeRepository;
+        this.areneRepository = areneRepository;
         this.sessionRepository = sessionRepository;
     }
 
     /**
      * Génère des missions pour une équipe donnée.
      * Ne dépasse pas MAX_ACTIVE_MISSIONS_PER_TEAM missions actives.
-     * Ne recrée pas une mission identique si déjà ACTIVE (même type + même payload clé).
      */
     public void generateForTeam(Long teamId) {
         long activeCount = missionRepository.countActiveByTeam(teamId);
@@ -61,16 +54,15 @@ public class MissionGenerationService {
         int slotsAvailable = (int) (MAX_ACTIVE_MISSIONS_PER_TEAM - activeCount);
         List<Mission> candidates = new ArrayList<>();
 
-        // R1: RECAPTURE_RECENT_LOSS
+        // R1: RECAPTURE_RECENT_LOSS — reprendre une arène contrôlée par un adversaire
         tryGenerateRecaptureMission(teamId, existingKeys).ifPresent(candidates::add);
 
-        // R2: DIVERSITY_SPORT
+        // R2: DIVERSITY_SPORT — jouer un sport peu joué sur une arène
         tryGenerateDiversityMission(teamId, existingKeys).ifPresent(candidates::add);
 
-        // R3: BREAK_ROUTE
+        // R3: BREAK_ROUTE — briser le contrôle d'une 2e arène adverse
         tryGenerateBreakRouteMission(teamId, existingKeys).ifPresent(candidates::add);
 
-        // Sauvegarder dans la limite des slots
         int toSave = Math.min(slotsAvailable, candidates.size());
         for (int i = 0; i < toSave; i++) {
             missionRepository.save(candidates.get(i));
@@ -78,171 +70,140 @@ public class MissionGenerationService {
     }
 
     /**
-     * R1: Trouver un point non contrôlé par l'équipe.
-     * Hypothèse: comme il n'y a pas d'historique de possession, on cherche un point
-     * contrôlé par une autre équipe dans une zone où l'équipe a au moins un point.
-     * Cela simule "un point perdu récemment" (l'équipe est présente dans la zone mais pas sur ce point).
+     * R1: Trouver une arène contrôlée par un adversaire.
      */
     private Optional<Mission> tryGenerateRecaptureMission(Long teamId, Set<String> existingKeys) {
-        List<Zone> zones = zoneRepository.findAll();
-        for (Zone zone : zones) {
-            boolean teamHasPointInZone = zone.getPoints().stream()
-                    .anyMatch(p -> teamId.equals(p.getControllingTeamId()));
-            if (!teamHasPointInZone) continue;
+        List<Arene> allArenes = areneRepository.findAll();
 
-            Optional<PointSportif> lostPoint = zone.getPoints().stream()
-                    .filter(p -> p.getControllingTeamId() != null && !teamId.equals(p.getControllingTeamId()))
-                    .findFirst();
+        for (Arene arene : allArenes) {
+            if (arene.getControllingTeam() == null) continue;
+            Long ownerId = arene.getControllingTeam().getId();
+            if (teamId.equals(ownerId)) continue;
 
-            if (lostPoint.isPresent()) {
-                PointSportif point = lostPoint.get();
-                Map<String, Object> payload = Map.of(
-                        "zoneId", zone.getId(),
-                        "pointId", point.getId(),
-                        "windowDays", 7
-                );
-                String payloadJson = toJson(payload);
-                String key = MissionType.RECAPTURE_RECENT_LOSS.name() + ":" + payloadJson;
-                if (existingKeys.contains(key)) return Optional.empty();
+            Map<String, Object> payload = Map.of(
+                    "arenaId", arene.getId(),
+                    "arenaName", arene.getNom(),
+                    "windowDays", 7
+            );
+            String payloadJson = toJson(payload);
+            String key = MissionType.RECAPTURE_RECENT_LOSS.name() + ":" + payloadJson;
+            if (existingKeys.contains(key)) continue;
 
-                Instant now = Instant.now();
-                Mission m = new Mission();
-                m.setTeamId(teamId);
-                m.setType(MissionType.RECAPTURE_RECENT_LOSS);
-                m.setStatus(MissionStatus.ACTIVE);
-                m.setTitle("Reprendre le point " + point.getNom());
-                m.setDescription("Reconquérir le point '" + point.getNom()
-                        + "' dans la zone '" + zone.getNom() + "' avant expiration.");
-                m.setPriority(MissionPriority.HIGH);
-                m.setRewardTeamPoints(50);
-                m.setRewardTeamXp(30);
-                m.setTimestampsFromInstant(now, now, now.plus(3, ChronoUnit.DAYS));
-                m.setPayloadJson(payloadJson);
-                m.setProgressCurrent(0);
-                m.setProgressTarget(1);
-                return Optional.of(m);
-            }
+            Instant now = Instant.now();
+            Mission m = new Mission();
+            m.setTeamId(teamId);
+            m.setType(MissionType.RECAPTURE_RECENT_LOSS);
+            m.setStatus(MissionStatus.ACTIVE);
+            m.setTitle("Reprendre " + arene.getNom());
+            m.setDescription("Reconquérir l'arène '" + arene.getNom()
+                    + "' actuellement contrôlée par une équipe adverse. Gagnez un match sur cette arène !");
+            m.setPriority(MissionPriority.HIGH);
+            m.setRewardTeamPoints(50);
+            m.setRewardTeamXp(30);
+            m.setTimestampsFromInstant(now, now, now.plus(3, ChronoUnit.DAYS));
+            m.setPayloadJson(payloadJson);
+            m.setProgressCurrent(0);
+            m.setProgressTarget(1);
+            return Optional.of(m);
         }
         return Optional.empty();
     }
 
     /**
-     * R2: Trouver un sport peu joué dans une zone sur 14 jours.
-     * Hypothèse: on compare les sports disponibles sur les points d'une zone
-     * avec les sessions terminées récentes. Un sport sans session récente = candidat.
+     * R2: Trouver un sport peu joué sur une arène.
      */
     private Optional<Mission> tryGenerateDiversityMission(Long teamId, Set<String> existingKeys) {
-        List<Zone> zones = zoneRepository.findAll();
+        List<Arene> allArenes = areneRepository.findAll();
         List<Session> terminatedSessions = sessionRepository.findByState(SessionState.TERMINATED);
 
-        // Collecter les sports joués récemment (14 derniers jours) par point
-        Set<String> recentSportPointCombos = new HashSet<>();
+        Set<String> recentCombos = new HashSet<>();
         Instant fourteenDaysAgo = Instant.now().minus(14, ChronoUnit.DAYS);
         for (Session s : terminatedSessions) {
             if (s.getEndedAt() != null && s.getSport() != null && s.getPointId() != null) {
                 Instant endedInstant = s.getEndedAt().atZone(java.time.ZoneId.systemDefault()).toInstant();
                 if (endedInstant.isAfter(fourteenDaysAgo)) {
-                    recentSportPointCombos.add(s.getSport().getId() + ":" + s.getPointId());
+                    recentCombos.add(s.getSport().getCode() + ":" + s.getPointId());
                 }
             }
         }
 
-        for (Zone zone : zones) {
-            for (PointSportif point : zone.getPoints()) {
-                if (point.getSportsDisponibles() == null) continue;
-                for (Sport sport : point.getSportsDisponibles()) {
-                    String combo = sport.getId() + ":" + point.getId();
-                    if (!recentSportPointCombos.contains(combo)) {
-                        Map<String, Object> payload = Map.of(
-                                "zoneId", zone.getId(),
-                                "sportId", sport.getId(),
-                                "sportCode", sport.getCode(),
-                                "pointId", point.getId(),
-                                "windowDays", 14
-                        );
-                        String payloadJson = toJson(payload);
-                        String key = MissionType.DIVERSITY_SPORT.name() + ":" + payloadJson;
-                        if (existingKeys.contains(key)) continue;
+        for (Arene arene : allArenes) {
+            if (arene.getSportsDisponibles() == null) continue;
+            for (String sportCode : arene.getSportsDisponibles()) {
+                String combo = sportCode + ":" + arene.getId();
+                if (recentCombos.contains(combo)) continue;
 
-                        Instant now = Instant.now();
-                        Mission m = new Mission();
-                        m.setTeamId(teamId);
-                        m.setType(MissionType.DIVERSITY_SPORT);
-                        m.setStatus(MissionStatus.ACTIVE);
-                        m.setTitle("Diversité: " + sport.getName() + " dans " + zone.getNom());
-                        m.setDescription("Faire une session de " + sport.getName()
-                                + " au point '" + point.getNom()
-                                + "' (zone " + zone.getNom() + "). Aucune session de ce sport depuis 2 semaines.");
-                        m.setPriority(MissionPriority.MEDIUM);
-                        m.setRewardTeamPoints(30);
-                        m.setRewardTeamXp(20);
-                        m.setTimestampsFromInstant(now, now, now.plus(7, ChronoUnit.DAYS));
-                        m.setPayloadJson(payloadJson);
-                        m.setProgressCurrent(0);
-                        m.setProgressTarget(1);
-                        return Optional.of(m);
-                    }
-                }
+                Map<String, Object> payload = Map.of(
+                        "arenaId", arene.getId(),
+                        "arenaName", arene.getNom(),
+                        "sportCode", sportCode,
+                        "windowDays", 14
+                );
+                String payloadJson = toJson(payload);
+                String key = MissionType.DIVERSITY_SPORT.name() + ":" + payloadJson;
+                if (existingKeys.contains(key)) continue;
+
+                Instant now = Instant.now();
+                Mission m = new Mission();
+                m.setTeamId(teamId);
+                m.setType(MissionType.DIVERSITY_SPORT);
+                m.setStatus(MissionStatus.ACTIVE);
+                m.setTitle("Diversité: " + sportCode + " à " + arene.getNom());
+                m.setDescription("Jouer une session de " + sportCode
+                        + " à l'arène '" + arene.getNom()
+                        + "'. Aucune session de ce sport ici depuis 2 semaines !");
+                m.setPriority(MissionPriority.MEDIUM);
+                m.setRewardTeamPoints(30);
+                m.setRewardTeamXp(20);
+                m.setTimestampsFromInstant(now, now, now.plus(7, ChronoUnit.DAYS));
+                m.setPayloadJson(payloadJson);
+                m.setProgressCurrent(0);
+                m.setProgressTarget(1);
+                return Optional.of(m);
             }
         }
         return Optional.empty();
     }
 
     /**
-     * R3: Sélectionner une route contrôlée par une équipe adverse.
-     * Une route est "contrôlée" si tous ses points appartiennent à la même équipe adversaire.
-     * Mission: reprendre au moins 1 point de cette route.
+     * R3: Briser le contrôle d'une 2e arène adverse.
+     * Sélectionne une arène différente de celle déjà en R1.
      */
     private Optional<Mission> tryGenerateBreakRouteMission(Long teamId, Set<String> existingKeys) {
-        List<Route> routes = routeRepository.findAll();
+        List<Arene> allArenes = areneRepository.findAll();
+        List<Arene> adversaryArenas = allArenes.stream()
+                .filter(a -> a.getControllingTeam() != null && !teamId.equals(a.getControllingTeam().getId()))
+                .toList();
 
-        for (Route route : routes) {
-            if (route.getPoints() == null || route.getPoints().size() < 2) continue;
+        // Prendre la 2e arène adverse (la 1ère est déjà en R1)
+        if (adversaryArenas.size() >= 2) {
+            Arene arene = adversaryArenas.get(1);
+            Map<String, Object> payload = Map.of(
+                    "arenaId", arene.getId(),
+                    "arenaName", arene.getNom(),
+                    "adversaryTeamId", arene.getControllingTeam().getId(),
+                    "minCount", 1
+            );
+            String payloadJson = toJson(payload);
+            String key = MissionType.BREAK_ROUTE.name() + ":" + payloadJson;
+            if (existingKeys.contains(key)) return Optional.empty();
 
-            // Vérifier si la route est entièrement contrôlée par un adversaire
-            Long adversaryTeamId = null;
-            boolean fullyControlled = true;
-            for (PointSportif p : route.getPoints()) {
-                Long owner = p.getControllingTeamId();
-                if (owner == null || teamId.equals(owner)) {
-                    fullyControlled = false;
-                    break;
-                }
-                if (adversaryTeamId == null) {
-                    adversaryTeamId = owner;
-                } else if (!adversaryTeamId.equals(owner)) {
-                    fullyControlled = false;
-                    break;
-                }
-            }
-
-            if (fullyControlled && adversaryTeamId != null) {
-                Map<String, Object> payload = Map.of(
-                        "routeId", route.getId(),
-                        "adversaryTeamId", adversaryTeamId,
-                        "minCount", 1
-                );
-                String payloadJson = toJson(payload);
-                String key = MissionType.BREAK_ROUTE.name() + ":" + payloadJson;
-                if (existingKeys.contains(key)) continue;
-
-                Instant now = Instant.now();
-                Mission m = new Mission();
-                m.setTeamId(teamId);
-                m.setType(MissionType.BREAK_ROUTE);
-                m.setStatus(MissionStatus.ACTIVE);
-                m.setTitle("Briser la route " + route.getNom());
-                m.setDescription("Reprendre au moins 1 point de la route '"
-                        + route.getNom() + "' contrôlée par l'équipe adverse.");
-                m.setPriority(MissionPriority.HIGH);
-                m.setRewardTeamPoints(75);
-                m.setRewardTeamXp(50);
-                m.setTimestampsFromInstant(now, now, now.plus(5, ChronoUnit.DAYS));
-                m.setPayloadJson(payloadJson);
-                m.setProgressCurrent(0);
-                m.setProgressTarget(1);
-                return Optional.of(m);
-            }
+            Instant now = Instant.now();
+            Mission m = new Mission();
+            m.setTeamId(teamId);
+            m.setType(MissionType.BREAK_ROUTE);
+            m.setStatus(MissionStatus.ACTIVE);
+            m.setTitle("Briser le contrôle de " + arene.getNom());
+            m.setDescription("Reprendre l'arène '" + arene.getNom()
+                    + "' contrôlée par l'équipe adverse. Cassez leur domination !");
+            m.setPriority(MissionPriority.HIGH);
+            m.setRewardTeamPoints(75);
+            m.setRewardTeamXp(50);
+            m.setTimestampsFromInstant(now, now, now.plus(5, ChronoUnit.DAYS));
+            m.setPayloadJson(payloadJson);
+            m.setProgressCurrent(0);
+            m.setProgressTarget(1);
+            return Optional.of(m);
         }
         return Optional.empty();
     }
