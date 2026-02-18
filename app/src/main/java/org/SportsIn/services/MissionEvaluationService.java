@@ -7,7 +7,6 @@ import org.SportsIn.model.Session;
 import org.SportsIn.model.SessionRepository;
 import org.SportsIn.model.SessionState;
 import org.SportsIn.model.mission.*;
-import org.SportsIn.model.territory.*;
 import org.SportsIn.repository.AreneRepository;
 import org.SportsIn.repository.EquipeRepository;
 import org.SportsIn.repository.MissionRepository;
@@ -31,21 +30,15 @@ public class MissionEvaluationService {
     private final MissionRepository missionRepository;
     private final EquipeRepository equipeRepository;
     private final AreneRepository areneRepository;
-    private final PointSportifRepository pointRepository;
-    private final RouteRepository routeRepository;
     private final SessionRepository sessionRepository;
 
     public MissionEvaluationService(MissionRepository missionRepository,
                                     EquipeRepository equipeRepository,
                                     AreneRepository areneRepository,
-                                    PointSportifRepository pointRepository,
-                                    RouteRepository routeRepository,
                                     SessionRepository sessionRepository) {
         this.missionRepository = missionRepository;
         this.equipeRepository = equipeRepository;
         this.areneRepository = areneRepository;
-        this.pointRepository = pointRepository;
-        this.routeRepository = routeRepository;
         this.sessionRepository = sessionRepository;
     }
 
@@ -111,31 +104,19 @@ public class MissionEvaluationService {
     }
 
     /**
-     * RECAPTURE: SUCCESS si l'équipe contrôle l'arène (arenaId) ou le point (pointId).
+     * RECAPTURE: SUCCESS si l'équipe contrôle l'arène (arenaId).
      */
     private boolean evaluateRecapture(Mission mission, Map<String, Object> payload) {
-        // D'abord essayer avec arenaId (nouveau format, String)
         Object arenaIdObj = payload.get("arenaId");
-        if (arenaIdObj != null) {
-            String arenaId = arenaIdObj.toString();
-            Optional<Arene> areneOpt = areneRepository.findById(arenaId);
-            if (areneOpt.isPresent()) {
-                Arene arene = areneOpt.get();
-                if (arene.getControllingTeam() != null
-                        && mission.getTeamId().equals(arene.getControllingTeam().getId())) {
-                    mission.setProgressCurrent(1);
-                    return true;
-                }
-            }
-            return false;
-        }
+        if (arenaIdObj == null) return false;
 
-        // Fallback: pointId (ancien format, Long) pour compatibilité in-memory
-        Long pointId = toLong(payload.get("pointId"));
-        if (pointId == null) return false;
-        Optional<PointSportif> pointOpt = pointRepository.findById(pointId);
-        if (pointOpt.isEmpty()) return false;
-        if (mission.getTeamId().equals(pointOpt.get().getControllingTeamId())) {
+        String arenaId = arenaIdObj.toString();
+        Optional<Arene> areneOpt = areneRepository.findById(arenaId);
+        if (areneOpt.isEmpty()) return false;
+
+        Arene arene = areneOpt.get();
+        if (arene.getControllingTeam() != null
+                && mission.getTeamId().equals(arene.getControllingTeam().getId())) {
             mission.setProgressCurrent(1);
             return true;
         }
@@ -159,7 +140,6 @@ public class MissionEvaluationService {
             if (s.getSport() == null || s.getEndedAt() == null) continue;
             if (!sportCode.equals(s.getSport().getCode())) continue;
 
-            // Vérifier l'arène si spécifié
             if (arenaIdObj != null) {
                 String expectedArenaId = arenaIdObj.toString();
                 if (!expectedArenaId.equals(s.getPointId())) continue;
@@ -175,33 +155,19 @@ public class MissionEvaluationService {
     }
 
     /**
-     * BREAK_ROUTE: SUCCESS si l'équipe contrôle l'arène (arenaId) ou un point de la route.
+     * BREAK_ROUTE: SUCCESS si l'équipe contrôle l'arène (arenaId).
      */
     private boolean evaluateBreakRoute(Mission mission, Map<String, Object> payload) {
-        // D'abord essayer avec arenaId (nouveau format)
         Object arenaIdObj = payload.get("arenaId");
-        if (arenaIdObj != null) {
-            String arenaId = arenaIdObj.toString();
-            Optional<Arene> areneOpt = areneRepository.findById(arenaId);
-            if (areneOpt.isPresent()) {
-                Arene arene = areneOpt.get();
-                if (arene.getControllingTeam() != null
-                        && mission.getTeamId().equals(arene.getControllingTeam().getId())) {
-                    mission.setProgressCurrent(1);
-                    return true;
-                }
-            }
-            return false;
-        }
+        if (arenaIdObj == null) return false;
 
-        // Fallback: routeId (ancien format) pour compatibilité in-memory
-        Long routeId = toLong(payload.get("routeId"));
-        if (routeId == null) return false;
-        Optional<Route> routeOpt = routeRepository.findById(routeId);
-        if (routeOpt.isEmpty()) return false;
-        boolean teamControlsAPoint = routeOpt.get().getPoints().stream()
-                .anyMatch(p -> mission.getTeamId().equals(p.getControllingTeamId()));
-        if (teamControlsAPoint) {
+        String arenaId = arenaIdObj.toString();
+        Optional<Arene> areneOpt = areneRepository.findById(arenaId);
+        if (areneOpt.isEmpty()) return false;
+
+        Arene arene = areneOpt.get();
+        if (arene.getControllingTeam() != null
+                && mission.getTeamId().equals(arene.getControllingTeam().getId())) {
             mission.setProgressCurrent(1);
             return true;
         }
@@ -217,14 +183,6 @@ public class MissionEvaluationService {
             equipe.setXp(equipe.getXp() + mission.getRewardTeamXp());
             equipeRepository.save(equipe);
         });
-
-        if (mission.getType() == MissionType.BREAK_ROUTE) {
-            Map<String, Object> payload = parsePayload(mission.getPayloadJson());
-            Long routeId = toLong(payload.get("routeId"));
-            if (routeId != null) {
-                System.out.println(">>> HOOK: Route " + routeId + " combo cassé par équipe " + mission.getTeamId());
-            }
-        }
     }
 
     private Map<String, Object> parsePayload(String json) {
@@ -233,16 +191,6 @@ public class MissionEvaluationService {
             return MAPPER.readValue(json, new TypeReference<>() {});
         } catch (Exception e) {
             return Map.of();
-        }
-    }
-
-    private Long toLong(Object value) {
-        if (value == null) return null;
-        if (value instanceof Number n) return n.longValue();
-        try {
-            return Long.parseLong(value.toString());
-        } catch (NumberFormatException e) {
-            return null;
         }
     }
 }
