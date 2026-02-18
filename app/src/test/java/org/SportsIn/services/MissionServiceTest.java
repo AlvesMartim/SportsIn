@@ -42,15 +42,6 @@ class MissionServiceTest {
         equipeRepository = new InMemoryEquipeRepository();
         areneRepository = new InMemoryAreneRepository();
         sessionRepository = new InMemorySessionRepository();
-<<<<<<< HEAD
-        pointRepository = new InMemoryPointSportifRepository();
-        zoneRepository = new InMemoryZoneRepository();
-        routeRepository = new InMemoryRouteRepository();
-        InfluenceCalculator influenceCalculator = new InfluenceCalculator(
-                List.of(new RouteInfluenceModifier(routeRepository)));
-        territoryService = new TerritoryService(pointRepository, zoneRepository, routeRepository, influenceCalculator);
-=======
->>>>>>> feature/missions-dynamiques
 
         generationService = new MissionGenerationService(
                 missionRepository, areneRepository, sessionRepository);
