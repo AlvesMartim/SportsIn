@@ -28,7 +28,9 @@ class TerritoryServiceTest {
         pointRepository = new InMemoryPointSportifRepository();
         zoneRepository = new InMemoryZoneRepository();
         routeRepository = new InMemoryRouteRepository();
-        territoryService = new TerritoryService(pointRepository, zoneRepository, routeRepository);
+        InfluenceCalculator influenceCalculator = new InfluenceCalculator(
+                List.of(new RouteInfluenceModifier(routeRepository)));
+        territoryService = new TerritoryService(pointRepository, zoneRepository, routeRepository, influenceCalculator);
 
         // Création de 4 points
         p1 = new PointSportif(1L, "Point 1", 0, 0, null);

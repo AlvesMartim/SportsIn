@@ -136,7 +136,19 @@ INSERT OR IGNORE INTO metric_value (id, session_id, participant_id, metric_type,
 INSERT OR IGNORE INTO metric_value (id, session_id, participant_id, metric_type, value) VALUES 
   (4, 'session_002', '3', 'GOALS', 2.0);
 
-INSERT OR IGNORE INTO metric_value (id, session_id, participant_id, metric_type, value) VALUES 
+INSERT OR IGNORE INTO metric_value (id, session_id, participant_id, metric_type, value) VALUES
   (5, 'session_003', '2', 'POINTS', 85.0);
-INSERT OR IGNORE INTO metric_value (id, session_id, participant_id, metric_type, value) VALUES 
+INSERT OR IGNORE INTO metric_value (id, session_id, participant_id, metric_type, value) VALUES
   (6, 'session_003', '4', 'POINTS', 78.0);
+
+-- ============================================
+-- PERK DEFINITIONS (Feature 6)
+-- ============================================
+INSERT OR IGNORE INTO perk_definition (id, code, name, description, effect_type, required_level, duration_seconds, cooldown_seconds, max_active_instances, stackable, parameters_json)
+VALUES (1, 'SHIELD_QUARTIER', 'Bouclier de quartier', 'Reduit de 50% les gains d''influence adverses sur un point controle pendant 3 jours.', 'INFLUENCE_REDUCTION', 3, 259200, 604800, 1, 0, '{"reductionPercent": 50, "targetType": "POINT"}');
+
+INSERT OR IGNORE INTO perk_definition (id, code, name, description, effect_type, required_level, duration_seconds, cooldown_seconds, max_active_instances, stackable, parameters_json)
+VALUES (2, 'BOOST_INFLUENCE', 'Surge d''influence', 'Augmente de 25% les gains d''influence sur un point pendant 2 jours.', 'INFLUENCE_BOOST', 5, 172800, 432000, 1, 0, '{"boostPercent": 25, "targetType": "POINT"}');
+
+INSERT OR IGNORE INTO perk_definition (id, code, name, description, effect_type, required_level, duration_seconds, cooldown_seconds, max_active_instances, stackable, parameters_json)
+VALUES (3, 'XP_BOOST', 'Entrainement intensif', 'Multiplie par 1.5 les gains d''XP pendant 24 heures.', 'XP_MULTIPLIER', 2, 86400, 259200, 1, 0, '{"multiplier": 1.5}');

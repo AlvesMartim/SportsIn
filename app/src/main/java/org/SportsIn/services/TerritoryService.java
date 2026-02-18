@@ -22,13 +22,18 @@ public class TerritoryService {
     private final RouteRepository routeRepository;
     private final RouteService routeService;
     private final RouteGeneratorService routeGeneratorService;
+    private final InfluenceCalculator influenceCalculator;
 
-    public TerritoryService(PointSportifRepository pointRepository, ZoneRepository zoneRepository, RouteRepository routeRepository) {
+    public TerritoryService(PointSportifRepository pointRepository,
+                            ZoneRepository zoneRepository,
+                            RouteRepository routeRepository,
+                            InfluenceCalculator influenceCalculator) {
         this.pointRepository = pointRepository;
         this.zoneRepository = zoneRepository;
         this.routeRepository = routeRepository;
         this.routeService = new RouteService();
         this.routeGeneratorService = new RouteGeneratorService();
+        this.influenceCalculator = influenceCalculator;
     }
 
     /**
@@ -64,22 +69,7 @@ public class TerritoryService {
      * @return Le multiplicateur de bonus (ex: 0.10 pour +10%). Retourne 0.0 si aucun bonus.
      */
     public double getScoreBonusForTeamOnPoint(Long teamId, Long pointId) {
-        List<Route> allRoutes = routeRepository.findAll();
-        if (allRoutes.isEmpty()) return 0.0;
-
-        List<RouteBonus> bonuses = routeService.calculateBonuses(allRoutes, teamId);
-        double totalBonus = 0.0;
-
-        for (RouteBonus bonus : bonuses) {
-            // Vérifie si le point actuel fait partie de la route qui donne le bonus
-            boolean pointIsOnRoute = bonus.getRoute().getPoints().stream()
-                    .anyMatch(p -> p.getId().equals(pointId));
-            
-            if (pointIsOnRoute && "SCORE_MULTIPLIER".equals(bonus.getBonusType())) {
-                totalBonus += bonus.getBonusValue();
-            }
-        }
-        return totalBonus;
+        return influenceCalculator.computeTotalModifier(teamId, pointId);
     }
 
     /**
