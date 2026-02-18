@@ -1,28 +1,30 @@
 package org.SportsIn.model.territory;
 
+import org.SportsIn.model.Arene;
+
 import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Représente une route sportive, constituée d'une suite ordonnée de points sportifs.
- * Permet de définir des bonus de combo si une équipe contrôle plusieurs points consécutifs.
+ * Représente une route sportive, constituée d'une suite ordonnée d'arènes.
+ * Permet de définir des bonus de combo si une équipe contrôle plusieurs arènes consécutives.
  */
 public class Route {
 
     private Long id;
     private String nom;
     private String description;
-    private List<PointSportif> points;
+    private List<Arene> arenes;
 
     public Route() {
-        this.points = new ArrayList<>();
+        this.arenes = new ArrayList<>();
     }
 
-    public Route(Long id, String nom, String description, List<PointSportif> points) {
+    public Route(Long id, String nom, String description, List<Arene> arenes) {
         this.id = id;
         this.nom = nom;
         this.description = description;
-        this.points = points != null ? points : new ArrayList<>();
+        this.arenes = arenes != null ? arenes : new ArrayList<>();
     }
 
     public Long getId() {
@@ -49,16 +51,16 @@ public class Route {
         this.description = description;
     }
 
-    public List<PointSportif> getPoints() {
-        return points;
+    public List<Arene> getArenes() {
+        return arenes;
     }
 
-    public void setPoints(List<PointSportif> points) {
-        this.points = points;
+    public void setArenes(List<Arene> arenes) {
+        this.arenes = arenes;
     }
 
-    public void addPoint(PointSportif point) {
-        this.points.add(point);
+    public void addArene(Arene arene) {
+        this.arenes.add(arene);
     }
 
     @Override
@@ -66,7 +68,7 @@ public class Route {
         return "Route{" +
                 "id=" + id +
                 ", nom='" + nom + '\'' +
-                ", pointsCount=" + (points != null ? points.size() : 0) +
+                ", arenesCount=" + (arenes != null ? arenes.size() : 0) +
                 '}';
     }
 }

@@ -1,0 +1,563 @@
+/* ========================================
+   Progression & Perks Page Styles
+   ======================================== */
+
+.progression-page {
+  min-height: 100vh;
+}
+
+.progression-content {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 100px 24px 48px;
+}
+
+.progression-header {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 32px;
+}
+
+.progression-header h1 {
+  margin: 0;
+  flex: 1;
+}
+
+.progression-loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 80px 0;
+  gap: 16px;
+  color: var(--gray-400);
+}
+
+.progression-error {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 16px 20px;
+  background: rgba(239, 68, 68, 0.1);
+  border: 1px solid rgba(239, 68, 68, 0.3);
+  border-radius: var(--radius-lg);
+  margin-bottom: 24px;
+  color: var(--danger-400);
+}
+
+.progression-error p {
+  flex: 1;
+  margin: 0;
+}
+
+.progression-error button {
+  background: none;
+  border: none;
+  color: var(--gray-400);
+  cursor: pointer;
+  font-size: 20px;
+  padding: 4px;
+}
+
+.progression-no-team {
+  text-align: center;
+  padding: 60px 20px;
+  color: var(--gray-400);
+}
+
+.progression-no-team__icon {
+  font-size: 64px;
+  display: block;
+  margin-bottom: 16px;
+  opacity: 0.5;
+}
+
+.progression-no-team p {
+  font-size: 1.1rem;
+  margin: 0 0 20px;
+}
+
+/* ---- Level Card ---- */
+.prog-card {
+  background: var(--bg-card);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-xl);
+  padding: 24px;
+  margin-bottom: 20px;
+}
+
+.prog-card__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 20px;
+}
+
+.prog-card__header h2,
+.prog-card__header h3 {
+  margin: 0;
+  font-size: 1.1rem;
+}
+
+.level-card {
+  background: linear-gradient(135deg, rgba(139, 92, 246, 0.15) 0%, var(--bg-tertiary) 100%);
+  border-color: rgba(139, 92, 246, 0.25);
+}
+
+.level-overview {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  margin-bottom: 24px;
+}
+
+.level-badge {
+  width: 88px;
+  height: 88px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #8b5cf6 0%, #6d28d9 100%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 0 30px rgba(139, 92, 246, 0.4);
+  flex-shrink: 0;
+}
+
+.level-badge__number {
+  font-size: 2rem;
+  font-weight: 800;
+  color: white;
+  line-height: 1;
+}
+
+.level-badge__label {
+  font-size: 0.65rem;
+  color: rgba(255, 255, 255, 0.7);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+}
+
+.level-info {
+  flex: 1;
+}
+
+.level-info__team-name {
+  font-size: 1.4rem;
+  font-weight: 700;
+  margin: 0 0 4px;
+  color: var(--gray-100);
+}
+
+.level-info__xp-text {
+  font-size: 0.9rem;
+  color: var(--gray-400);
+  margin: 0 0 12px;
+}
+
+.level-info__xp-text strong {
+  color: var(--primary-400);
+}
+
+/* XP Progress Bar */
+.xp-progress {
+  width: 100%;
+}
+
+.xp-progress__bar-bg {
+  width: 100%;
+  height: 12px;
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: var(--radius-full);
+  overflow: hidden;
+  margin-bottom: 6px;
+}
+
+.xp-progress__bar-fill {
+  height: 100%;
+  border-radius: var(--radius-full);
+  background: linear-gradient(90deg, #8b5cf6, #a78bfa, #c4b5fd);
+  transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 0 12px rgba(139, 92, 246, 0.5);
+}
+
+.xp-progress__labels {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.75rem;
+  color: var(--gray-500);
+}
+
+/* Level stats */
+.level-stats {
+  display: flex;
+  gap: 32px;
+  padding-top: 20px;
+  border-top: 1px solid var(--glass-border);
+}
+
+.level-stat {
+  text-align: center;
+}
+
+.level-stat__value {
+  display: block;
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--primary-400);
+}
+
+.level-stat__label {
+  font-size: 0.8rem;
+  color: var(--gray-500);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+/* ---- Perks Catalog ---- */
+.perks-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 16px;
+}
+
+.perk-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+  padding: 20px;
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-lg);
+  transition: all var(--transition-fast);
+}
+
+.perk-item:hover {
+  border-color: rgba(139, 92, 246, 0.3);
+  background: rgba(139, 92, 246, 0.05);
+}
+
+.perk-item--locked {
+  opacity: 0.5;
+}
+
+.perk-item--unlocked {
+  border-color: rgba(34, 197, 94, 0.2);
+}
+
+.perk-icon {
+  width: 48px;
+  height: 48px;
+  border-radius: var(--radius-md);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 22px;
+  flex-shrink: 0;
+}
+
+.perk-icon--shield {
+  background: rgba(59, 130, 246, 0.15);
+}
+
+.perk-icon--boost {
+  background: rgba(34, 197, 94, 0.15);
+}
+
+.perk-icon--xp {
+  background: rgba(245, 158, 11, 0.15);
+}
+
+.perk-icon--default {
+  background: rgba(139, 92, 246, 0.15);
+}
+
+.perk-details {
+  flex: 1;
+  min-width: 0;
+}
+
+.perk-details__name {
+  font-weight: 600;
+  color: var(--gray-100);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 4px;
+}
+
+.perk-details__desc {
+  font-size: 0.85rem;
+  color: var(--gray-400);
+  margin: 0 0 10px;
+  line-height: 1.4;
+}
+
+.perk-meta {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.perk-meta__tag {
+  font-size: 0.75rem;
+  padding: 3px 10px;
+  border-radius: var(--radius-full);
+  background: rgba(255, 255, 255, 0.05);
+  color: var(--gray-400);
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.perk-actions {
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 8px;
+}
+
+.perk-level-req {
+  font-size: 0.75rem;
+  padding: 4px 10px;
+  border-radius: var(--radius-full);
+  font-weight: 600;
+}
+
+.perk-level-req--unlocked {
+  background: rgba(34, 197, 94, 0.15);
+  color: var(--success-400);
+}
+
+.perk-level-req--locked {
+  background: rgba(239, 68, 68, 0.15);
+  color: var(--danger-400);
+}
+
+/* ---- Active Perks ---- */
+.active-perks-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.active-perk-item {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 16px 0;
+  border-bottom: 1px solid var(--glass-border);
+}
+
+.active-perk-item:last-child {
+  border-bottom: none;
+}
+
+.active-perk__icon {
+  width: 44px;
+  height: 44px;
+  border-radius: var(--radius-md);
+  background: rgba(139, 92, 246, 0.15);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+  flex-shrink: 0;
+}
+
+.active-perk__info {
+  flex: 1;
+}
+
+.active-perk__name {
+  font-weight: 600;
+  color: var(--gray-100);
+  display: block;
+  margin-bottom: 2px;
+}
+
+.active-perk__target {
+  font-size: 0.8rem;
+  color: var(--gray-500);
+}
+
+.active-perk__timer {
+  text-align: right;
+  flex-shrink: 0;
+}
+
+.active-perk__time-left {
+  display: block;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--warning-400);
+}
+
+.active-perk__expires-label {
+  display: block;
+  font-size: 0.7rem;
+  color: var(--gray-500);
+}
+
+/* ---- Activate Perk Modal ---- */
+.perk-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.7);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 20px;
+}
+
+.perk-modal {
+  background: var(--bg-secondary);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-xl);
+  padding: 32px;
+  width: 100%;
+  max-width: 480px;
+  max-height: 80vh;
+  overflow-y: auto;
+}
+
+.perk-modal h3 {
+  margin: 0 0 8px;
+  font-size: 1.2rem;
+}
+
+.perk-modal__desc {
+  color: var(--gray-400);
+  font-size: 0.9rem;
+  margin: 0 0 24px;
+}
+
+.perk-modal__field {
+  margin-bottom: 20px;
+}
+
+.perk-modal__field label {
+  display: block;
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: var(--gray-300);
+  margin-bottom: 8px;
+}
+
+.perk-modal__field select,
+.perk-modal__field input {
+  width: 100%;
+  padding: 12px 16px;
+  background: var(--bg-tertiary);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-md);
+  color: var(--gray-100);
+  font-size: 0.95rem;
+  outline: none;
+  transition: border-color var(--transition-fast);
+}
+
+.perk-modal__field select:focus,
+.perk-modal__field input:focus {
+  border-color: var(--primary-400);
+}
+
+.perk-modal__actions {
+  display: flex;
+  gap: 12px;
+  margin-top: 24px;
+}
+
+.perk-modal__error {
+  color: var(--danger-400);
+  font-size: 0.85rem;
+  margin-top: 12px;
+  padding: 8px 12px;
+  background: rgba(239, 68, 68, 0.1);
+  border-radius: var(--radius-md);
+}
+
+/* ---- No perks state ---- */
+.no-active-perks {
+  text-align: center;
+  padding: 32px 20px;
+  color: var(--gray-500);
+}
+
+.no-active-perks__icon {
+  font-size: 40px;
+  display: block;
+  margin-bottom: 12px;
+  opacity: 0.4;
+}
+
+/* ---- Tabs ---- */
+.prog-tabs {
+  display: flex;
+  gap: 4px;
+  background: rgba(255, 255, 255, 0.04);
+  border-radius: var(--radius-lg);
+  padding: 4px;
+  margin-bottom: 24px;
+}
+
+.prog-tab {
+  flex: 1;
+  padding: 10px 16px;
+  border: none;
+  background: none;
+  color: var(--gray-400);
+  font-size: 0.9rem;
+  font-weight: 500;
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  text-align: center;
+}
+
+.prog-tab:hover {
+  color: var(--gray-200);
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.prog-tab--active {
+  background: rgba(139, 92, 246, 0.2);
+  color: #c4b5fd;
+}
+
+/* ---- Responsive ---- */
+@media (max-width: 768px) {
+  .progression-content {
+    padding: 90px 16px 32px;
+  }
+
+  .level-overview {
+    flex-direction: column;
+    text-align: center;
+  }
+
+  .level-stats {
+    justify-content: center;
+  }
+
+  .perk-item {
+    flex-wrap: wrap;
+  }
+
+  .perk-actions {
+    width: 100%;
+    flex-direction: row;
+    justify-content: flex-end;
+  }
+
+  .perk-modal {
+    padding: 24px;
+  }
+}

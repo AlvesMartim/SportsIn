@@ -1,6 +1,7 @@
 package org.SportsIn.services;
 
-import org.SportsIn.model.territory.PointSportif;
+import org.SportsIn.model.Arene;
+import org.SportsIn.model.user.Equipe;
 import org.SportsIn.model.territory.Route;
 import org.SportsIn.model.territory.RouteBonus;
 import org.junit.jupiter.api.BeforeEach;
@@ -17,7 +18,9 @@ class RouteServiceTest {
 
     private RouteService routeService;
     private Route routeRerB;
-    private PointSportif pA, pB, pC, pD, pE;
+    private Arene aA, aB, aC, aD, aE;
+    private Equipe equipeRouge;
+    private Equipe equipeBleu;
     private Long teamRouge = 1L;
     private Long teamBleu = 2L;
 
@@ -25,57 +28,59 @@ class RouteServiceTest {
     void setUp() {
         routeService = new RouteService();
 
-        pA = new PointSportif(1L, "A", 0, 0, null);
-        pB = new PointSportif(2L, "B", 0, 0, null);
-        pC = new PointSportif(3L, "C", 0, 0, null);
-        pD = new PointSportif(4L, "D", 0, 0, null);
-        pE = new PointSportif(5L, "E", 0, 0, null);
+        equipeRouge = new Equipe("Rouge");
+        equipeRouge.setId(teamRouge);
+        equipeBleu = new Equipe("Bleu");
+        equipeBleu.setId(teamBleu);
 
-        routeRerB = new Route(100L, "RER B Sud", "A -> E", new ArrayList<>(Arrays.asList(pA, pB, pC, pD, pE)));
+        aA = new Arene("1", "A", 0, 0);
+        aB = new Arene("2", "B", 0, 0);
+        aC = new Arene("3", "C", 0, 0);
+        aD = new Arene("4", "D", 0, 0);
+        aE = new Arene("5", "E", 0, 0);
+
+        routeRerB = new Route(100L, "RER B Sud", "A -> E", new ArrayList<>(Arrays.asList(aA, aB, aC, aD, aE)));
     }
 
     @Test
-    void testGetMaxConsecutivePoints_NoControl() {
-        int max = routeService.getMaxConsecutivePoints(routeRerB, teamRouge);
-        assertEquals(0, max, "Aucun point contrôlé devrait donner 0");
+    void testGetMaxConsecutiveArenes_NoControl() {
+        int max = routeService.getMaxConsecutiveArenes(routeRerB, teamRouge);
+        assertEquals(0, max, "Aucune arène contrôlée devrait donner 0");
     }
 
     @Test
-    void testGetMaxConsecutivePoints_SinglePoint() {
-        pA.setControllingTeamId(teamRouge);
-        int max = routeService.getMaxConsecutivePoints(routeRerB, teamRouge);
-        assertEquals(1, max, "Un seul point contrôlé devrait donner 1");
+    void testGetMaxConsecutiveArenes_SingleArene() {
+        aA.setControllingTeam(equipeRouge);
+        int max = routeService.getMaxConsecutiveArenes(routeRerB, teamRouge);
+        assertEquals(1, max, "Une seule arène contrôlée devrait donner 1");
     }
 
     @Test
-    void testGetMaxConsecutivePoints_ThreeConsecutive() {
-        // A, B, C contrôlés par Rouge
-        pA.setControllingTeamId(teamRouge);
-        pB.setControllingTeamId(teamRouge);
-        pC.setControllingTeamId(teamRouge);
+    void testGetMaxConsecutiveArenes_ThreeConsecutive() {
+        aA.setControllingTeam(equipeRouge);
+        aB.setControllingTeam(equipeRouge);
+        aC.setControllingTeam(equipeRouge);
         
-        int max = routeService.getMaxConsecutivePoints(routeRerB, teamRouge);
+        int max = routeService.getMaxConsecutiveArenes(routeRerB, teamRouge);
         assertEquals(3, max, "A, B, C contrôlés devrait donner 3");
     }
 
     @Test
-    void testGetMaxConsecutivePoints_BrokenSequence() {
-        // A, B contrôlés, C non, D contrôlé
-        pA.setControllingTeamId(teamRouge);
-        pB.setControllingTeamId(teamRouge);
-        // pC neutre
-        pD.setControllingTeamId(teamRouge);
+    void testGetMaxConsecutiveArenes_BrokenSequence() {
+        aA.setControllingTeam(equipeRouge);
+        aB.setControllingTeam(equipeRouge);
+        // aC neutre
+        aD.setControllingTeam(equipeRouge);
 
-        int max = routeService.getMaxConsecutivePoints(routeRerB, teamRouge);
+        int max = routeService.getMaxConsecutiveArenes(routeRerB, teamRouge);
         assertEquals(2, max, "La plus longue suite est A, B (donc 2)");
     }
 
     @Test
     void testCalculateBonuses_BonusUnlocked() {
-        // A, B, C contrôlés par Rouge -> Bonus attendu
-        pA.setControllingTeamId(teamRouge);
-        pB.setControllingTeamId(teamRouge);
-        pC.setControllingTeamId(teamRouge);
+        aA.setControllingTeam(equipeRouge);
+        aB.setControllingTeam(equipeRouge);
+        aC.setControllingTeam(equipeRouge);
 
         List<RouteBonus> bonuses = routeService.calculateBonuses(Collections.singletonList(routeRerB), teamRouge);
         
@@ -89,12 +94,11 @@ class RouteServiceTest {
 
     @Test
     void testCalculateBonuses_BonusNotUnlocked() {
-        // A, B contrôlés par Rouge -> Pas de bonus (min 3)
-        pA.setControllingTeamId(teamRouge);
-        pB.setControllingTeamId(teamRouge);
+        aA.setControllingTeam(equipeRouge);
+        aB.setControllingTeam(equipeRouge);
 
         List<RouteBonus> bonuses = routeService.calculateBonuses(Collections.singletonList(routeRerB), teamRouge);
         
-        assertTrue(bonuses.isEmpty(), "Pas de bonus pour seulement 2 points consécutifs");
+        assertTrue(bonuses.isEmpty(), "Pas de bonus pour seulement 2 arènes consécutives");
     }
 }

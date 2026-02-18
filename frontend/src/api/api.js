@@ -138,7 +138,7 @@ export const routeAPI = {
 export const zoneAPI = {
   getAll: async () => fetchAPI('/zones'),
   getById: async (id) => fetchAPI(`/zones/${id}`),
-  getByPointId: async (pointId) => fetchAPI(`/zones/point/${pointId}`),
+  getByAreneId: async (areneId) => fetchAPI(`/zones/arene/${areneId}`),
 };
 
 /**
@@ -169,6 +169,19 @@ export const missionAPI = {
   refresh: async (missionId) => fetchAPI(`/missions/${missionId}/refresh`, { method: 'POST' }),
 };
 
+/**
+ * ========== PROGRESSION & PERKS ==========
+ */
+export const progressionAPI = {
+  getProgression: async (teamId) => fetchAPI(`/teams/${teamId}/progression`),
+  getAllPerks: async () => fetchAPI('/perks'),
+  activatePerk: async (teamId, perkCode, targetId) => fetchAPI(`/teams/${teamId}/perks/activate`, {
+    method: 'POST',
+    body: JSON.stringify({ perkCode, targetId }),
+  }),
+  getActivePerks: async (teamId) => fetchAPI(`/teams/${teamId}/perks/active`),
+};
+
 export default {
   authAPI,
   equipeAPI,
@@ -181,4 +194,5 @@ export default {
   zoneAPI,
   gameAPI,
   missionAPI,
+  progressionAPI,
 };

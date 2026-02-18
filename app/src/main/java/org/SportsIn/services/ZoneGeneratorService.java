@@ -1,6 +1,6 @@
 package org.SportsIn.services;
 
-import org.SportsIn.model.territory.PointSportif;
+import org.SportsIn.model.Arene;
 import org.SportsIn.model.territory.Zone;
 import org.SportsIn.utils.GeoUtils;
 
@@ -12,33 +12,30 @@ import java.util.Set;
 public class ZoneGeneratorService {
 
     /**
-     * Génère automatiquement des zones en regroupant les points proches.
+     * Génère automatiquement des zones en regroupant les arènes proches.
      *
-     * @param allPoints La liste complète des points sportifs disponibles.
-     * @param radiusKm Le rayon de recherche en kilomètres pour grouper les points.
-     * @param minPointsPerZone Le nombre minimum de points pour former une zone valide.
+     * @param allArenes La liste complète des arènes disponibles.
+     * @param radiusKm Le rayon de recherche en kilomètres pour grouper les arènes.
+     * @param minArenesPerZone Le nombre minimum d'arènes pour former une zone valide.
      * @return Une liste de zones générées.
      */
-    public List<Zone> generateZonesFromPoints(List<PointSportif> allPoints, double radiusKm, int minPointsPerZone) {
+    public List<Zone> generateZonesFromArenes(List<Arene> allArenes, double radiusKm, int minArenesPerZone) {
         List<Zone> generatedZones = new ArrayList<>();
-        Set<Long> assignedPointIds = new HashSet<>();
+        Set<String> assignedAreneIds = new HashSet<>();
         long zoneIdCounter = 1;
 
-        for (PointSportif centerPoint : allPoints) {
-            // Si le point est déjà dans une zone, on passe
-            if (assignedPointIds.contains(centerPoint.getId())) {
+        for (Arene centerArene : allArenes) {
+            if (assignedAreneIds.contains(centerArene.getId())) {
                 continue;
             }
 
-            // Créer un nouveau groupe potentiel avec ce point comme centre
-            List<PointSportif> currentGroup = new ArrayList<>();
-            currentGroup.add(centerPoint);
+            List<Arene> currentGroup = new ArrayList<>();
+            currentGroup.add(centerArene);
 
-            // Chercher les voisins proches qui ne sont pas encore assignés
-            for (PointSportif candidate : allPoints) {
-                if (!candidate.getId().equals(centerPoint.getId()) && !assignedPointIds.contains(candidate.getId())) {
+            for (Arene candidate : allArenes) {
+                if (!candidate.getId().equals(centerArene.getId()) && !assignedAreneIds.contains(candidate.getId())) {
                     double distance = GeoUtils.calculateDistance(
-                            centerPoint.getLatitude(), centerPoint.getLongitude(),
+                            centerArene.getLatitude(), centerArene.getLongitude(),
                             candidate.getLatitude(), candidate.getLongitude()
                     );
 
@@ -48,19 +45,17 @@ public class ZoneGeneratorService {
                 }
             }
 
-            // Si le groupe est assez grand, on crée une zone
-            if (currentGroup.size() >= minPointsPerZone) {
+            if (currentGroup.size() >= minArenesPerZone) {
                 Zone newZone = new Zone(
                         zoneIdCounter++,
-                        "Zone Auto " + zoneIdCounter + " (Centre: " + centerPoint.getNom() + ")",
+                        "Zone Auto " + zoneIdCounter + " (Centre: " + centerArene.getNom() + ")",
                         currentGroup
                 );
                 
                 generatedZones.add(newZone);
 
-                // Marquer ces points comme assignés
-                for (PointSportif p : currentGroup) {
-                    assignedPointIds.add(p.getId());
+                for (Arene a : currentGroup) {
+                    assignedAreneIds.add(a.getId());
                 }
             }
         }

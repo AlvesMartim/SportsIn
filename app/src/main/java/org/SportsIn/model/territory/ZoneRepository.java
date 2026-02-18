@@ -9,9 +9,9 @@ public interface ZoneRepository {
     void save(Zone zone);
     
     /**
-     * Trouve la ou les zones qui contiennent ce point spécifique.
-     * Un point pourrait théoriquement appartenir à plusieurs zones (chevauchement),
+     * Trouve la ou les zones qui contiennent cette arène spécifique.
+     * Une arène pourrait théoriquement appartenir à plusieurs zones (chevauchement),
      * ou une seule.
      */
-    List<Zone> findZonesByPointId(Long pointId);
+    List<Zone> findZonesByAreneId(String areneId);
 }

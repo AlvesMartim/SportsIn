@@ -269,7 +269,7 @@ class MissionServiceTest {
     static class InMemoryAreneRepository implements AreneRepository {
         private final Map<String, Arene> db = new LinkedHashMap<>();
 
-        @Override public List<Arene> findByControllingTeamId(Long teamId) {
+        @Override public List<Arene> findByControllingTeam_Id(Long teamId) {
             return db.values().stream()
                     .filter(a -> a.getControllingTeam() != null && teamId.equals(a.getControllingTeam().getId()))
                     .toList();

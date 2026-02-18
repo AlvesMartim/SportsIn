@@ -8,6 +8,6 @@ import java.util.List;
 
 @Repository
 public interface AreneRepository extends JpaRepository<Arene, String> {
-    List<Arene> findByControllingTeamId(Long teamId);
+    List<Arene> findByControllingTeam_Id(Long teamId);
     List<Arene> findBySportsDisponiblesContaining(String sport);
 }

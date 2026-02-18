@@ -21,7 +21,7 @@ class ShieldEffectTest {
 
     @Test
     void reduces_influence_by_configured_percent() {
-        PerkContext ctx = new PerkContext(1L, 2L, 10L, 0.20,
+        PerkContext ctx = new PerkContext(1L, 2L, "10", 0.20,
                 Map.of("reductionPercent", 50));
 
         double modifier = shield.computeInfluenceModifier(ctx);
@@ -30,7 +30,7 @@ class ShieldEffectTest {
 
     @Test
     void defaults_to_50_percent_if_no_parameter() {
-        PerkContext ctx = new PerkContext(1L, 2L, 10L, 0.20, Map.of());
+        PerkContext ctx = new PerkContext(1L, 2L, "10", 0.20, Map.of());
 
         double modifier = shield.computeInfluenceModifier(ctx);
         assertEquals(-0.10, modifier, 0.001);
@@ -38,7 +38,7 @@ class ShieldEffectTest {
 
     @Test
     void zero_base_influence_yields_zero_reduction() {
-        PerkContext ctx = new PerkContext(1L, 2L, 10L, 0.0,
+        PerkContext ctx = new PerkContext(1L, 2L, "10", 0.0,
                 Map.of("reductionPercent", 50));
 
         assertEquals(0.0, shield.computeInfluenceModifier(ctx), 0.001);
@@ -46,7 +46,7 @@ class ShieldEffectTest {
 
     @Test
     void full_reduction_with_100_percent() {
-        PerkContext ctx = new PerkContext(1L, 2L, 10L, 0.20,
+        PerkContext ctx = new PerkContext(1L, 2L, "10", 0.20,
                 Map.of("reductionPercent", 100));
 
         assertEquals(-0.20, shield.computeInfluenceModifier(ctx), 0.001);

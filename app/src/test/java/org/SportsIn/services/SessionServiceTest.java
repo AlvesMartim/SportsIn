@@ -2,13 +2,15 @@ package org.SportsIn.services;
 
 import org.SportsIn.model.*;
 import org.SportsIn.model.territory.*;
+import org.SportsIn.model.user.Equipe;
+import org.SportsIn.repository.AreneRepository;
+import org.SportsIn.repository.EquipeRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import java.time.LocalDateTime;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -16,49 +18,58 @@ class SessionServiceTest {
 
     private SessionService sessionService;
     private SessionRepository sessionRepository;
-    private PointSportifRepository pointSportifRepository;
+    private InMemoryAreneRepository areneRepository;
+    private InMemoryEquipeRepository equipeRepository;
     private ZoneRepository zoneRepository;
     private RouteRepository routeRepository;
     private TerritoryService territoryService;
 
     private Sport football;
-    private PointSportif cityStade;
+    private Arene cityStade;
+    private Equipe equipeAEntity;
+    private Equipe equipeBEntity;
     private Participant equipeA;
     private Participant equipeB;
 
     @BeforeEach
     void setUp() {
-        // Initialisation des repositories
         sessionRepository = new InMemorySessionRepository();
-        pointSportifRepository = new InMemoryPointSportifRepository();
+        areneRepository = new InMemoryAreneRepository();
+        equipeRepository = new InMemoryEquipeRepository();
         zoneRepository = new InMemoryZoneRepository();
         routeRepository = new InMemoryRouteRepository();
 
-        // Initialisation des services avec leurs dépendances
         InfluenceCalculator influenceCalculator = new InfluenceCalculator(
                 List.of(new RouteInfluenceModifier(routeRepository)));
-        territoryService = new TerritoryService(pointSportifRepository, zoneRepository, routeRepository, influenceCalculator);
-        // XpGrantService avec des repos null — les tests ne vérifient pas l'XP
+        territoryService = new TerritoryService(areneRepository, equipeRepository, zoneRepository, routeRepository, influenceCalculator);
         XpGrantService xpGrantService = new XpGrantService(null, null, null);
-        sessionService = new SessionService(sessionRepository, territoryService, xpGrantService);
+        RuleEvaluationService ruleEvaluationService = new RuleEvaluationService(new InMemoryRuleRepository());
+        sessionService = new SessionService(sessionRepository, territoryService, xpGrantService, ruleEvaluationService);
 
         // Données de test
         football = new Sport(1L, "FOOT", "Football", 101L, null);
-        cityStade = new PointSportif(42L, "City Stade de la Villette", 48.89, 2.38, List.of(football));
+
+        equipeAEntity = new Equipe("Les Aigles");
+        equipeAEntity.setId(10L);
+        equipeRepository.save(equipeAEntity);
+
+        equipeBEntity = new Equipe("Les Requins");
+        equipeBEntity.setId(12L);
+        equipeRepository.save(equipeBEntity);
+
+        cityStade = new Arene("42", "City Stade de la Villette", 48.89, 2.38);
+        areneRepository.save(cityStade);
+
         equipeA = new Participant("10", "Les Aigles", ParticipantType.TEAM);
         equipeB = new Participant("12", "Les Requins", ParticipantType.TEAM);
-
-        pointSportifRepository.save(cityStade);
         
-        // Créer une zone pour les tests de conquête de zone via SessionService
         Zone zoneTest = new Zone(200L, "Zone de Test", List.of(cityStade));
         zoneRepository.save(zoneTest);
     }
 
     @Test
-    @DisplayName("Cas nominal : une équipe conquiert un point neutre")
+    @DisplayName("Cas nominal : une équipe conquiert une arène neutre")
     void testProcessSessionCompletion_SuccessfulConquest() {
-        // ARRANGE
         Session session = new Session("S_001", football, "42", SessionState.ACTIVE, LocalDateTime.now(), List.of(equipeA, equipeB));
         session.getResult().setMetrics(List.of(
             new MetricValue(equipeA.getId(), MetricType.GOALS, 3.0, "match"),
@@ -66,12 +77,10 @@ class SessionServiceTest {
         ));
         sessionRepository.save(session);
 
-        // ACT
         sessionService.processSessionCompletion("S_001");
 
-        // ASSERT
-        PointSportif pointVerif = pointSportifRepository.findById(42L).orElseThrow();
-        assertEquals(10L, pointVerif.getControllingTeamId(), "L'équipe A (ID 10) devrait contrôler le point.");
+        Arene areneVerif = areneRepository.findById("42").orElseThrow();
+        assertEquals(10L, areneVerif.getControllingTeamId(), "L'équipe A (ID 10) devrait contrôler l'arène.");
 
         Session sessionVerif = sessionRepository.findById("S_001").orElseThrow();
         assertEquals(SessionState.TERMINATED, sessionVerif.getState());
@@ -79,11 +88,10 @@ class SessionServiceTest {
     }
 
     @Test
-    @DisplayName("Cas d'égalité : le contrôle du point ne change pas")
+    @DisplayName("Cas d'égalité : le contrôle de l'arène ne change pas")
     void testProcessSessionCompletion_NoWinner_ControlDoesNotChange() {
-        // ARRANGE
-        cityStade.setControllingTeamId(12L);
-        pointSportifRepository.save(cityStade);
+        cityStade.setControllingTeam(equipeBEntity);
+        areneRepository.save(cityStade);
 
         Session session = new Session("S_002", football, "42", SessionState.ACTIVE, LocalDateTime.now(), List.of(equipeA, equipeB));
         session.getResult().setMetrics(List.of(
@@ -92,12 +100,10 @@ class SessionServiceTest {
         ));
         sessionRepository.save(session);
 
-        // ACT
         sessionService.processSessionCompletion("S_002");
 
-        // ASSERT
-        PointSportif pointVerif = pointSportifRepository.findById(42L).orElseThrow();
-        assertEquals(12L, pointVerif.getControllingTeamId(), "Le contrôle du point ne devrait pas avoir changé.");
+        Arene areneVerif = areneRepository.findById("42").orElseThrow();
+        assertEquals(12L, areneVerif.getControllingTeamId(), "Le contrôle de l'arène ne devrait pas avoir changé.");
 
         Session sessionVerif = sessionRepository.findById("S_002").orElseThrow();
         assertEquals(SessionState.TERMINATED, sessionVerif.getState());
@@ -105,11 +111,10 @@ class SessionServiceTest {
     }
     
     @Test
-    @DisplayName("Nouveau test : une équipe conquiert un point adverse")
-    void testProcessSessionCompletion_ConquersOpponentPoint() {
-        // ARRANGE : Le point est contrôlé par l'équipe B
-        cityStade.setControllingTeamId(12L);
-        pointSportifRepository.save(cityStade);
+    @DisplayName("Nouveau test : une équipe conquiert une arène adverse")
+    void testProcessSessionCompletion_ConquersOpponentArene() {
+        cityStade.setControllingTeam(equipeBEntity);
+        areneRepository.save(cityStade);
 
         Session session = new Session("S_004", football, "42", SessionState.ACTIVE, LocalDateTime.now(), List.of(equipeA, equipeB));
         session.getResult().setMetrics(List.of(
@@ -118,20 +123,17 @@ class SessionServiceTest {
         ));
         sessionRepository.save(session);
 
-        // ACT
         sessionService.processSessionCompletion("S_004");
 
-        // ASSERT
-        PointSportif pointVerif = pointSportifRepository.findById(42L).orElseThrow();
-        assertEquals(10L, pointVerif.getControllingTeamId(), "Le contrôle doit basculer de l'équipe B (12) à l'équipe A (10).");
+        Arene areneVerif = areneRepository.findById("42").orElseThrow();
+        assertEquals(10L, areneVerif.getControllingTeamId(), "Le contrôle doit basculer de l'équipe B (12) à l'équipe A (10).");
     }
 
     @Test
-    @DisplayName("Nouveau test : une équipe défend son propre point")
-    void testProcessSessionCompletion_DefendsOwnPoint() {
-        // ARRANGE : Le point est déjà contrôlé par l'équipe A
-        cityStade.setControllingTeamId(10L);
-        pointSportifRepository.save(cityStade);
+    @DisplayName("Nouveau test : une équipe défend sa propre arène")
+    void testProcessSessionCompletion_DefendsOwnArene() {
+        cityStade.setControllingTeam(equipeAEntity);
+        areneRepository.save(cityStade);
 
         Session session = new Session("S_005", football, "42", SessionState.ACTIVE, LocalDateTime.now(), List.of(equipeA, equipeB));
         session.getResult().setMetrics(List.of(
@@ -140,30 +142,25 @@ class SessionServiceTest {
         ));
         sessionRepository.save(session);
 
-        // ACT
         sessionService.processSessionCompletion("S_005");
 
-        // ASSERT
-        PointSportif pointVerif = pointSportifRepository.findById(42L).orElseThrow();
-        assertEquals(10L, pointVerif.getControllingTeamId(), "Le contrôle doit rester à l'équipe A.");
+        Arene areneVerif = areneRepository.findById("42").orElseThrow();
+        assertEquals(10L, areneVerif.getControllingTeamId(), "Le contrôle doit rester à l'équipe A.");
     }
 
     @Test
-    @DisplayName("Nouveau test : un seul joueur prend le contrôle d'un point")
+    @DisplayName("Nouveau test : un seul joueur prend le contrôle d'une arène")
     void testProcessSessionCompletion_SinglePlayerTakesControl() {
-        // ARRANGE
         Session session = new Session("S_006", football, "42", SessionState.ACTIVE, LocalDateTime.now(), Collections.singletonList(equipeA));
         session.getResult().setMetrics(List.of(
                 new MetricValue(equipeA.getId(), MetricType.GOALS, 10.0, "entrainement")
         ));
         sessionRepository.save(session);
 
-        // ACT
         sessionService.processSessionCompletion("S_006");
 
-        // ASSERT
-        PointSportif pointVerif = pointSportifRepository.findById(42L).orElseThrow();
-        assertEquals(10L, pointVerif.getControllingTeamId(), "Le joueur seul doit prendre le contrôle du point.");
+        Arene areneVerif = areneRepository.findById("42").orElseThrow();
+        assertEquals(10L, areneVerif.getControllingTeamId(), "Le joueur seul doit prendre le contrôle de l'arène.");
     }
 
     @Test
@@ -175,20 +172,101 @@ class SessionServiceTest {
     }
 
     @Test
-    @DisplayName("Cas d'erreur : l'ID de point est invalide")
-    void testProcessSessionCompletion_WithInvalidPointId_CompletesSessionWithoutCrashing() {
-        // ARRANGE
+    @DisplayName("Cas d'erreur : l'ID d'arène est invalide")
+    void testProcessSessionCompletion_WithInvalidAreneId_CompletesSessionWithoutCrashing() {
         Session session = new Session("S_003", football, "9999", SessionState.ACTIVE, LocalDateTime.now(), List.of(equipeA, equipeB));
         session.getResult().setMetrics(List.of(new MetricValue(equipeA.getId(), MetricType.GOALS, 5.0, "match")));
         sessionRepository.save(session);
 
-        // ACT & ASSERT
-        // Le service ne doit pas planter
         assertDoesNotThrow(() -> sessionService.processSessionCompletion("S_003"));
 
-        // La session doit quand même être terminée
         Session sessionVerif = sessionRepository.findById("S_003").orElseThrow();
         assertEquals(SessionState.TERMINATED, sessionVerif.getState());
         assertEquals("10", sessionVerif.getWinnerParticipantId());
+    }
+
+    // ========== IN-MEMORY STUBS ==========
+
+    static class InMemoryAreneRepository implements AreneRepository {
+        private final Map<String, Arene> db = new LinkedHashMap<>();
+
+        @Override public List<Arene> findByControllingTeam_Id(Long teamId) {
+            return db.values().stream()
+                    .filter(a -> a.getControllingTeam() != null && teamId.equals(a.getControllingTeam().getId()))
+                    .toList();
+        }
+        @Override public List<Arene> findBySportsDisponiblesContaining(String sport) {
+            return db.values().stream()
+                    .filter(a -> a.getSportsDisponibles() != null && a.getSportsDisponibles().contains(sport))
+                    .toList();
+        }
+        @Override public <S extends Arene> S save(S entity) { db.put(entity.getId(), entity); return entity; }
+        @Override public Optional<Arene> findById(String id) { return Optional.ofNullable(db.get(id)); }
+        @Override public boolean existsById(String id) { return db.containsKey(id); }
+        @Override public List<Arene> findAll() { return new ArrayList<>(db.values()); }
+        @Override public <S extends Arene> List<S> saveAll(Iterable<S> entities) { entities.forEach(this::save); return List.of(); }
+        @Override public List<Arene> findAllById(Iterable<String> ids) { return List.of(); }
+        @Override public long count() { return db.size(); }
+        @Override public void deleteById(String id) { db.remove(id); }
+        @Override public void delete(Arene entity) { db.remove(entity.getId()); }
+        @Override public void deleteAllById(Iterable<? extends String> ids) {}
+        @Override public void deleteAll(Iterable<? extends Arene> entities) {}
+        @Override public void deleteAll() { db.clear(); }
+        @Override public void flush() {}
+        @Override public <S extends Arene> S saveAndFlush(S entity) { return save(entity); }
+        @Override public <S extends Arene> List<S> saveAllAndFlush(Iterable<S> entities) { return List.of(); }
+        @Override public void deleteAllInBatch(Iterable<Arene> entities) {}
+        @Override public void deleteAllByIdInBatch(Iterable<String> ids) {}
+        @Override public void deleteAllInBatch() {}
+        @Override public Arene getOne(String id) { return db.get(id); }
+        @Override public Arene getById(String id) { return db.get(id); }
+        @Override public Arene getReferenceById(String id) { return db.get(id); }
+        @Override public <S extends Arene> Optional<S> findOne(org.springframework.data.domain.Example<S> example) { return Optional.empty(); }
+        @Override public <S extends Arene> List<S> findAll(org.springframework.data.domain.Example<S> example) { return List.of(); }
+        @Override public <S extends Arene> List<S> findAll(org.springframework.data.domain.Example<S> example, org.springframework.data.domain.Sort sort) { return List.of(); }
+        @Override public <S extends Arene> org.springframework.data.domain.Page<S> findAll(org.springframework.data.domain.Example<S> example, org.springframework.data.domain.Pageable pageable) { return org.springframework.data.domain.Page.empty(); }
+        @Override public <S extends Arene> long count(org.springframework.data.domain.Example<S> example) { return 0; }
+        @Override public <S extends Arene> boolean exists(org.springframework.data.domain.Example<S> example) { return false; }
+        @Override public <S extends Arene, R> R findBy(org.springframework.data.domain.Example<S> example, java.util.function.Function<org.springframework.data.repository.query.FluentQuery.FetchableFluentQuery<S>, R> queryFunction) { return null; }
+        @Override public List<Arene> findAll(org.springframework.data.domain.Sort sort) { return findAll(); }
+        @Override public org.springframework.data.domain.Page<Arene> findAll(org.springframework.data.domain.Pageable pageable) { return org.springframework.data.domain.Page.empty(); }
+    }
+
+    static class InMemoryEquipeRepository implements EquipeRepository {
+        private final Map<Long, Equipe> db = new LinkedHashMap<>();
+
+        @Override public Optional<Equipe> findByNom(String nom) {
+            return db.values().stream().filter(e -> e.getNom().equals(nom)).findFirst();
+        }
+        @Override public <S extends Equipe> S save(S entity) { db.put(entity.getId(), entity); return entity; }
+        @Override public Optional<Equipe> findById(Long id) { return Optional.ofNullable(db.get(id)); }
+        @Override public boolean existsById(Long id) { return db.containsKey(id); }
+        @Override public List<Equipe> findAll() { return new ArrayList<>(db.values()); }
+        @Override public <S extends Equipe> List<S> saveAll(Iterable<S> entities) { entities.forEach(this::save); return List.of(); }
+        @Override public List<Equipe> findAllById(Iterable<Long> ids) { return List.of(); }
+        @Override public long count() { return db.size(); }
+        @Override public void deleteById(Long id) { db.remove(id); }
+        @Override public void delete(Equipe entity) { db.remove(entity.getId()); }
+        @Override public void deleteAllById(Iterable<? extends Long> ids) {}
+        @Override public void deleteAll(Iterable<? extends Equipe> entities) {}
+        @Override public void deleteAll() { db.clear(); }
+        @Override public void flush() {}
+        @Override public <S extends Equipe> S saveAndFlush(S entity) { return save(entity); }
+        @Override public <S extends Equipe> List<S> saveAllAndFlush(Iterable<S> entities) { return List.of(); }
+        @Override public void deleteAllInBatch(Iterable<Equipe> entities) {}
+        @Override public void deleteAllByIdInBatch(Iterable<Long> ids) {}
+        @Override public void deleteAllInBatch() {}
+        @Override public Equipe getOne(Long id) { return db.get(id); }
+        @Override public Equipe getById(Long id) { return db.get(id); }
+        @Override public Equipe getReferenceById(Long id) { return db.get(id); }
+        @Override public <S extends Equipe> Optional<S> findOne(org.springframework.data.domain.Example<S> example) { return Optional.empty(); }
+        @Override public <S extends Equipe> List<S> findAll(org.springframework.data.domain.Example<S> example) { return List.of(); }
+        @Override public <S extends Equipe> List<S> findAll(org.springframework.data.domain.Example<S> example, org.springframework.data.domain.Sort sort) { return List.of(); }
+        @Override public <S extends Equipe> org.springframework.data.domain.Page<S> findAll(org.springframework.data.domain.Example<S> example, org.springframework.data.domain.Pageable pageable) { return org.springframework.data.domain.Page.empty(); }
+        @Override public <S extends Equipe> long count(org.springframework.data.domain.Example<S> example) { return 0; }
+        @Override public <S extends Equipe> boolean exists(org.springframework.data.domain.Example<S> example) { return false; }
+        @Override public <S extends Equipe, R> R findBy(org.springframework.data.domain.Example<S> example, java.util.function.Function<org.springframework.data.repository.query.FluentQuery.FetchableFluentQuery<S>, R> queryFunction) { return null; }
+        @Override public List<Equipe> findAll(org.springframework.data.domain.Sort sort) { return findAll(); }
+        @Override public org.springframework.data.domain.Page<Equipe> findAll(org.springframework.data.domain.Pageable pageable) { return org.springframework.data.domain.Page.empty(); }
     }
 }

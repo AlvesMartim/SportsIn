@@ -128,6 +128,14 @@ export default function HomePage() {
           />
 
           <Button
+            icon="🎯"
+            buttonTitle="Missions"
+            description="Consulte et complète tes missions dynamiques"
+            goTo="/missions"
+            variant="warning"
+          />
+
+          <Button
             icon="👥"
             buttonTitle="Mon équipe"
             description="Gère ton équipe et tes coéquipiers"

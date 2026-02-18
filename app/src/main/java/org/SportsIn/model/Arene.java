@@ -82,6 +82,14 @@ public class Arene {
         this.controllingTeam = controllingTeam;
     }
 
+    /**
+     * Retourne l'ID de l'équipe qui contrôle cette arène, ou null si neutre.
+     * Méthode de convenance pour éviter les NullPointerException.
+     */
+    public Long getControllingTeamId() {
+        return controllingTeam != null ? controllingTeam.getId() : null;
+    }
+
     public List<String> getSportsDisponibles() {
         return sportsDisponibles;
     }

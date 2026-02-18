@@ -1,27 +1,29 @@
 package org.SportsIn.model.territory;
 
+import org.SportsIn.model.Arene;
+
 import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Représente une zone géographique composée de plusieurs points sportifs.
- * Règle de contrôle : Une zone est contrôlée par une équipe si elle possède au moins 3 points dans cette zone.
+ * Représente une zone géographique composée de plusieurs arènes.
+ * Règle de contrôle : Une zone est contrôlée par une équipe si elle possède au moins 3 arènes dans cette zone.
  */
 public class Zone {
 
     private Long id;
     private String nom;
-    private List<PointSportif> points;
+    private List<Arene> arenes;
     private Long controllingTeamId; // ID de l'équipe qui contrôle la zone (null si personne)
 
     public Zone() {
-        this.points = new ArrayList<>();
+        this.arenes = new ArrayList<>();
     }
 
-    public Zone(Long id, String nom, List<PointSportif> points) {
+    public Zone(Long id, String nom, List<Arene> arenes) {
         this.id = id;
         this.nom = nom;
-        this.points = points != null ? points : new ArrayList<>();
+        this.arenes = arenes != null ? arenes : new ArrayList<>();
         this.controllingTeamId = null;
     }
 
@@ -43,8 +45,8 @@ public class Zone {
         // Approche simple : On itère sur les points et on compte.
         java.util.Map<Long, Integer> counts = new java.util.HashMap<>();
         
-        for (PointSportif p : points) {
-            Long teamId = p.getControllingTeamId();
+        for (Arene a : arenes) {
+            Long teamId = a.getControllingTeamId();
             if (teamId != null) {
                 counts.put(teamId, counts.getOrDefault(teamId, 0) + 1);
             }
@@ -92,12 +94,12 @@ public class Zone {
         this.nom = nom;
     }
 
-    public List<PointSportif> getPoints() {
-        return points;
+    public List<Arene> getArenes() {
+        return arenes;
     }
 
-    public void setPoints(List<PointSportif> points) {
-        this.points = points;
+    public void setArenes(List<Arene> arenes) {
+        this.arenes = arenes;
     }
 
     public Long getControllingTeamId() {
@@ -114,7 +116,7 @@ public class Zone {
                 "id=" + id +
                 ", nom='" + nom + '\'' +
                 ", controllingTeamId=" + controllingTeamId +
-                ", nbPoints=" + points.size() +
+                ", nbArenes=" + arenes.size() +
                 '}';
     }
 }

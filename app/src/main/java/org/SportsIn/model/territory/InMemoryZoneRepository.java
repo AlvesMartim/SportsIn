@@ -33,10 +33,10 @@ public class InMemoryZoneRepository implements ZoneRepository {
     }
 
     @Override
-    public List<Zone> findZonesByPointId(Long pointId) {
+    public List<Zone> findZonesByAreneId(String areneId) {
         return database.values().stream()
-                .filter(zone -> zone.getPoints().stream()
-                        .anyMatch(p -> p.getId().equals(pointId)))
+                .filter(zone -> zone.getArenes().stream()
+                        .anyMatch(a -> a.getId().equals(areneId)))
                 .collect(Collectors.toList());
     }
 }

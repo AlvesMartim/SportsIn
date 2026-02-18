@@ -25,7 +25,7 @@ public class AreneService {
     }
 
     public List<Arene> getByEquipe(Long equipeId) {
-        return areneRepository.findByControllingTeamId(equipeId);
+        return areneRepository.findByControllingTeam_Id(equipeId);
     }
 
     public List<Arene> getBySport(String sport) {
