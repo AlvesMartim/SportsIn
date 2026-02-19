@@ -25,6 +25,9 @@ public class Equipe {
     @Column(nullable = false)
     private int xp = 0;
 
+    @Column
+    private String couleur;
+
     // Une équipe peut avoir plusieurs joueurs.
     // mappedBy = "equipe" indique que c'est l'entité Joueur qui gère la relation.
     // CascadeType.ALL signifie que les opérations (création, suppression) sur l'équipe
@@ -44,6 +47,11 @@ public class Equipe {
 
     public Equipe(String nom) {
         this.nom = nom;
+    }
+
+    public Equipe(String nom, String couleur) {
+        this.nom = nom;
+        this.couleur = couleur;
     }
 
     // --- Getters et Setters ---
@@ -86,6 +94,14 @@ public class Equipe {
 
     public void setXp(int xp) {
         this.xp = xp;
+    }
+
+    public String getCouleur() {
+        return couleur;
+    }
+
+    public void setCouleur(String couleur) {
+        this.couleur = couleur;
     }
 
     // --- Méthodes utilitaires ---

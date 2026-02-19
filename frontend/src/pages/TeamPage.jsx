@@ -1,7 +1,7 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext.jsx";
-import { equipeAPI, joueurAPI, areneAPI, progressionAPI } from "../api/api.js";
+import { equipeAPI, joueurAPI, areneAPI, progressionAPI, messageAPI } from "../api/api.js";
 import Header from "../components/Header.jsx";
 import "../styles/team.css";
 
@@ -23,6 +23,14 @@ function TeamPage() {
   const [newTeamColor, setNewTeamColor] = useState("#3b82f6");
   const [creating, setCreating] = useState(false);
   const [joiningTeam, setJoiningTeam] = useState(null);
+
+  // Chat state
+  const [chatMessages, setChatMessages] = useState([]);
+  const [chatInput, setChatInput] = useState("");
+  const [sendingMessage, setSendingMessage] = useState(false);
+  const [contextMenu, setContextMenu] = useState(null);
+  const chatEndRef = useRef(null);
+  const chatPollRef = useRef(null);
 
   const TEAM_COLORS = [
     { value: "#3b82f6", label: "Bleu" },
@@ -106,6 +114,11 @@ function TeamPage() {
         couleur: newTeamColor,
       });
 
+      // Join the newly created team
+      if (user?.id) {
+        await equipeAPI.join(newTeam.id, user.id);
+      }
+
       sessionStorage.setItem("insport_team_id", newTeam.id);
       setNewTeamName("");
       setShowCreateForm(false);
@@ -132,6 +145,79 @@ function TeamPage() {
     setControlledArenas([]);
     loadData();
   };
+
+  // --- Chat functions ---
+  const loadChatMessages = useCallback(async (teamId) => {
+    try {
+      const msgs = await messageAPI.getByEquipe(teamId);
+      setChatMessages(msgs);
+    } catch (err) {
+      console.warn("Erreur chargement chat:", err);
+    }
+  }, []);
+
+  const scrollToBottom = () => {
+    chatEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  };
+
+  useEffect(() => {
+    scrollToBottom();
+  }, [chatMessages]);
+
+  // Poll chat messages every 3s when team is active
+  useEffect(() => {
+    const teamId = sessionStorage.getItem("insport_team_id");
+    if (playerTeam && teamId) {
+      loadChatMessages(teamId);
+      chatPollRef.current = setInterval(() => loadChatMessages(teamId), 3000);
+    }
+    return () => {
+      if (chatPollRef.current) clearInterval(chatPollRef.current);
+    };
+  }, [playerTeam, loadChatMessages]);
+
+  const handleSendMessage = async (e) => {
+    e.preventDefault();
+    if (!chatInput.trim() || sendingMessage) return;
+    const teamId = sessionStorage.getItem("insport_team_id");
+    if (!user?.id || !teamId) return;
+
+    try {
+      setSendingMessage(true);
+      await messageAPI.send(user.id, teamId, chatInput.trim());
+      setChatInput("");
+      await loadChatMessages(teamId);
+    } catch (err) {
+      console.error("Erreur envoi message:", err);
+    } finally {
+      setSendingMessage(false);
+    }
+  };
+
+  const handleDeleteMessage = async (messageId) => {
+    try {
+      await messageAPI.delete(messageId);
+      const teamId = sessionStorage.getItem("insport_team_id");
+      if (teamId) await loadChatMessages(teamId);
+    } catch (err) {
+      console.error("Erreur suppression message:", err);
+    }
+    setContextMenu(null);
+  };
+
+  const handleContextMenu = (e, msg) => {
+    e.preventDefault();
+    setContextMenu({ x: e.clientX, y: e.clientY, messageId: msg.id });
+  };
+
+  // Close context menu on click anywhere
+  useEffect(() => {
+    const close = () => setContextMenu(null);
+    if (contextMenu) {
+      document.addEventListener("click", close);
+      return () => document.removeEventListener("click", close);
+    }
+  }, [contextMenu]);
 
   if (loading) {
     return (
@@ -171,7 +257,9 @@ function TeamPage() {
         )}
 
         {playerTeam ? (
-          <div className="team-view animate-fadeIn">
+          <div className="team-layout">
+            {/* Left column: team info */}
+            <div className="team-view animate-fadeIn">
             {/* Info de l'équipe */}
             <div className="team-card team-info-card">
               <div className="team-info-header">
@@ -294,6 +382,100 @@ function TeamPage() {
             <button className="btn btn-danger w-full" onClick={handleLeaveTeam}>
               Quitter l'équipe
             </button>
+          </div>
+
+            {/* Right column: Team Chat */}
+            <div className="team-chat-column animate-fadeIn">
+              <div className="team-card team-chat-card">
+                <div className="team-card__header">
+                  <h3>💬 Chat d'équipe</h3>
+                  <span className="badge badge-primary">{chatMessages.length}</span>
+                </div>
+
+                <div className="team-chat-messages">
+                  {chatMessages.length === 0 ? (
+                    <div className="team-chat-empty">
+                      <span>🗨️</span>
+                      <p>Aucun message pour le moment</p>
+                      <span className="text-muted">Soyez le premier à écrire !</span>
+                    </div>
+                  ) : (
+                    chatMessages.map((msg) => {
+                      const isOwn = msg.auteur?.id === user?.id;
+                      return (
+                        <div
+                          key={msg.id}
+                          className={`team-chat-msg ${isOwn ? "team-chat-msg--own" : ""}`}
+                          onContextMenu={(e) => handleContextMenu(e, msg)}
+                        >
+                          {!isOwn && (
+                            <div className="team-chat-msg__avatar">
+                              {msg.auteur?.pseudo?.charAt(0).toUpperCase() || "?"}
+                            </div>
+                          )}
+                          <div className="team-chat-msg__bubble">
+                            {!isOwn && (
+                              <span className="team-chat-msg__author">
+                                {msg.auteur?.pseudo || "Inconnu"}
+                              </span>
+                            )}
+                            <p className="team-chat-msg__text">{msg.contenu}</p>
+                            <span className="team-chat-msg__time">
+                              {msg.envoyeA
+                                ? new Date(msg.envoyeA).toLocaleTimeString("fr-FR", {
+                                    hour: "2-digit",
+                                    minute: "2-digit",
+                                  })
+                                : ""}
+                            </span>
+                          </div>
+                        </div>
+                      );
+                    })
+                  )}
+                  <div ref={chatEndRef} />
+                </div>
+
+                <form className="team-chat-input" onSubmit={handleSendMessage}>
+                  <input
+                    type="text"
+                    className="input"
+                    placeholder="Écrire un message..."
+                    value={chatInput}
+                    onChange={(e) => setChatInput(e.target.value)}
+                    maxLength={500}
+                  />
+                  <button
+                    type="submit"
+                    className="btn btn-primary"
+                    disabled={sendingMessage || !chatInput.trim()}
+                  >
+                    {sendingMessage ? (
+                      <div className="spinner" style={{ width: 16, height: 16 }} />
+                    ) : (
+                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                        <path d="M22 2L11 13" />
+                        <path d="M22 2L15 22L11 13L2 9L22 2Z" />
+                      </svg>
+                    )}
+                  </button>
+                </form>
+              </div>
+            </div>
+
+            {/* Context Menu */}
+            {contextMenu && (
+              <div
+                className="team-chat-context-menu"
+                style={{ top: contextMenu.y, left: contextMenu.x }}
+              >
+                <button
+                  onClick={() => handleDeleteMessage(contextMenu.messageId)}
+                >
+                  🗑️ Supprimer le message pour tout le monde
+                </button>
+              </div>
+            )}
           </div>
         ) : (
           <div className="team-join-view animate-fadeIn">

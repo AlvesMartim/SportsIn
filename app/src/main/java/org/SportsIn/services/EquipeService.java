@@ -35,6 +35,9 @@ public class EquipeService {
     public Optional<Equipe> update(Long id, Equipe equipeDetails) {
         return equipeRepository.findById(id).map(equipe -> {
             equipe.setNom(equipeDetails.getNom());
+            if (equipeDetails.getCouleur() != null) {
+                equipe.setCouleur(equipeDetails.getCouleur());
+            }
             return equipeRepository.save(equipe);
         });
     }
@@ -59,8 +62,17 @@ public class EquipeService {
 
     public boolean leaveTeam(Long joueurId) {
         return joueurRepository.findById(joueurId).map(joueur -> {
+            Equipe equipe = joueur.getEquipe();
             joueur.setEquipe(null);
             joueurRepository.save(joueur);
+
+            // Auto-delete team if no members remain
+            if (equipe != null) {
+                long remainingMembers = joueurRepository.countByEquipeId(equipe.getId());
+                if (remainingMembers == 0) {
+                    equipeRepository.deleteById(equipe.getId());
+                }
+            }
             return true;
         }).orElse(false);
     }

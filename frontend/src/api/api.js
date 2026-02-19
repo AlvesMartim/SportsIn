@@ -188,6 +188,18 @@ export const progressionAPI = {
   getActivePerks: async (teamId) => fetchAPI(`/teams/${teamId}/perks/active`),
 };
 
+/**
+ * ========== MESSAGE (Chat équipe) ==========
+ */
+export const messageAPI = {
+  getByEquipe: async (equipeId) => fetchAPI(`/messages/equipe/${equipeId}`),
+  send: async (joueurId, equipeId, contenu) => fetchAPI('/messages', {
+    method: 'POST',
+    body: JSON.stringify({ joueurId, equipeId, contenu }),
+  }),
+  delete: async (id) => fetchAPI(`/messages/${id}`, { method: 'DELETE' }),
+};
+
 export default {
   authAPI,
   equipeAPI,
@@ -201,4 +213,5 @@ export default {
   gameAPI,
   missionAPI,
   progressionAPI,
+  messageAPI,
 };

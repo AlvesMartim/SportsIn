@@ -14,4 +14,5 @@ public interface JoueurRepository extends JpaRepository<Joueur, Long> {
     boolean existsByEmail(String email);
     boolean existsByPseudo(String pseudo);
     List<Joueur> findByEquipeId(Long equipeId);
+    long countByEquipeId(Long equipeId);
 }

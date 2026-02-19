@@ -6,7 +6,8 @@ CREATE TABLE IF NOT EXISTS equipe (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     nom TEXT NOT NULL UNIQUE,
     points INTEGER NOT NULL DEFAULT 0,
-    xp INTEGER NOT NULL DEFAULT 0
+    xp INTEGER NOT NULL DEFAULT 0,
+    couleur TEXT
 );
 
 -- Table JOUEUR
@@ -130,6 +131,17 @@ CREATE TABLE IF NOT EXISTS active_perk (
     FOREIGN KEY (perk_definition_id) REFERENCES perk_definition(id) ON DELETE CASCADE
 );
 
+-- Table MESSAGE (Chat d'équipe)
+CREATE TABLE IF NOT EXISTS message (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    contenu TEXT NOT NULL,
+    envoye_a TEXT NOT NULL,
+    joueur_id INTEGER NOT NULL,
+    equipe_id INTEGER NOT NULL,
+    FOREIGN KEY (joueur_id) REFERENCES joueur(id) ON DELETE CASCADE,
+    FOREIGN KEY (equipe_id) REFERENCES equipe(id) ON DELETE CASCADE
+);
+
 -- Index pour améliorer les performances des requêtes fréquentes
 CREATE INDEX IF NOT EXISTS idx_joueur_equipe_id ON joueur(equipe_id);
 CREATE INDEX IF NOT EXISTS idx_arene_equipe_controle ON arene(equipe_controle);
@@ -144,4 +156,6 @@ CREATE INDEX IF NOT EXISTS idx_active_perk_team ON active_perk(team_id);
 CREATE INDEX IF NOT EXISTS idx_active_perk_target ON active_perk(target_id);
 CREATE INDEX IF NOT EXISTS idx_active_perk_expires ON active_perk(expires_at);
 CREATE INDEX IF NOT EXISTS idx_perk_definition_level ON perk_definition(required_level);
+CREATE INDEX IF NOT EXISTS idx_message_equipe ON message(equipe_id);
+CREATE INDEX IF NOT EXISTS idx_message_joueur ON message(joueur_id);
 
