@@ -20,7 +20,7 @@ export default function HomePage() {
   const loadUserData = async () => {
     try {
       // Charger l'équipe de l'utilisateur
-      const teamId = localStorage.getItem("insport_team_id");
+      const teamId = sessionStorage.getItem("insport_team_id");
       if (teamId) {
         const teamData = await equipeAPI.getById(teamId);
         setTeam(teamData);

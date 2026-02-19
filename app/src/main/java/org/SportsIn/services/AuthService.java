@@ -19,36 +19,27 @@ public class AuthService {
      * Inscription d'un nouveau joueur
      */
     public Joueur register(String pseudo, String email, String password) {
-        // Vérifier si l'email existe déjà
         if (joueurRepository.existsByEmail(email)) {
             throw new RuntimeException("Cet email est déjà utilisé");
         }
-
-        // Vérifier si le pseudo existe déjà
         if (joueurRepository.existsByPseudo(pseudo)) {
             throw new RuntimeException("Ce pseudo est déjà utilisé");
         }
-
-        // Créer le joueur (mot de passe stocké en clair pour la simplicité)
-        // Dans une vraie app, utiliser BCrypt pour hasher le mot de passe
         Joueur joueur = new Joueur(pseudo, email, password);
         return joueurRepository.save(joueur);
     }
 
     /**
-     * Connexion d'un joueur
+     * Connexion par email OU pseudo
      */
-    public Optional<Joueur> login(String email, String password) {
-        Optional<Joueur> joueurOpt = joueurRepository.findByEmail(email);
-
-        if (joueurOpt.isPresent()) {
-            Joueur joueur = joueurOpt.get();
-            // Vérifier le mot de passe (en clair pour la simplicité)
-            if (joueur.getPassword().equals(password)) {
-                return Optional.of(joueur);
-            }
+    public Optional<Joueur> login(String identifier, String password) {
+        Optional<Joueur> joueurOpt = joueurRepository.findByEmail(identifier.toLowerCase());
+        if (joueurOpt.isEmpty()) {
+            joueurOpt = joueurRepository.findByPseudo(identifier);
         }
-
+        if (joueurOpt.isPresent() && joueurOpt.get().getPassword().equals(password)) {
+            return joueurOpt;
+        }
         return Optional.empty();
     }
 
@@ -57,5 +48,26 @@ public class AuthService {
      */
     public Optional<Joueur> getById(Long id) {
         return joueurRepository.findById(id);
+    }
+
+    /**
+     * Modifier pseudo et/ou mot de passe
+     */
+    public Optional<Joueur> updateProfile(Long id, String newPseudo, String newPassword) {
+        return joueurRepository.findById(id).map(joueur -> {
+            if (newPseudo != null && !newPseudo.isBlank()) {
+                if (!newPseudo.equals(joueur.getPseudo()) && joueurRepository.existsByPseudo(newPseudo)) {
+                    throw new RuntimeException("Ce pseudo est déjà utilisé");
+                }
+                joueur.setPseudo(newPseudo);
+            }
+            if (newPassword != null && !newPassword.isBlank()) {
+                if (newPassword.length() < 6) {
+                    throw new RuntimeException("Le mot de passe doit contenir au moins 6 caractères");
+                }
+                joueur.setPassword(newPassword);
+            }
+            return joueurRepository.save(joueur);
+        });
     }
 }

@@ -118,7 +118,7 @@ function MapPage() {
   const [missionsByArena, setMissionsByArena] = useState({});
 
   const handleLaunchGame = async (arene) => {
-    const teamId = localStorage.getItem("insport_team_id");
+    const teamId = sessionStorage.getItem("insport_team_id");
 
     if (!teamId) {
       navigate("/team");
@@ -165,7 +165,7 @@ function MapPage() {
     async function fetchData() {
       try {
         setLoading(true);
-        const teamId = localStorage.getItem("insport_team_id");
+        const teamId = sessionStorage.getItem("insport_team_id");
 
         const [arenesData, routesData, zonesData, missionsData] = await Promise.all([
           areneAPI.getAll().catch(() => []),

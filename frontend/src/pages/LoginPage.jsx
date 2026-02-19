@@ -7,7 +7,7 @@ function LoginPage() {
   const { login } = useAuth();
   const navigate = useNavigate();
 
-  const [email, setEmail] = useState("");
+  const [identifier, setIdentifier] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -19,10 +19,10 @@ function LoginPage() {
     setLoading(true);
 
     try {
-      await login(email, password);
+      await login(identifier, password);
       navigate("/");
     } catch (err) {
-      setError("Email ou mot de passe incorrect");
+      setError("Identifiant ou mot de passe incorrect");
     } finally {
       setLoading(false);
     }
@@ -55,19 +55,19 @@ function LoginPage() {
               <div className="auth-input-group">
                 <label className="auth-label">
                   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                    <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" />
-                    <polyline points="22,6 12,13 2,6" />
+                    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+                    <circle cx="12" cy="7" r="4" />
                   </svg>
-                  Email
+                  Email ou Pseudo
                 </label>
                 <input
-                  type="email"
+                  type="text"
                   className="auth-input"
-                  placeholder="ton@email.com"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
+                  placeholder="ton@email.com ou monPseudo"
+                  value={identifier}
+                  onChange={(e) => setIdentifier(e.target.value)}
                   required
-                  autoComplete="email"
+                  autoComplete="username"
                   autoFocus
                 />
               </div>

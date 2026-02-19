@@ -213,7 +213,7 @@ function GameLobbyPage() {
 
   const isWaiting = game?.state === "WAITING";
   const isMatched = game?.state === "MATCHED";
-  const playerTeamId = localStorage.getItem("insport_team_id");
+  const playerTeamId = sessionStorage.getItem("insport_team_id");
   const isCreator = game?.creatorTeam?.id?.toString() === playerTeamId;
 
   return (

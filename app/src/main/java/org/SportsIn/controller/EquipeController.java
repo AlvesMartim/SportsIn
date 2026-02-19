@@ -8,6 +8,7 @@ import org.springframework.lang.NonNull;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/equipes")
@@ -51,5 +52,22 @@ public class EquipeController {
             return ResponseEntity.noContent().build();
         }
         return ResponseEntity.notFound().build();
+    }
+
+    @PostMapping("/{id}/join")
+    public ResponseEntity<Equipe> join(@NonNull @PathVariable Long id, @RequestBody Map<String, Long> body) {
+        Long joueurId = body.get("joueurId");
+        if (joueurId == null) return ResponseEntity.badRequest().build();
+        return equipeService.joinTeam(joueurId, id)
+                .map(ResponseEntity::ok)
+                .orElseGet(() -> ResponseEntity.notFound().build());
+    }
+
+    @PostMapping("/leave")
+    public ResponseEntity<Void> leave(@RequestBody Map<String, Long> body) {
+        Long joueurId = body.get("joueurId");
+        if (joueurId == null) return ResponseEntity.badRequest().build();
+        equipeService.leaveTeam(joueurId);
+        return ResponseEntity.noContent().build();
     }
 }

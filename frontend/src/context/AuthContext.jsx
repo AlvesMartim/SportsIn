@@ -9,8 +9,8 @@ export function AuthProvider({ children }) {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const savedToken = localStorage.getItem("insport_token");
-    const savedUser = localStorage.getItem("insport_user");
+    const savedToken = sessionStorage.getItem("insport_token");
+    const savedUser = sessionStorage.getItem("insport_user");
 
     if (savedToken && savedUser) {
       setToken(savedToken);
@@ -19,8 +19,8 @@ export function AuthProvider({ children }) {
     setLoading(false);
   }, []);
 
-  async function login(email, password) {
-    const response = await authAPI.login(email, password);
+  async function login(identifier, password) {
+    const response = await authAPI.login(identifier, password);
 
     if (!response.success) {
       throw new Error(response.error || "Erreur de connexion");
@@ -31,8 +31,8 @@ export function AuthProvider({ children }) {
     setToken(newToken);
     setUser(userData);
 
-    localStorage.setItem("insport_token", newToken);
-    localStorage.setItem("insport_user", JSON.stringify(userData));
+    sessionStorage.setItem("insport_token", newToken);
+    sessionStorage.setItem("insport_user", JSON.stringify(userData));
 
     return userData;
   }
@@ -49,8 +49,8 @@ export function AuthProvider({ children }) {
     setToken(newToken);
     setUser(userData);
 
-    localStorage.setItem("insport_token", newToken);
-    localStorage.setItem("insport_user", JSON.stringify(userData));
+    sessionStorage.setItem("insport_token", newToken);
+    sessionStorage.setItem("insport_user", JSON.stringify(userData));
 
     return userData;
   }
@@ -58,13 +58,14 @@ export function AuthProvider({ children }) {
   function logout() {
     setUser(null);
     setToken(null);
-    localStorage.removeItem("insport_token");
-    localStorage.removeItem("insport_user");
-    localStorage.removeItem("insport_team_id");
+    sessionStorage.removeItem("insport_token");
+    sessionStorage.removeItem("insport_user");
+    sessionStorage.removeItem("insport_team_id");
   }
 
   const value = {
     user,
+    setUser,
     token,
     isAuthenticated: !!token,
     loading,

@@ -5,6 +5,7 @@ import org.SportsIn.model.Rule;
 import org.SportsIn.model.RuleRepository;
 import org.SportsIn.model.Session;
 import org.SportsIn.model.Sport;
+import org.SportsIn.model.rules.FootballVictoryRule;
 import org.springframework.stereotype.Service;
 
 /**
@@ -30,10 +31,14 @@ public class RuleEvaluationService {
             return null;
         }
         Sport sport = session.getSport();
-        Rule rule = ruleRepository.findRuleById(sport.getVictoryRuleId());
-        if (rule != null) {
-            return rule.evaluate(session);
+        Long ruleId = sport.getVictoryRuleId();
+        if (ruleId != null) {
+            Rule rule = ruleRepository.findRuleById(ruleId);
+            if (rule != null) {
+                return rule.evaluate(session);
+            }
         }
-        return null;
+        // Fallback : règle par défaut basée sur les scores GOALS/POINTS
+        return new FootballVictoryRule().evaluate(session);
     }
 }

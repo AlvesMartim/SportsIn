@@ -28,7 +28,6 @@ public class AuthController {
     @PostMapping("/register")
     public ResponseEntity<?> register(@RequestBody RegisterRequest request) {
         try {
-            // Validation basique
             if (request.pseudo == null || request.pseudo.trim().isEmpty()) {
                 return ResponseEntity.badRequest().body(errorResponse("Le pseudo est requis"));
             }
@@ -40,7 +39,6 @@ public class AuthController {
             }
 
             Joueur joueur = authService.register(request.pseudo.trim(), request.email.trim().toLowerCase(), request.password);
-
             return ResponseEntity.status(HttpStatus.CREATED).body(authResponse(joueur));
         } catch (RuntimeException e) {
             return ResponseEntity.badRequest().body(errorResponse(e.getMessage()));
@@ -48,25 +46,25 @@ public class AuthController {
     }
 
     /**
-     * Connexion d'un joueur
+     * Connexion par email OU pseudo
      * POST /api/auth/login
      */
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody LoginRequest request) {
         try {
-            if (request.email == null || request.email.trim().isEmpty()) {
-                return ResponseEntity.badRequest().body(errorResponse("L'email est requis"));
+            if (request.identifier == null || request.identifier.trim().isEmpty()) {
+                return ResponseEntity.badRequest().body(errorResponse("L'email ou le pseudo est requis"));
             }
             if (request.password == null || request.password.isEmpty()) {
                 return ResponseEntity.badRequest().body(errorResponse("Le mot de passe est requis"));
             }
 
-            Optional<Joueur> joueurOpt = authService.login(request.email.trim().toLowerCase(), request.password);
+            Optional<Joueur> joueurOpt = authService.login(request.identifier.trim(), request.password);
 
             if (joueurOpt.isPresent()) {
                 return ResponseEntity.ok(authResponse(joueurOpt.get()));
             } else {
-                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(errorResponse("Email ou mot de passe incorrect"));
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(errorResponse("Identifiant ou mot de passe incorrect"));
             }
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorResponse("Erreur lors de la connexion"));
@@ -75,16 +73,27 @@ public class AuthController {
 
     /**
      * Récupérer le profil de l'utilisateur connecté
-     * GET /api/auth/me
+     * GET /api/auth/me/{id}
      */
     @GetMapping("/me/{id}")
     public ResponseEntity<?> getProfile(@PathVariable Long id) {
-        Optional<Joueur> joueurOpt = authService.getById(id);
+        return authService.getById(id)
+                .map(j -> ResponseEntity.ok(userResponse(j)))
+                .orElseGet(() -> ResponseEntity.notFound().build());
+    }
 
-        if (joueurOpt.isPresent()) {
-            return ResponseEntity.ok(userResponse(joueurOpt.get()));
-        } else {
-            return ResponseEntity.notFound().build();
+    /**
+     * Modifier pseudo et/ou mot de passe
+     * PUT /api/auth/profile/{id}
+     */
+    @PutMapping("/profile/{id}")
+    public ResponseEntity<?> updateProfile(@PathVariable Long id, @RequestBody UpdateProfileRequest request) {
+        try {
+            return authService.updateProfile(id, request.pseudo, request.password)
+                    .map(j -> (ResponseEntity<?>) ResponseEntity.ok(userResponse(j)))
+                    .orElseGet(() -> ResponseEntity.notFound().build());
+        } catch (RuntimeException e) {
+            return ResponseEntity.badRequest().body(errorResponse(e.getMessage()));
         }
     }
 
@@ -97,7 +106,12 @@ public class AuthController {
     }
 
     static class LoginRequest {
-        public String email;
+        public String identifier;
+        public String password;
+    }
+
+    static class UpdateProfileRequest {
+        public String pseudo;
         public String password;
     }
 
