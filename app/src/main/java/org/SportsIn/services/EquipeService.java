@@ -1,7 +1,9 @@
 package org.SportsIn.services;
 
 import org.SportsIn.model.user.Equipe;
+import org.SportsIn.model.user.Joueur;
 import org.SportsIn.repository.EquipeRepository;
+import org.SportsIn.repository.JoueurRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -11,9 +13,11 @@ import java.util.Optional;
 public class EquipeService {
 
     private final EquipeRepository equipeRepository;
+    private final JoueurRepository joueurRepository;
 
-    public EquipeService(EquipeRepository equipeRepository) {
+    public EquipeService(EquipeRepository equipeRepository, JoueurRepository joueurRepository) {
         this.equipeRepository = equipeRepository;
+        this.joueurRepository = joueurRepository;
     }
 
     public List<Equipe> getAll() {
@@ -41,5 +45,23 @@ public class EquipeService {
             return true;
         }
         return false;
+    }
+
+    public Optional<Equipe> joinTeam(Long joueurId, Long equipeId) {
+        Optional<Joueur> joueurOpt = joueurRepository.findById(joueurId);
+        Optional<Equipe> equipeOpt = equipeRepository.findById(equipeId);
+        if (joueurOpt.isEmpty() || equipeOpt.isEmpty()) return Optional.empty();
+        Joueur joueur = joueurOpt.get();
+        joueur.setEquipe(equipeOpt.get());
+        joueurRepository.save(joueur);
+        return equipeRepository.findById(equipeId);
+    }
+
+    public boolean leaveTeam(Long joueurId) {
+        return joueurRepository.findById(joueurId).map(joueur -> {
+            joueur.setEquipe(null);
+            joueurRepository.save(joueur);
+            return true;
+        }).orElse(false);
     }
 }

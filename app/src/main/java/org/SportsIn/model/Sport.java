@@ -1,15 +1,29 @@
 package org.SportsIn.model;
 
+import jakarta.persistence.*;
+
 /**
  * Représente un sport (ex : Foot, Muscu, Basket)
  * et les références vers les règles de victoire et de scoring.
  */
+@Entity
+@Table(name = "sport")
 public class Sport {
 
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    private String code;          // "FOOT", "MUSCU", "BASKET_3X3"
+
+    @Column(nullable = false, unique = true)
+    private String code;          // "FOOTBALL", "BASKET", "TENNIS", "MUSCULATION"
+
+    @Column(nullable = false)
     private String name;          // "Football", "Musculation", ...
+
+    @Column(name = "scoring_rule_id")
     private Long scoringRuleId;   // référence vers une Rule SCORING
+
+    @Column(name = "victory_rule_id")
     private Long victoryRuleId;
 
     public Sport() {

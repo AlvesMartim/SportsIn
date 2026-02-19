@@ -10,7 +10,7 @@ const API_BASE_URL = '/api'; // Utilise le proxy Vite
  */
 const fetchAPI = async (endpoint, options = {}) => {
   const url = `${API_BASE_URL}${endpoint}`;
-  const token = localStorage.getItem('insport_token');
+  const token = sessionStorage.getItem('insport_token');
 
   const headers = {
     'Content-Type': 'application/json',
@@ -42,15 +42,19 @@ const fetchAPI = async (endpoint, options = {}) => {
  * ========== AUTH ==========
  */
 export const authAPI = {
-  login: async (email, password) => fetchAPI('/auth/login', {
+  login: async (identifier, password) => fetchAPI('/auth/login', {
     method: 'POST',
-    body: JSON.stringify({ email, password })
+    body: JSON.stringify({ identifier, password })
   }),
   register: async (pseudo, email, password) => fetchAPI('/auth/register', {
     method: 'POST',
     body: JSON.stringify({ pseudo, email, password })
   }),
   getProfile: async (id) => fetchAPI(`/auth/me/${id}`),
+  updateProfile: async (id, data) => fetchAPI(`/auth/profile/${id}`, {
+    method: 'PUT',
+    body: JSON.stringify(data),
+  }),
 };
 
 /**
@@ -62,6 +66,8 @@ export const equipeAPI = {
   create: async (data) => fetchAPI('/equipes', { method: 'POST', body: JSON.stringify(data) }),
   update: async (id, data) => fetchAPI(`/equipes/${id}`, { method: 'PUT', body: JSON.stringify(data) }),
   delete: async (id) => fetchAPI(`/equipes/${id}`, { method: 'DELETE' }),
+  join: async (equipeId, joueurId) => fetchAPI(`/equipes/${equipeId}/join`, { method: 'POST', body: JSON.stringify({ joueurId }) }),
+  leave: async (joueurId) => fetchAPI('/equipes/leave', { method: 'POST', body: JSON.stringify({ joueurId }) }),
 };
 
 /**

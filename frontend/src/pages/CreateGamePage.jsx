@@ -37,7 +37,7 @@ function CreateGamePage() {
       setArenas(arenasData);
       setSports(sportsData);
 
-      const savedTeamId = localStorage.getItem("insport_team_id");
+      const savedTeamId = sessionStorage.getItem("insport_team_id");
       if (savedTeamId) {
         try {
           const team = await equipeAPI.getById(savedTeamId);

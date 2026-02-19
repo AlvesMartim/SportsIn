@@ -39,7 +39,7 @@ function formatTimeRemaining(expiresAt) {
 
 function ProgressionPage() {
   const navigate = useNavigate();
-  const teamId = localStorage.getItem("insport_team_id");
+  const teamId = sessionStorage.getItem("insport_team_id");
 
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);

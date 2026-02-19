@@ -54,7 +54,7 @@ export default function MissionsPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  const teamId = localStorage.getItem("insport_team_id");
+  const teamId = sessionStorage.getItem("insport_team_id");
 
   useEffect(() => {
     if (!teamId) {

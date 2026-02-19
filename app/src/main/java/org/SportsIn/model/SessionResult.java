@@ -2,12 +2,15 @@ package org.SportsIn.model;
 
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 /**
  * Représente les données brutes envoyées pour une session de sport.
  * Le moteur se base dessus pour appliquer les règles.
  */
 public class SessionResult {
 
+    @JsonIgnore
     private transient Session session;
     private List<MetricValue> metrics;
 

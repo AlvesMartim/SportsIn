@@ -45,7 +45,7 @@ function TeamPage() {
       setError(null);
 
       const teams = await equipeAPI.getAll();
-      const savedTeamId = localStorage.getItem("insport_team_id");
+      const savedTeamId = sessionStorage.getItem("insport_team_id");
 
       if (savedTeamId) {
         try {
@@ -65,7 +65,7 @@ function TeamPage() {
             console.warn('Progression non disponible:', e);
           }
         } catch (e) {
-          localStorage.removeItem("insport_team_id");
+          sessionStorage.removeItem("insport_team_id");
           setAvailableTeams(teams);
         }
       } else {
@@ -82,7 +82,10 @@ function TeamPage() {
   const handleJoinTeam = async (teamId) => {
     try {
       setJoiningTeam(teamId);
-      localStorage.setItem("insport_team_id", teamId);
+      if (user?.id) {
+        await equipeAPI.join(teamId, user.id);
+      }
+      sessionStorage.setItem("insport_team_id", teamId);
       await loadData();
     } catch (err) {
       setError("Erreur lors de la jonction à l'équipe");
@@ -103,7 +106,7 @@ function TeamPage() {
         couleur: newTeamColor,
       });
 
-      localStorage.setItem("insport_team_id", newTeam.id);
+      sessionStorage.setItem("insport_team_id", newTeam.id);
       setNewTeamName("");
       setShowCreateForm(false);
       await loadData();
@@ -115,8 +118,15 @@ function TeamPage() {
     }
   };
 
-  const handleLeaveTeam = () => {
-    localStorage.removeItem("insport_team_id");
+  const handleLeaveTeam = async () => {
+    try {
+      if (user?.id) {
+        await equipeAPI.leave(user.id);
+      }
+    } catch (err) {
+      console.error("Erreur lors du départ de l'équipe", err);
+    }
+    sessionStorage.removeItem("insport_team_id");
     setPlayerTeam(null);
     setTeamMembers([]);
     setControlledArenas([]);
