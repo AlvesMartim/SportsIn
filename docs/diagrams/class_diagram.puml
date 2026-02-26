@@ -1,0 +1,67 @@
+@startuml
+class Team {
+    - id: Long
+    - name: String
+    - score: int
+    - level: int
+    + addPlayer(Player): void
+    + getInfluence(Point): int
+}
+
+class Player {
+    - id: Long
+    - username: String
+    - email: String
+    + joinTeam(Team): void
+    + startSession(Point, Sport): Session
+}
+
+class Point {
+    - id: Long
+    - name: String
+    - latitude: double
+    - longitude: double
+    - type: PointType
+    + getControllingTeam(): Team
+    + addInfluence(Team, int): void
+}
+
+class Zone {
+    - id: Long
+    - name: String
+    + isDominatedBy(Team): boolean
+}
+
+class Route {
+    - id: Long
+    - name: String
+    - bonusType: BonusType
+    + isControlledBy(Team): boolean
+}
+
+class Sport {
+    - id: Long
+    - name: String
+    - rules: String
+}
+
+class Session {
+    - id: Long
+    - startTime: LocalDateTime
+    - endTime: LocalDateTime
+    - result: double
+    + validate(): boolean
+    + calculateInfluence(): int
+}
+
+Team "1" -- "*" Player : has >
+Zone "1" *-- "*" Point : contains >
+Route "1" *-- "*" Point : connects >
+Point "*" -- "*" Sport : supports >
+Player "1" -- "*" Session : performs >
+Session "*" -- "1" Point : at >
+Session "*" -- "1" Sport : involves >
+Team "1" -- "*" Point : controls >
+Team "1" -- "*" Route : controls >
+
+@enduml

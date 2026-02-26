@@ -56,3 +56,13 @@ Le frontend est une application monopage (SPA) développée avec **React** et **
 ### Communication avec le backend
 
 Le frontend communique avec le backend via des requêtes HTTP aux endpoints de l'API REST. Il est conçu pour être remplaçable par n'importe quel autre client (mobile, CLI, etc.), car toute la logique réside dans le backend.
+
+## 📊 Diagrammes UML
+
+### Diagramme de Classes (Modèle de Données)
+
+![Diagramme de Classes](assets/diagrams/class_diagram.png)
+
+### Diagramme de Séquence (Conquête d'un Point)
+
+![Diagramme de Séquence](assets/diagrams/sequence_conquest.png)

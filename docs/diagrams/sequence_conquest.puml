@@ -1,0 +1,33 @@
+@startuml
+actor Joueur
+participant "Frontend (React)" as Front
+participant "API (Spring Boot)" as API
+participant "GameEngine" as Engine
+database "Base de Données" as DB
+
+Joueur -> Front: Se rend sur un Point
+Front -> API: GET /points/{id}
+API -> DB: Récupère infos Point
+DB --> API: Point (Sports, Influence)
+API --> Front: Affiche détails Point
+
+Joueur -> Front: Lance Session (Sport X)
+Front -> API: POST /sessions/start
+API -> Engine: Valide conditions (GPS, Team)
+Engine -> DB: Crée Session (En cours)
+API --> Front: Session démarrée
+
+Joueur -> Front: Termine Session (Score Y)
+Front -> API: POST /sessions/submit
+API -> Engine: Calcule Résultat & Influence
+Engine -> DB: Met à jour Score Équipe
+Engine -> DB: Met à jour Influence Point
+
+alt Influence suffisante
+    Engine -> DB: Change Contrôle Point
+    Engine -> API: Notification "Point Conquis !"
+end
+
+API --> Front: Résultat Session & Nouvel État
+Front --> Joueur: Affiche Victoire/Défaite
+@enduml

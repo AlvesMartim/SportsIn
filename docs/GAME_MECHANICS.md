@@ -42,3 +42,9 @@ Le jeu propose des missions pour encourager l'activité physique :
 *   Missions à durée limitée.
 *   Missions liées à la conquête de routes spécifiques.
 *   Missions de défense de territoire.
+
+## 📊 Diagramme des Cas d'Utilisation
+
+Ce diagramme illustre les actions possibles pour les joueurs et les administrateurs.
+
+![Diagramme des Cas d'Utilisation](assets/diagrams/use_case.png)

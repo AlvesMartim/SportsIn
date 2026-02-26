@@ -1,0 +1,29 @@
+@startuml
+left to right direction
+actor "Joueur" as Player
+actor "Administrateur" as Admin
+
+package "InSport System" {
+    usecase "Consulter la Carte" as ViewMap
+    usecase "Rejoindre une Équipe" as JoinTeam
+    usecase "Se rendre sur un Point" as GoToPoint
+    usecase "Lancer une Session Sportive" as StartSession
+    usecase "Soumettre un Résultat" as SubmitResult
+    usecase "Conquérir un Point" as ConquerPoint
+    usecase "Contrôler une Route" as ControlRoute
+    
+    usecase "Gérer les Sports" as ManageSports
+    usecase "Configurer les Zones" as ConfigZones
+}
+
+Player --> ViewMap
+Player --> JoinTeam
+Player --> GoToPoint
+Player --> StartSession
+Player --> SubmitResult
+SubmitResult ..> ConquerPoint : include
+ConquerPoint ..> ControlRoute : extend
+
+Admin --> ManageSports
+Admin --> ConfigZones
+@enduml
