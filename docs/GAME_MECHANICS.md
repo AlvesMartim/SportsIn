@@ -47,4 +47,4 @@ Le jeu propose des missions pour encourager l'activité physique :
 
 Ce diagramme illustre les actions possibles pour les joueurs et les administrateurs.
 
-![Diagramme des Cas d'Utilisation](assets/diagrams/use_case.png)
+![Diagramme des Cas d'Utilisation](diagrams/use_case.png)

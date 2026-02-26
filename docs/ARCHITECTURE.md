@@ -61,8 +61,8 @@ Le frontend communique avec le backend via des requêtes HTTP aux endpoints de l
 
 ### Diagramme de Classes (Modèle de Données)
 
-![Diagramme de Classes](assets/diagrams/class_diagram.png)
+![Diagramme de Classes](diagrams/class_diagram.png)
 
 ### Diagramme de Séquence (Conquête d'un Point)
 
-![Diagramme de Séquence](assets/diagrams/sequence_conquest.png)
+![Diagramme de Séquence](diagrams/sequence_conquest.png)
