@@ -29,4 +29,4 @@ jobs:
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-      run: ./gradlew build sonar -Dsonar.projectKey=TA_PROJECT_KEY -Dsonar.organization=TON_ORGANIZATION_KEY -Dsonar.host.url=https://sonarcloud.io
+      run: ./gradlew build sonar -Dsonar.projectKey=AlvesMartim_SportsIn -Dsonar.organization=alvesmartim -Dsonar.host.url=https://sonarcloud.io
