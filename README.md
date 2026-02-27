@@ -1,8 +1,8 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
-[![CI](https://github.com/<OWNER>/<REPO>/actions/workflows/ci.yml/badge.svg)](https://github.com/<OWNER>/<REPO>/actions/workflows/ci.yml)
+[![CI](https://github.com/AlvesMartim/SportsIn/actions/workflows/ci.yml/badge.svg)](https://github.com/AlvesMartim/SportsIn/actions/workflows/ci.yml)
 [![Build avec Gradle](https://github.com/AlvesMartim/SportsIn/actions/workflows/ant.yml/badge.svg)](https://github.com/AlvesMartim/SportsIn/actions/workflows/ant.yml)
-[![Coverage](https://sonarcloud.io/api/project_badges/measure?project=AlvesMartim_SportsIn&metric=coverage&token=0451fed156d904596d1f2244ffcc5586244cd67d)](https://sonarcloud.io/summary/new_code?id=AlvesMartim_SportsIn)
-[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=AlvesMartim_SportsIn&metric=alert_status&token=0451fed156d904596d1f2244ffcc5586244cd67d)](https://sonarcloud.io/summary/new_code?id=AlvesMartim_SportsIn)
+[![Coverage](https://sonarcloud.io/api/project_badges/measure?project=AlvesMartim_SportsIn&metric=coverage)](https://sonarcloud.io/summary/new_code?id=AlvesMartim_SportsIn)
+[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=AlvesMartim_SportsIn&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=AlvesMartim_SportsIn)
 # 🏃 InSport - Conquête Sportive en Territoire Urbain
 
 **InSport** est un projet innovant s’inspirant de la logique de jeux en réalité augmentée (type Ingress ou Pokémon Go), mais centré sur la **pratique sportive réelle**.

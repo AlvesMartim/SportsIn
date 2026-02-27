@@ -11,6 +11,7 @@ plugins {
     id("io.spring.dependency-management") version "1.1.5"
     id("java")
     id("org.sonarqube") version "5.0.0.4638"
+    jacoco
 }
 
 repositories {
@@ -52,6 +53,24 @@ application {
 
 tasks.named<Test>("test") {
     useJUnitPlatform()
+    finalizedBy(tasks.jacocoTestReport)
+}
+
+tasks.jacocoTestReport {
+    dependsOn(tasks.test)
+    reports {
+        xml.required = true
+        html.required = true
+    }
+}
+
+sonar {
+    properties {
+        property("sonar.projectKey", "AlvesMartim_SportsIn")
+        property("sonar.organization", "alvesmartim")
+        property("sonar.host.url", "https://sonarcloud.io")
+        property("sonar.coverage.jacoco.xmlReportPaths", "${layout.buildDirectory.get()}/reports/jacoco/test/jacocoTestReport.xml")
+    }
 }
 
 // Tâche pour construire le frontend avant le build
