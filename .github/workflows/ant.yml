@@ -1,25 +1,27 @@
-# This workflow will build a Java project with Ant
-# For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-java-with-ant
-
-name: Java CI
+name: Build avec Gradle
 
 on:
   push:
-    branches: [ "master" ]
+    branches: [ "main", "master" ]
   pull_request:
-    branches: [ "master" ]
+    branches: [ "main", "master" ]
 
 jobs:
   build:
-
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v4
-    - name: Set up JDK 11
+    - name: Récupérer le code
+      uses: actions/checkout@v4
+
+    - name: Installer Java (JDK 17)
       uses: actions/setup-java@v4
       with:
-        java-version: '11'
+        java-version: '17' # Tu peux mettre '21' ou '11' selon la version de ton projet
         distribution: 'temurin'
-    - name: Build with Ant
-      run: ant -noinput -buildfile build.xml
+
+    - name: Donner les droits d'exécution au wrapper Gradle
+      run: chmod +x gradlew
+
+    - name: Lancer le build Gradle
+      run: ./gradlew build
