@@ -61,7 +61,7 @@ Le projet respecte une séparation stricte :
 
 ## 👥 Crédits
 
-MOREIRA ALVES Martim
-ARNAUD Noé
-HASHANI Art
+MOREIRA ALVES Martim<br>
+ARNAUD Noé<br>
+HASHANI Art<br>
 MOUMEN MOKHTARY Aya
