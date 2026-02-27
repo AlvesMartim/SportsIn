@@ -3,8 +3,8 @@ package org.SportsIn.services;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.SportsIn.model.*;
 import org.SportsIn.model.mission.*;
-import org.SportsIn.model.territory.*;
 import org.SportsIn.model.user.Equipe;
+import org.SportsIn.repository.AreneRepository;
 import org.SportsIn.repository.EquipeRepository;
 import org.SportsIn.repository.MissionRepository;
 import org.junit.jupiter.api.BeforeEach;
@@ -19,8 +19,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * Tests unitaires pour MissionGenerationService et MissionEvaluationService.
- * Utilise des implémentations in-memory pour les repositories territoire/session
- * et des stubs simples pour MissionRepository et EquipeRepository.
+ * Utilise des stubs in-memory pour tous les repositories.
  */
 class MissionServiceTest {
 
@@ -28,44 +27,32 @@ class MissionServiceTest {
 
     private InMemoryMissionRepository missionRepository;
     private InMemoryEquipeRepository equipeRepository;
+    private InMemoryAreneRepository areneRepository;
     private InMemorySessionRepository sessionRepository;
-    private InMemoryPointSportifRepository pointRepository;
-    private InMemoryZoneRepository zoneRepository;
-    private InMemoryRouteRepository routeRepository;
-    private TerritoryService territoryService;
 
     private MissionGenerationService generationService;
     private MissionEvaluationService evaluationService;
 
-    private Sport football;
-    private Sport basket;
+    private Equipe equipeA;
+    private Equipe equipeB;
 
     @BeforeEach
     void setUp() {
         missionRepository = new InMemoryMissionRepository();
         equipeRepository = new InMemoryEquipeRepository();
+        areneRepository = new InMemoryAreneRepository();
         sessionRepository = new InMemorySessionRepository();
-        pointRepository = new InMemoryPointSportifRepository();
-        zoneRepository = new InMemoryZoneRepository();
-        routeRepository = new InMemoryRouteRepository();
-        InfluenceCalculator influenceCalculator = new InfluenceCalculator(
-                List.of(new RouteInfluenceModifier(routeRepository)));
-        territoryService = new TerritoryService(pointRepository, zoneRepository, routeRepository, influenceCalculator);
 
         generationService = new MissionGenerationService(
-                missionRepository, pointRepository, zoneRepository, routeRepository, sessionRepository);
+                missionRepository, areneRepository, sessionRepository);
         evaluationService = new MissionEvaluationService(
-                missionRepository, equipeRepository, pointRepository, routeRepository, sessionRepository, territoryService);
+                missionRepository, equipeRepository, areneRepository, sessionRepository);
 
-        football = new Sport(1L, "FOOT", "Football", 1L, 1L);
-        basket = new Sport(2L, "BASKET", "Basketball", 2L, 2L);
-
-        // Créer 2 équipes
-        Equipe equipeA = new Equipe("Équipe Alpha");
+        equipeA = new Equipe("Équipe Alpha");
         equipeA.setId(1L);
         equipeRepository.save(equipeA);
 
-        Equipe equipeB = new Equipe("Équipe Beta");
+        equipeB = new Equipe("Équipe Beta");
         equipeB.setId(2L);
         equipeRepository.save(equipeB);
     }
@@ -77,96 +64,115 @@ class MissionServiceTest {
     @Test
     @DisplayName("generateForTeam ne dépasse pas 3 missions actives")
     void testGenerateDoesNotExceedMaxActive() {
-        // Pré-remplir 3 missions actives pour l'équipe 1
         for (int i = 0; i < 3; i++) {
             Mission m = createActiveMission(1L, MissionType.DIVERSITY_SPORT, "Mission " + i);
             m.setPayloadJson("{\"idx\":" + i + "}");
             missionRepository.save(m);
         }
 
-        // Setup: au moins une zone avec des points pour que la génération ait des données
-        PointSportif p1 = new PointSportif(1L, "Point A", 48.0, 2.0, List.of(football));
-        p1.setControllingTeamId(2L); // contrôlé par adversaire
-        pointRepository.save(p1);
-        PointSportif p2 = new PointSportif(2L, "Point B", 48.1, 2.1, List.of(football));
-        p2.setControllingTeamId(1L); // contrôlé par nous
-        pointRepository.save(p2);
-        Zone zone = new Zone(1L, "Zone Test", List.of(p1, p2));
-        zoneRepository.save(zone);
+        Arene arene = createArene("arena1", "Arène Test", equipeB, List.of("FOOT"));
+        areneRepository.save(arene);
 
-        // Act
         generationService.generateForTeam(1L);
 
-        // Assert: toujours 3 missions, pas plus
         long activeCount = missionRepository.countActiveByTeam(1L);
         assertEquals(3, activeCount, "Ne doit pas créer de missions au-delà de 3 actives");
     }
 
     @Test
+    @DisplayName("La génération crée une mission RECAPTURE quand une arène adverse existe")
+    void testGenerateRecaptureMission() {
+        Arene arene = createArene("parc_princes", "Parc des Princes", equipeB, List.of("FOOT"));
+        areneRepository.save(arene);
+
+        generationService.generateForTeam(1L);
+
+        List<Mission> active = missionRepository.findActiveByTeam(1L);
+        assertFalse(active.isEmpty(), "Au moins une mission doit être générée");
+        assertTrue(active.stream().anyMatch(m -> m.getType() == MissionType.RECAPTURE_RECENT_LOSS),
+                "Doit générer une mission RECAPTURE_RECENT_LOSS");
+    }
+
+    @Test
+    @DisplayName("La génération crée une mission DIVERSITY quand un sport non joué existe")
+    void testGenerateDiversityMission() {
+        Arene arene = createArene("stade1", "Stade Test", null, List.of("BASKET", "FOOT"));
+        areneRepository.save(arene);
+
+        generationService.generateForTeam(1L);
+
+        List<Mission> active = missionRepository.findActiveByTeam(1L);
+        assertTrue(active.stream().anyMatch(m -> m.getType() == MissionType.DIVERSITY_SPORT),
+                "Doit générer une mission DIVERSITY_SPORT");
+    }
+
+    @Test
+    @DisplayName("La génération crée une mission BREAK_ROUTE quand 2+ arènes adverses existent")
+    void testGenerateBreakRouteMissionFromArenas() {
+        Arene arene1 = createArene("arena1", "Arène 1", equipeB, List.of("FOOT"));
+        Arene arene2 = createArene("arena2", "Arène 2", equipeB, List.of("BASKET"));
+        areneRepository.save(arene1);
+        areneRepository.save(arene2);
+
+        generationService.generateForTeam(1L);
+
+        List<Mission> active = missionRepository.findActiveByTeam(1L);
+        assertTrue(active.stream().anyMatch(m -> m.getType() == MissionType.BREAK_ROUTE),
+                "Doit générer une mission BREAK_ROUTE");
+    }
+
+    // ========================
+    // EVALUATION TESTS
+    // ========================
+
+    @Test
     @DisplayName("Mission expire quand now > endsAt")
     void testMissionExpires() {
-        // Mission qui a expiré il y a 1 heure
         Mission m = createActiveMission(1L, MissionType.RECAPTURE_RECENT_LOSS, "Mission expirée");
         m.setTimestampsFromInstant(
                 Instant.now().minus(5, ChronoUnit.DAYS),
                 Instant.now().minus(5, ChronoUnit.DAYS),
-                Instant.now().minus(1, ChronoUnit.HOURS) // expiré
+                Instant.now().minus(1, ChronoUnit.HOURS)
         );
         missionRepository.save(m);
 
-        // Act
         evaluationService.expireActiveMissions();
 
-        // Assert
         Mission updated = missionRepository.findById(m.getId()).orElseThrow();
         assertEquals(MissionStatus.EXPIRED, updated.getStatus());
     }
 
     @Test
-    @DisplayName("evaluateRecapture: SUCCESS quand l'équipe reprend le point")
+    @DisplayName("evaluateRecapture: SUCCESS quand l'équipe contrôle l'arène")
     void testEvaluateRecaptureSuccess() {
-        // Setup: point contrôlé initialement par adversaire
-        PointSportif point = new PointSportif(10L, "Point Contesté", 48.0, 2.0, List.of(football));
-        point.setControllingTeamId(2L);
-        pointRepository.save(point);
+        Arene arene = createArene("parc_princes", "Parc des Princes", equipeA, List.of("FOOT"));
+        areneRepository.save(arene);
 
-        Zone zone = new Zone(1L, "Zone A", List.of(point));
-        zoneRepository.save(zone);
-
-        // Créer une mission RECAPTURE pour l'équipe 1
-        Mission m = createActiveMission(1L, MissionType.RECAPTURE_RECENT_LOSS, "Reprendre Point Contesté");
-        m.setPayloadJson(toJson(Map.of("zoneId", 1L, "pointId", 10L, "windowDays", 7)));
+        Mission m = createActiveMission(1L, MissionType.RECAPTURE_RECENT_LOSS, "Reprendre Parc");
+        m.setPayloadJson(toJson(Map.of("arenaId", "parc_princes", "arenaName", "Parc des Princes", "windowDays", 7)));
         m.setRewardTeamPoints(50);
         m.setRewardTeamXp(30);
         missionRepository.save(m);
 
-        // Simuler: l'équipe 1 reprend le point
-        point.setControllingTeamId(1L);
-        pointRepository.save(point);
-
-        // Act
         Mission evaluated = evaluationService.evaluateMission(m.getId());
 
-        // Assert
         assertEquals(MissionStatus.SUCCESS, evaluated.getStatus());
         assertEquals(1, evaluated.getProgressCurrent());
         assertNotNull(evaluated.getCompletedAt());
 
-        // Vérifier que les points ont été attribués
         Equipe equipe = equipeRepository.findById(1L).orElseThrow();
         assertEquals(50, equipe.getPoints());
         assertEquals(30, equipe.getXp());
     }
 
     @Test
-    @DisplayName("evaluateRecapture: reste ACTIVE quand le point n'est pas repris")
+    @DisplayName("evaluateRecapture: reste ACTIVE quand l'arène est contrôlée par un adversaire")
     void testEvaluateRecaptureStillActive() {
-        PointSportif point = new PointSportif(10L, "Point Contesté", 48.0, 2.0, List.of(football));
-        point.setControllingTeamId(2L); // toujours contrôlé par adversaire
-        pointRepository.save(point);
+        Arene arene = createArene("parc_princes", "Parc des Princes", equipeB, List.of("FOOT"));
+        areneRepository.save(arene);
 
-        Mission m = createActiveMission(1L, MissionType.RECAPTURE_RECENT_LOSS, "Reprendre Point");
-        m.setPayloadJson(toJson(Map.of("zoneId", 1L, "pointId", 10L, "windowDays", 7)));
+        Mission m = createActiveMission(1L, MissionType.RECAPTURE_RECENT_LOSS, "Reprendre Parc");
+        m.setPayloadJson(toJson(Map.of("arenaId", "parc_princes", "arenaName", "Parc des Princes", "windowDays", 7)));
         missionRepository.save(m);
 
         Mission evaluated = evaluationService.evaluateMission(m.getId());
@@ -176,26 +182,27 @@ class MissionServiceTest {
     }
 
     @Test
-    @DisplayName("evaluateBreakRoute: SUCCESS quand l'équipe prend un point de la route adverse")
-    void testEvaluateBreakRouteSuccess() {
-        PointSportif p1 = new PointSportif(1L, "P1", 48.0, 2.0, List.of(football));
-        p1.setControllingTeamId(2L);
-        PointSportif p2 = new PointSportif(2L, "P2", 48.1, 2.1, List.of(football));
-        p2.setControllingTeamId(2L);
-        pointRepository.save(p1);
-        pointRepository.save(p2);
-
-        Route route = new Route(1L, "Route Alpha", "Route test", List.of(p1, p2));
-        routeRepository.save(route);
-
-        Mission m = createActiveMission(1L, MissionType.BREAK_ROUTE, "Briser Route Alpha");
-        m.setPayloadJson(toJson(Map.of("routeId", 1L, "adversaryTeamId", 2L, "minCount", 1)));
-        m.setRewardTeamPoints(75);
+    @DisplayName("evaluateRecapture: retourne false si arenaId absent du payload")
+    void testEvaluateRecaptureNoArenaId() {
+        Mission m = createActiveMission(1L, MissionType.RECAPTURE_RECENT_LOSS, "Mission sans arène");
+        m.setPayloadJson(toJson(Map.of("windowDays", 7)));
         missionRepository.save(m);
 
-        // Équipe 1 prend un point de la route
-        p1.setControllingTeamId(1L);
-        pointRepository.save(p1);
+        Mission evaluated = evaluationService.evaluateMission(m.getId());
+
+        assertEquals(MissionStatus.ACTIVE, evaluated.getStatus());
+    }
+
+    @Test
+    @DisplayName("evaluateBreakRoute: SUCCESS quand l'équipe contrôle l'arène")
+    void testEvaluateBreakRouteSuccess() {
+        Arene arene = createArene("groupama", "Groupama Stadium", equipeA, List.of("FOOT"));
+        areneRepository.save(arene);
+
+        Mission m = createActiveMission(1L, MissionType.BREAK_ROUTE, "Briser Groupama");
+        m.setPayloadJson(toJson(Map.of("arenaId", "groupama", "arenaName", "Groupama Stadium", "adversaryTeamId", 2, "minCount", 1)));
+        m.setRewardTeamPoints(75);
+        missionRepository.save(m);
 
         Mission evaluated = evaluationService.evaluateMission(m.getId());
 
@@ -204,28 +211,33 @@ class MissionServiceTest {
     }
 
     @Test
-    @DisplayName("La génération crée des missions RECAPTURE quand un point adverse est dans une zone partagée")
-    void testGenerateRecaptureMission() {
-        PointSportif p1 = new PointSportif(1L, "Notre Point", 48.0, 2.0, List.of(football));
-        p1.setControllingTeamId(1L);
-        PointSportif p2 = new PointSportif(2L, "Point Perdu", 48.05, 2.05, List.of(football));
-        p2.setControllingTeamId(2L);
-        pointRepository.save(p1);
-        pointRepository.save(p2);
+    @DisplayName("evaluateAllActiveMissions évalue toutes les missions actives")
+    void testEvaluateAllActiveMissions() {
+        Arene arene = createArene("parc_princes", "Parc des Princes", equipeA, List.of("FOOT"));
+        areneRepository.save(arene);
 
-        Zone zone = new Zone(1L, "Zone Mixte", List.of(p1, p2));
-        zoneRepository.save(zone);
+        Mission m1 = createActiveMission(1L, MissionType.RECAPTURE_RECENT_LOSS, "Mission 1");
+        m1.setPayloadJson(toJson(Map.of("arenaId", "parc_princes", "arenaName", "Parc", "windowDays", 7)));
+        m1.setRewardTeamPoints(50);
+        m1.setRewardTeamXp(30);
+        missionRepository.save(m1);
 
-        generationService.generateForTeam(1L);
+        evaluationService.evaluateAllActiveMissions();
 
-        List<Mission> active = missionRepository.findActiveByTeam(1L);
-        assertFalse(active.isEmpty(), "Au moins une mission doit être générée");
-        assertTrue(active.stream().anyMatch(m -> m.getType() == MissionType.RECAPTURE_RECENT_LOSS));
+        Mission evaluated = missionRepository.findById(m1.getId()).orElseThrow();
+        assertEquals(MissionStatus.SUCCESS, evaluated.getStatus());
     }
 
     // ========================
     // HELPERS
     // ========================
+
+    private Arene createArene(String id, String nom, Equipe controllingTeam, List<String> sports) {
+        Arene arene = new Arene(id, nom, 48.0, 2.0);
+        arene.setControllingTeam(controllingTeam);
+        arene.setSportsDisponibles(sports);
+        return arene;
+    }
 
     private Mission createActiveMission(Long teamId, MissionType type, String title) {
         Mission m = new Mission();
@@ -254,80 +266,86 @@ class MissionServiceTest {
     // IN-MEMORY STUBS
     // ========================
 
-    /**
-     * Stub in-memory pour MissionRepository (simule JpaRepository).
-     */
+    static class InMemoryAreneRepository implements AreneRepository {
+        private final Map<String, Arene> db = new LinkedHashMap<>();
+
+        @Override public List<Arene> findByControllingTeam_Id(Long teamId) {
+            return db.values().stream()
+                    .filter(a -> a.getControllingTeam() != null && teamId.equals(a.getControllingTeam().getId()))
+                    .toList();
+        }
+        @Override public List<Arene> findBySportsDisponiblesContaining(String sport) {
+            return db.values().stream()
+                    .filter(a -> a.getSportsDisponibles() != null && a.getSportsDisponibles().contains(sport))
+                    .toList();
+        }
+        @Override public <S extends Arene> S save(S entity) { db.put(entity.getId(), entity); return entity; }
+        @Override public Optional<Arene> findById(String id) { return Optional.ofNullable(db.get(id)); }
+        @Override public boolean existsById(String id) { return db.containsKey(id); }
+        @Override public List<Arene> findAll() { return new ArrayList<>(db.values()); }
+        @Override public <S extends Arene> List<S> saveAll(Iterable<S> entities) { entities.forEach(this::save); return List.of(); }
+        @Override public List<Arene> findAllById(Iterable<String> ids) { return List.of(); }
+        @Override public long count() { return db.size(); }
+        @Override public void deleteById(String id) { db.remove(id); }
+        @Override public void delete(Arene entity) { db.remove(entity.getId()); }
+        @Override public void deleteAllById(Iterable<? extends String> ids) {}
+        @Override public void deleteAll(Iterable<? extends Arene> entities) {}
+        @Override public void deleteAll() { db.clear(); }
+        @Override public void flush() {}
+        @Override public <S extends Arene> S saveAndFlush(S entity) { return save(entity); }
+        @Override public <S extends Arene> List<S> saveAllAndFlush(Iterable<S> entities) { return List.of(); }
+        @Override public void deleteAllInBatch(Iterable<Arene> entities) {}
+        @Override public void deleteAllByIdInBatch(Iterable<String> ids) {}
+        @Override public void deleteAllInBatch() {}
+        @Override public Arene getOne(String id) { return db.get(id); }
+        @Override public Arene getById(String id) { return db.get(id); }
+        @Override public Arene getReferenceById(String id) { return db.get(id); }
+        @Override public <S extends Arene> Optional<S> findOne(org.springframework.data.domain.Example<S> example) { return Optional.empty(); }
+        @Override public <S extends Arene> List<S> findAll(org.springframework.data.domain.Example<S> example) { return List.of(); }
+        @Override public <S extends Arene> List<S> findAll(org.springframework.data.domain.Example<S> example, org.springframework.data.domain.Sort sort) { return List.of(); }
+        @Override public <S extends Arene> org.springframework.data.domain.Page<S> findAll(org.springframework.data.domain.Example<S> example, org.springframework.data.domain.Pageable pageable) { return org.springframework.data.domain.Page.empty(); }
+        @Override public <S extends Arene> long count(org.springframework.data.domain.Example<S> example) { return 0; }
+        @Override public <S extends Arene> boolean exists(org.springframework.data.domain.Example<S> example) { return false; }
+        @Override public <S extends Arene, R> R findBy(org.springframework.data.domain.Example<S> example, java.util.function.Function<org.springframework.data.repository.query.FluentQuery.FetchableFluentQuery<S>, R> queryFunction) { return null; }
+        @Override public List<Arene> findAll(org.springframework.data.domain.Sort sort) { return findAll(); }
+        @Override public org.springframework.data.domain.Page<Arene> findAll(org.springframework.data.domain.Pageable pageable) { return org.springframework.data.domain.Page.empty(); }
+    }
+
     static class InMemoryMissionRepository implements MissionRepository {
         private final Map<Long, Mission> db = new LinkedHashMap<>();
         private long nextId = 1;
 
-        @Override
-        public List<Mission> findByTeamIdAndStatus(Long teamId, MissionStatus status) {
-            return db.values().stream()
-                    .filter(m -> m.getTeamId().equals(teamId) && m.getStatus() == status)
-                    .toList();
+        @Override public List<Mission> findByTeamIdAndStatus(Long teamId, MissionStatus status) {
+            return db.values().stream().filter(m -> m.getTeamId().equals(teamId) && m.getStatus() == status).toList();
         }
-
-        @Override
-        public List<Mission> findActiveByTeam(Long teamId) {
+        @Override public List<Mission> findActiveByTeam(Long teamId) {
             return db.values().stream()
                     .filter(m -> m.getTeamId().equals(teamId) && m.getStatus() == MissionStatus.ACTIVE)
-                    .sorted(Comparator.comparing(Mission::getEndsAt))
-                    .toList();
+                    .sorted(Comparator.comparing(Mission::getEndsAt)).toList();
         }
-
-        @Override
-        public List<Mission> findActiveEndingBefore(String now) {
+        @Override public List<Mission> findActiveEndingBefore(String now) {
             return db.values().stream()
-                    .filter(m -> m.getStatus() == MissionStatus.ACTIVE && m.getEndsAt().compareTo(now) < 0)
-                    .toList();
+                    .filter(m -> m.getStatus() == MissionStatus.ACTIVE && m.getEndsAt().compareTo(now) < 0).toList();
         }
-
-        @Override
-        public long countActiveByTeam(Long teamId) {
-            return db.values().stream()
-                    .filter(m -> m.getTeamId().equals(teamId) && m.getStatus() == MissionStatus.ACTIVE)
-                    .count();
+        @Override public long countActiveByTeam(Long teamId) {
+            return db.values().stream().filter(m -> m.getTeamId().equals(teamId) && m.getStatus() == MissionStatus.ACTIVE).count();
         }
-
-        @Override
-        public List<Mission> findAllActive() {
-            return db.values().stream()
-                    .filter(m -> m.getStatus() == MissionStatus.ACTIVE)
-                    .toList();
+        @Override public List<Mission> findAllActive() {
+            return db.values().stream().filter(m -> m.getStatus() == MissionStatus.ACTIVE).toList();
         }
-
-        @Override
-        public List<Mission> findByTeamIdOrderByEndsAtAsc(Long teamId) {
-            return db.values().stream()
-                    .filter(m -> m.getTeamId().equals(teamId))
-                    .sorted(Comparator.comparing(Mission::getEndsAt))
-                    .toList();
+        @Override public List<Mission> findByTeamIdOrderByEndsAtAsc(Long teamId) {
+            return db.values().stream().filter(m -> m.getTeamId().equals(teamId))
+                    .sorted(Comparator.comparing(Mission::getEndsAt)).toList();
         }
-
-        @Override
-        public <S extends Mission> S save(S entity) {
-            if (entity.getId() == null) {
-                entity.setId(nextId++);
-            }
+        @Override public <S extends Mission> S save(S entity) {
+            if (entity.getId() == null) entity.setId(nextId++);
             db.put(entity.getId(), entity);
             return entity;
         }
-
-        @Override
-        public Optional<Mission> findById(Long id) {
-            return Optional.ofNullable(db.get(id));
-        }
-
-        @Override
-        public boolean existsById(Long id) {
-            return db.containsKey(id);
-        }
-
+        @Override public Optional<Mission> findById(Long id) { return Optional.ofNullable(db.get(id)); }
+        @Override public boolean existsById(Long id) { return db.containsKey(id); }
         @Override public <S extends Mission> List<S> saveAll(Iterable<S> entities) {
-            List<S> result = new ArrayList<>();
-            entities.forEach(e -> result.add(save(e)));
-            return result;
+            List<S> r = new ArrayList<>(); entities.forEach(e -> r.add(save(e))); return r;
         }
         @Override public List<Mission> findAll() { return new ArrayList<>(db.values()); }
         @Override public List<Mission> findAllById(Iterable<Long> ids) { return List.of(); }
@@ -357,33 +375,15 @@ class MissionServiceTest {
         @Override public org.springframework.data.domain.Page<Mission> findAll(org.springframework.data.domain.Pageable pageable) { return org.springframework.data.domain.Page.empty(); }
     }
 
-    /**
-     * Stub in-memory pour EquipeRepository.
-     */
     static class InMemoryEquipeRepository implements EquipeRepository {
         private final Map<Long, Equipe> db = new LinkedHashMap<>();
 
-        @Override
-        public Optional<Equipe> findByNom(String nom) {
+        @Override public Optional<Equipe> findByNom(String nom) {
             return db.values().stream().filter(e -> e.getNom().equals(nom)).findFirst();
         }
-
-        @Override
-        public <S extends Equipe> S save(S entity) {
-            db.put(entity.getId(), entity);
-            return entity;
-        }
-
-        @Override
-        public Optional<Equipe> findById(Long id) {
-            return Optional.ofNullable(db.get(id));
-        }
-
-        @Override
-        public boolean existsById(Long id) {
-            return db.containsKey(id);
-        }
-
+        @Override public <S extends Equipe> S save(S entity) { db.put(entity.getId(), entity); return entity; }
+        @Override public Optional<Equipe> findById(Long id) { return Optional.ofNullable(db.get(id)); }
+        @Override public boolean existsById(Long id) { return db.containsKey(id); }
         @Override public List<Equipe> findAll() { return new ArrayList<>(db.values()); }
         @Override public <S extends Equipe> List<S> saveAll(Iterable<S> entities) { entities.forEach(this::save); return List.of(); }
         @Override public List<Equipe> findAllById(Iterable<Long> ids) { return List.of(); }
@@ -413,80 +413,16 @@ class MissionServiceTest {
         @Override public org.springframework.data.domain.Page<Equipe> findAll(org.springframework.data.domain.Pageable pageable) { return org.springframework.data.domain.Page.empty(); }
     }
 
-    /**
-     * Stub in-memory pour PointSportifRepository (utilise l'interface existante du projet).
-     */
-    static class InMemoryPointSportifRepository implements PointSportifRepository {
-        private final Map<Long, PointSportif> db = new LinkedHashMap<>();
+    static class InMemorySessionRepository implements SessionRepository {
+        private final Map<String, Session> db = new LinkedHashMap<>();
 
-        @Override
-        public Optional<PointSportif> findById(Long id) {
-            return Optional.ofNullable(db.get(id));
+        @Override public Session save(Session s) { db.put(s.getId(), s); return s; }
+        @Override public Optional<Session> findById(String id) { return Optional.ofNullable(db.get(id)); }
+        @Override public List<Session> findByState(SessionState state) {
+            return db.values().stream().filter(s -> s.getState() == state).toList();
         }
-
-        @Override
-        public List<PointSportif> findAll() {
-            return new ArrayList<>(db.values());
-        }
-
-        @Override
-        public void save(PointSportif point) {
-            db.put(point.getId(), point);
-        }
-    }
-
-    static class InMemoryZoneRepository implements ZoneRepository {
-        private final Map<Long, Zone> db = new LinkedHashMap<>();
-
-        @Override
-        public Optional<Zone> findById(Long id) {
-            return Optional.ofNullable(db.get(id));
-        }
-
-        @Override
-        public List<Zone> findAll() {
-            return new ArrayList<>(db.values());
-        }
-
-        @Override
-        public void save(Zone zone) {
-            db.put(zone.getId(), zone);
-        }
-
-        @Override
-        public List<Zone> findZonesByPointId(Long pointId) {
-            return db.values().stream()
-                    .filter(z -> z.getPoints().stream().anyMatch(p -> p.getId().equals(pointId)))
-                    .toList();
-        }
-    }
-
-    static class InMemoryRouteRepository implements RouteRepository {
-        private final Map<Long, Route> db = new LinkedHashMap<>();
-
-        @Override
-        public Optional<Route> findById(Long id) {
-            return Optional.ofNullable(db.get(id));
-        }
-
-        @Override
-        public List<Route> findAll() {
-            return new ArrayList<>(db.values());
-        }
-
-        @Override
-        public void save(Route route) {
-            db.put(route.getId(), route);
-        }
-
-        @Override
-        public void saveAll(List<Route> routes) {
-            routes.forEach(this::save);
-        }
-
-        @Override
-        public void deleteAll() {
-            db.clear();
-        }
+        @Override public boolean deleteById(String id) { return db.remove(id) != null; }
+        @Override public boolean existsById(String id) { return db.containsKey(id); }
+        @Override public List<Session> findAll() { return new ArrayList<>(db.values()); }
     }
 }
