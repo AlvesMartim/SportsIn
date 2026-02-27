@@ -1,6 +1,6 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 [![CI](https://github.com/<OWNER>/<REPO>/actions/workflows/ci.yml/badge.svg)](https://github.com/<OWNER>/<REPO>/actions/workflows/ci.yml)
-
+[![Build avec Gradle](https://github.com/AlvesMartim/SportsIn/actions/workflows/ant.yml/badge.svg)](https://github.com/AlvesMartim/SportsIn/actions/workflows/ant.yml)
 # 🏃 InSport - Conquête Sportive en Territoire Urbain
 
 **InSport** est un projet innovant s’inspirant de la logique de jeux en réalité augmentée (type Ingress ou Pokémon Go), mais centré sur la **pratique sportive réelle**.
