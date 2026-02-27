@@ -1,4 +1,4 @@
-name: Build avec Gradle
+name: Build et Qualité (SonarCloud)
 
 on:
   push:
@@ -13,15 +13,20 @@ jobs:
     steps:
     - name: Récupérer le code
       uses: actions/checkout@v4
+      with:
+        fetch-depth: 0  # Très important pour SonarCloud !
 
-    - name: Installer Java (JDK 17)
+    - name: Installer Java 17
       uses: actions/setup-java@v4
       with:
-        java-version: '17' # Tu peux mettre '21' ou '11' selon la version de ton projet
+        java-version: '17' # À adapter si tu utilises une autre version de Java
         distribution: 'temurin'
 
-    - name: Donner les droits d'exécution au wrapper Gradle
+    - name: Donner les droits au wrapper Gradle
       run: chmod +x gradlew
 
-    - name: Lancer le build Gradle
-      run: ./gradlew build
+    - name: Lancer le build et l'analyse SonarCloud
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+      run: ./gradlew build sonar -Dsonar.projectKey=TA_PROJECT_KEY -Dsonar.organization=TON_ORGANIZATION_KEY -Dsonar.host.url=https://sonarcloud.io
