@@ -128,6 +128,10 @@ public class MissionEvaluationService {
      * sur l'arène (arenaId) après startsAt.
      */
     private boolean evaluateDiversity(Mission mission, Map<String, Object> payload) {
+        if (isWeatherFlashPayload(payload)) {
+            return evaluateWeatherFlash(mission, payload);
+        }
+
         Object arenaIdObj = payload.get("arenaId");
         Object sportCodeObj = payload.get("sportCode");
         if (sportCodeObj == null) return false;
@@ -147,6 +151,41 @@ public class MissionEvaluationService {
 
             Instant endedInstant = s.getEndedAt().atZone(java.time.ZoneId.systemDefault()).toInstant();
             if (endedInstant.isAfter(startsAt)) {
+                mission.setProgressCurrent(1);
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * WEATHER_FLASH: SUCCESS si l'equipe gagne une session sur l'arene cible
+     * entre startsAt et eventStartsAt.
+     */
+    private boolean evaluateWeatherFlash(Mission mission, Map<String, Object> payload) {
+        Object arenaIdObj = payload.get("arenaId");
+        Object eventStartsAtObj = payload.get("eventStartsAt");
+        if (arenaIdObj == null || eventStartsAtObj == null) {
+            return false;
+        }
+
+        String expectedArenaId = arenaIdObj.toString();
+        Instant startsAt = mission.getStartsAtInstant();
+        Instant eventStartsAt;
+        try {
+            eventStartsAt = Instant.parse(eventStartsAtObj.toString());
+        } catch (Exception e) {
+            return false;
+        }
+
+        List<Session> terminated = sessionRepository.findByState(SessionState.TERMINATED);
+        for (Session session : terminated) {
+            if (session.getEndedAt() == null || session.getWinnerParticipantId() == null) continue;
+            if (!expectedArenaId.equals(session.getPointId())) continue;
+            if (!mission.getTeamId().toString().equals(session.getWinnerParticipantId())) continue;
+
+            Instant endedAt = session.getEndedAt().atZone(java.time.ZoneId.systemDefault()).toInstant();
+            if ((endedAt.equals(startsAt) || endedAt.isAfter(startsAt)) && endedAt.isBefore(eventStartsAt)) {
                 mission.setProgressCurrent(1);
                 return true;
             }
@@ -192,5 +231,10 @@ public class MissionEvaluationService {
         } catch (Exception e) {
             return Map.of();
         }
+    }
+
+    private boolean isWeatherFlashPayload(Map<String, Object> payload) {
+        Object category = payload.get("missionCategory");
+        return category != null && "WEATHER_FLASH".equalsIgnoreCase(category.toString());
     }
 }

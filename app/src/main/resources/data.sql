@@ -152,3 +152,12 @@ VALUES (2, 'BOOST_INFLUENCE', 'Surge d''influence', 'Augmente de 25% les gains d
 
 INSERT OR IGNORE INTO perk_definition (id, code, name, description, effect_type, required_level, duration_seconds, cooldown_seconds, max_active_instances, stackable, parameters_json)
 VALUES (3, 'XP_BOOST', 'Entrainement intensif', 'Multiplie par 1.5 les gains d''XP pendant 24 heures.', 'XP_MULTIPLIER', 2, 86400, 259200, 1, 0, '{"multiplier": 1.5}');
+
+INSERT OR IGNORE INTO perk_definition (id, code, name, description, effect_type, required_level, duration_seconds, cooldown_seconds, max_active_instances, stackable, parameters_json)
+VALUES (4, 'AMPHIBIEN', 'Amphibien', 'Exploite la pluie: supprime la penalite meteo et ajoute un bonus offensif.', 'WEATHER_AFFINITY', 4, 172800, 345600, 1, 0, '{"condition": "RAIN", "weatherBonusBoostPercent": 100, "flatInfluenceBonusPercent": 15}');
+
+INSERT OR IGNORE INTO perk_definition (id, code, name, description, effect_type, required_level, duration_seconds, cooldown_seconds, max_active_instances, stackable, parameters_json)
+VALUES (5, 'THERMO_RUNNER', 'Thermo Runner', 'Specialisation canicule: bonus d''influence en forte chaleur.', 'WEATHER_AFFINITY', 5, 172800, 345600, 1, 0, '{"condition": "HEAT", "weatherBonusBoostPercent": 70, "flatInfluenceBonusPercent": 10}');
+
+INSERT OR IGNORE INTO perk_definition (id, code, name, description, effect_type, required_level, duration_seconds, cooldown_seconds, max_active_instances, stackable, parameters_json)
+VALUES (6, 'AERO_STRIKE', 'Aero Strike', 'Exploite les rafales de vent pour renforcer les offensives.', 'WEATHER_AFFINITY', 5, 172800, 345600, 1, 0, '{"condition": "WIND", "weatherBonusBoostPercent": 60, "flatInfluenceBonusPercent": 8}');

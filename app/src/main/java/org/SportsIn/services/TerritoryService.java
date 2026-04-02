@@ -8,6 +8,7 @@ import org.SportsIn.model.territory.RouteBonus;
 import org.SportsIn.model.territory.RouteRepository;
 import org.SportsIn.repository.AreneRepository;
 import org.SportsIn.repository.EquipeRepository;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -18,6 +19,9 @@ import java.util.List;
 @Service
 public class TerritoryService {
 
+    private static final double DEFAULT_SESSION_INFLUENCE_GAIN = 25.0;
+    private static final double CAPTURE_BASE_INFLUENCE = 35.0;
+
     private final AreneRepository areneRepository;
     private final EquipeRepository equipeRepository;
     private final ZoneRepository zoneRepository;
@@ -25,6 +29,24 @@ public class TerritoryService {
     private final RouteService routeService;
     private final RouteGeneratorService routeGeneratorService;
     private final InfluenceCalculator influenceCalculator;
+    private final TerritoryInfluenceStateService territoryInfluenceStateService;
+
+    @Autowired
+    public TerritoryService(AreneRepository areneRepository,
+                            EquipeRepository equipeRepository,
+                            ZoneRepository zoneRepository,
+                            RouteRepository routeRepository,
+                            InfluenceCalculator influenceCalculator,
+                            TerritoryInfluenceStateService territoryInfluenceStateService) {
+        this.areneRepository = areneRepository;
+        this.equipeRepository = equipeRepository;
+        this.zoneRepository = zoneRepository;
+        this.routeRepository = routeRepository;
+        this.routeService = new RouteService();
+        this.routeGeneratorService = new RouteGeneratorService();
+        this.influenceCalculator = influenceCalculator;
+        this.territoryInfluenceStateService = territoryInfluenceStateService;
+    }
 
     public TerritoryService(AreneRepository areneRepository,
                             EquipeRepository equipeRepository,
@@ -38,6 +60,7 @@ public class TerritoryService {
         this.routeService = new RouteService();
         this.routeGeneratorService = new RouteGeneratorService();
         this.influenceCalculator = influenceCalculator;
+        this.territoryInfluenceStateService = new TerritoryInfluenceStateService();
     }
 
     /**
@@ -84,11 +107,21 @@ public class TerritoryService {
      * @param winningTeamId L'ID de l'équipe gagnante.
      */
     public void updateTerritoryControl(String areneId, Long winningTeamId) {
+        updateTerritoryControl(areneId, winningTeamId, DEFAULT_SESSION_INFLUENCE_GAIN);
+    }
+
+    /**
+     * Variante avec gain d'influence explicite (Hard Mode meteo, perks, routes).
+     */
+    public void updateTerritoryControl(String areneId, Long winningTeamId, double influenceGain) {
         areneRepository.findById(areneId).ifPresent(arene -> {
             Long oldOwner = arene.getControllingTeamId();
+            double sanitizedGain = Math.max(5.0, influenceGain);
             
             if (winningTeamId.equals(oldOwner)) {
-                System.out.println("Arène " + arene.getNom() + " défendue avec succès par l'équipe " + winningTeamId);
+                double level = territoryInfluenceStateService.reinforce(areneId, sanitizedGain * 0.30);
+                System.out.println("Arène " + arene.getNom() + " défendue avec succès par l'équipe " + winningTeamId
+                        + " | influence=" + String.format("%.1f", level));
                 return;
             }
 
@@ -97,6 +130,11 @@ public class TerritoryService {
             equipeRepository.findById(winningTeamId).ifPresent(equipe -> {
                 arene.setControllingTeam(equipe);
                 areneRepository.save(arene);
+
+                double seededLevel = CAPTURE_BASE_INFLUENCE + Math.min(50.0, sanitizedGain * 0.50);
+                double level = territoryInfluenceStateService.setLevel(areneId, seededLevel);
+                System.out.println(">>> Influence territoriale initialisee sur " + arene.getNom() + " a "
+                        + String.format("%.1f", level));
             });
 
             // Vérifier les zones impactées
@@ -105,6 +143,10 @@ public class TerritoryService {
             // Vérifier les bonus de route
             checkRouteBonuses(winningTeamId);
         });
+    }
+
+    public double getCurrentInfluenceLevel(String areneId) {
+        return territoryInfluenceStateService.getInfluenceLevel(areneId);
     }
 
     private void checkZonesImpactedByArene(String areneId) {
