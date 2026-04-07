@@ -78,6 +78,8 @@ const TEAM_COLORS = {
 };
 
 const getTeamColor = (teamId) => TEAM_COLORS[teamId] || TEAM_COLORS.default;
+const normalizeSportCode = (sportCode) => String(sportCode || "").trim().toUpperCase();
+const formatSportLabel = (sportCode) => String(sportCode || "").replace(/_/g, " ");
 
 const MISSION_TYPE_LABELS = {
   RECAPTURE_RECENT_LOSS: "Reconquête",
@@ -116,8 +118,9 @@ function MapPage() {
   const [showLegend, setShowLegend] = useState(false);
   const [missions, setMissions] = useState([]);
   const [missionsByArena, setMissionsByArena] = useState({});
+  const [selectedSportByArena, setSelectedSportByArena] = useState({});
 
-  const handleLaunchGame = async (arene) => {
+  const handleLaunchGame = async (arene, selectedSportCode) => {
     const teamId = sessionStorage.getItem("insport_team_id");
 
     if (!teamId) {
@@ -127,22 +130,86 @@ function MapPage() {
 
     try {
       setLaunchingGame(arene.id);
+      setError(null);
+
+      const availableSports = Array.isArray(arene.sportsDisponibles)
+        ? arene.sportsDisponibles
+        : [];
+      const chosenSport = normalizeSportCode(
+        selectedSportCode || selectedSportByArena[arene.id] || availableSports[0]
+      );
+
+      if (!chosenSport) {
+        setError("Cette arène ne propose aucun sport pour le matchmaking.");
+        return;
+      }
+
       const team = await equipeAPI.getById(teamId);
+
+      const waitingGames = await gameAPI.getWaitingAtPoint(arene.id).catch(() => []);
+      const compatibleGame = waitingGames.find(
+        (g) =>
+          normalizeSportCode(g?.sport?.code) === chosenSport &&
+          g?.creatorTeam?.id?.toString() !== team?.id?.toString()
+      );
+
+      if (compatibleGame) {
+        await gameAPI.join(compatibleGame.id, Number(team.id));
+        navigate(`/game/lobby/${compatibleGame.id}`);
+        return;
+      }
 
       const gameData = {
         pointId: arene.id,
-        sport: arene.sportsDisponibles?.[0] ? { code: arene.sportsDisponibles[0] } : null,
+        sport: { code: chosenSport },
         creatorTeam: team,
       };
 
       const game = await gameAPI.create(gameData);
       navigate(`/game/lobby/${game.id}`);
     } catch (err) {
+      setError("Erreur lors du lancement du matchmaking.");
       console.error("Erreur lors de la création du jeu:", err);
     } finally {
       setLaunchingGame(null);
     }
   };
+
+  const handleSelectArenaSport = (arenaId, sportCode, event) => {
+    if (event) {
+      event.preventDefault();
+      event.stopPropagation();
+    }
+
+    setSelectedSportByArena((previous) => ({
+      ...previous,
+      [arenaId]: sportCode,
+    }));
+  };
+
+  useEffect(() => {
+    setSelectedSportByArena((previous) => {
+      const next = { ...previous };
+
+      for (const arena of arenes) {
+        const availableSports = Array.isArray(arena.sportsDisponibles)
+          ? arena.sportsDisponibles
+          : [];
+        if (availableSports.length === 0) continue;
+
+        const selected = normalizeSportCode(next[arena.id]);
+        const exists = availableSports.some(
+          (sport) => normalizeSportCode(sport) === selected
+        );
+
+        if (!exists) {
+          next[arena.id] = availableSports[0];
+        }
+      }
+
+      return next;
+    });
+  }, [arenes]);
 
   useEffect(() => {
     if (navigator.geolocation) {
@@ -283,6 +350,10 @@ function MapPage() {
           {showArenas && arenes.map((arene) => {
             const arenaMissions = missionsByArena[String(arene.id)] || [];
             const hasMission = arenaMissions.length > 0;
+            const availableSports = Array.isArray(arene.sportsDisponibles)
+              ? arene.sportsDisponibles
+              : [];
+            const selectedSport = selectedSportByArena[arene.id] || availableSports[0] || "";
 
             return (
               <Marker
@@ -294,11 +365,23 @@ function MapPage() {
                   <div className="map-popup-content">
                     {/* Section 1 : Infos arène */}
                     <h4>{arene.nom || `Arène ${arene.id}`}</h4>
-                    {arene.sportsDisponibles?.length > 0 && (
-                      <div className="map-popup-sports">
-                        {arene.sportsDisponibles.map((sport) => (
-                          <span key={sport} className="map-popup-sport">{sport}</span>
-                        ))}
+                    {availableSports.length > 0 && (
+                      <div className="map-popup-sports map-popup-sports--selectable">
+                        {availableSports.map((sport) => {
+                          const isSelected =
+                            normalizeSportCode(sport) === normalizeSportCode(selectedSport);
+
+                          return (
+                            <button
+                              key={sport}
+                              type="button"
+                              className={`map-popup-sport-btn${isSelected ? " is-active" : ""}`}
+                              onClick={(event) => handleSelectArenaSport(arene.id, sport, event)}
+                            >
+                              {formatSportLabel(sport)}
+                            </button>
+                          );
+                        })}
                       </div>
                     )}
                     {arene.controllingTeamId && (
@@ -306,10 +389,12 @@ function MapPage() {
                     )}
                     <button
                       className="map-popup-action"
-                      onClick={() => handleLaunchGame(arene)}
+                      onClick={() => handleLaunchGame(arene, selectedSport)}
                       disabled={launchingGame === arene.id}
                     >
-                      {launchingGame === arene.id ? "Création..." : "⚔️ Lancer un jeu"}
+                      {launchingGame === arene.id
+                        ? "Matchmaking..."
+                        : `⚔️ Lancer un jeu${selectedSport ? ` (${formatSportLabel(selectedSport)})` : ""}`}
                     </button>
 
                     {/* Section 2 : Missions actives sur cette arène */}

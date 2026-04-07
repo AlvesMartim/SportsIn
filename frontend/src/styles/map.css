@@ -298,6 +298,10 @@
   margin: 8px 0;
 }
 
+.map-popup-sports--selectable {
+  margin-bottom: 10px;
+}
+
 .map-popup-sport {
   display: inline-block;
   padding: 3px 8px;
@@ -306,6 +310,28 @@
   border-radius: 4px;
   font-size: 0.75rem;
   font-weight: 500;
+}
+
+.map-popup-sport-btn {
+  border: 1px solid #c7d2fe;
+  border-radius: 6px;
+  background: #eef2ff;
+  color: #3730a3;
+  font-size: 0.75rem;
+  font-weight: 600;
+  padding: 4px 10px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.map-popup-sport-btn:hover {
+  background: #e0e7ff;
+}
+
+.map-popup-sport-btn.is-active {
+  background: #3730a3;
+  color: #ffffff;
+  border-color: #312e81;
 }
 
 .map-popup-badge {
