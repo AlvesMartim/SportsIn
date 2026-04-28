@@ -47,3 +47,6 @@ node_modules/
 npm-debug.log
 yarn-error.log
 .node_local/
+
+### Strava credentials (secrets locaux) ###
+.env.strava

@@ -159,3 +159,42 @@ CREATE INDEX IF NOT EXISTS idx_perk_definition_level ON perk_definition(required
 CREATE INDEX IF NOT EXISTS idx_message_equipe ON message(equipe_id);
 CREATE INDEX IF NOT EXISTS idx_message_joueur ON message(joueur_id);
 
+-- ============================================
+-- STRAVA INTEGRATION
+-- ============================================
+
+-- Données OAuth Strava par joueur (1:1 avec joueur)
+CREATE TABLE IF NOT EXISTS joueur_strava (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    joueur_id INTEGER NOT NULL UNIQUE,
+    strava_athlete_id INTEGER,
+    strava_access_token TEXT,
+    strava_refresh_token TEXT,
+    strava_token_expires_at INTEGER,
+    strava_connected INTEGER NOT NULL DEFAULT 0,
+    FOREIGN KEY (joueur_id) REFERENCES joueur(id) ON DELETE CASCADE
+);
+
+-- Activités Strava importées
+CREATE TABLE IF NOT EXISTS strava_activity (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    joueur_id INTEGER NOT NULL,
+    strava_activity_id INTEGER NOT NULL,
+    strava_type TEXT,
+    sport_code TEXT,
+    name TEXT,
+    start_date TEXT,
+    distance_meters REAL,
+    moving_time_seconds INTEGER,
+    elevation_gain REAL,
+    polyline_encoded TEXT,
+    imported_as_session INTEGER NOT NULL DEFAULT 0,
+    created_at TEXT NOT NULL,
+    UNIQUE (joueur_id, strava_activity_id),
+    FOREIGN KEY (joueur_id) REFERENCES joueur(id) ON DELETE CASCADE
+);
+
+CREATE INDEX IF NOT EXISTS idx_joueur_strava_joueur_id ON joueur_strava(joueur_id);
+CREATE INDEX IF NOT EXISTS idx_strava_activity_joueur_id ON strava_activity(joueur_id);
+CREATE INDEX IF NOT EXISTS idx_strava_activity_strava_id ON strava_activity(strava_activity_id);
+CREATE INDEX IF NOT EXISTS idx_strava_activity_imported ON strava_activity(imported_as_session);

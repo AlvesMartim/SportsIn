@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext.jsx";
 import { authAPI } from "../api/api.js";
+import StravaSection from "../components/StravaSection.jsx";
 
 function ProfilePage() {
   const { user, setUser } = useAuth();
@@ -151,6 +152,9 @@ function ProfilePage() {
           <p style={{ margin: "0 0 8px" }}><span style={{ opacity: 0.6 }}>Pseudo :</span> <strong>{user.pseudo}</strong></p>
           <p style={{ margin: 0 }}><span style={{ opacity: 0.6 }}>Email :</span> <strong>{user.email}</strong></p>
         </div>
+
+        {/* Intégration Strava */}
+        <StravaSection userId={user.id} />
 
         {/* Changer le pseudo */}
         <div style={cardStyle}>

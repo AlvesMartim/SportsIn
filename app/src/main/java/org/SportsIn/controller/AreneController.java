@@ -11,7 +11,6 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/arenes")
-@CrossOrigin(origins = {"http://localhost:5173", "http://localhost:3000"})
 public class AreneController {
 
     private final AreneService areneService;

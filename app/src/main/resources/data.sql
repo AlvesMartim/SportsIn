@@ -94,6 +94,11 @@ INSERT OR IGNORE INTO sport (id, code, name) VALUES (1, 'FOOTBALL', 'Football');
 INSERT OR IGNORE INTO sport (id, code, name) VALUES (2, 'BASKET', 'Basketball');
 INSERT OR IGNORE INTO sport (id, code, name) VALUES (3, 'TENNIS', 'Tennis');
 INSERT OR IGNORE INTO sport (id, code, name) VALUES (4, 'MUSCULATION', 'Musculation');
+-- Sports importés depuis Strava
+INSERT OR IGNORE INTO sport (id, code, name) VALUES (5, 'RUNNING', 'Course à pied');
+INSERT OR IGNORE INTO sport (id, code, name) VALUES (6, 'CYCLING', 'Cyclisme');
+INSERT OR IGNORE INTO sport (id, code, name) VALUES (7, 'WALKING', 'Marche / Randonnée');
+INSERT OR IGNORE INTO sport (id, code, name) VALUES (8, 'OUTDOOR', 'Activité extérieure');
 
 -- ============================================
 -- SESSIONS D'EXEMPLE

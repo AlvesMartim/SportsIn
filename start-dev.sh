@@ -30,6 +30,21 @@ if ! command -v curl &> /dev/null; then
     exit 1
 fi
 
+# Charger les variables d'environnement Strava depuis .env.strava si le fichier existe
+if [ -f ".env.strava" ]; then
+    echo -e "${BLUE}🔑 Chargement de la configuration Strava depuis .env.strava...${NC}"
+    set -a
+    # shellcheck disable=SC1091
+    source ".env.strava"
+    set +a
+    if [ -n "$STRAVA_CLIENT_ID" ] && [ "$STRAVA_CLIENT_ID" != "votre_client_id_ici" ]; then
+        echo -e "${GREEN}    ✅ Strava configuré (Client ID: ${STRAVA_CLIENT_ID})${NC}"
+    else
+        echo -e "${YELLOW}    ⚠️  Strava non configuré — éditez .env.strava pour activer l'intégration${NC}"
+    fi
+    echo ""
+fi
+
 # Fonction pour installer Node.js localement
 install_node_local() {
     echo -e "${YELLOW}⚠️  Node.js n'est pas installé ou la version est incompatible.${NC}"

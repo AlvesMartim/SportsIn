@@ -200,6 +200,20 @@ export const messageAPI = {
   delete: async (id) => fetchAPI(`/messages/${id}`, { method: 'DELETE' }),
 };
 
+/**
+ * ========== STRAVA ==========
+ */
+export const stravaAPI = {
+  getStatus: async (joueurId) => fetchAPI(`/strava/status?joueurId=${joueurId}`),
+  getActivities: async (joueurId) => fetchAPI(`/strava/activities?joueurId=${joueurId}`),
+  importLatest: async (joueurId) => fetchAPI(`/strava/import-latest?joueurId=${joueurId}`, { method: 'POST' }),
+  importById: async (joueurId, stravaActivityId) =>
+    fetchAPI(`/strava/import/${stravaActivityId}?joueurId=${joueurId}`, { method: 'POST' }),
+  disconnect: async (joueurId) => fetchAPI(`/strava/disconnect?joueurId=${joueurId}`, { method: 'POST' }),
+  // La connexion OAuth nécessite une navigation complète (pas un fetch)
+  getConnectUrl: (joueurId) => `/api/strava/connect?joueurId=${joueurId}`,
+};
+
 export default {
   authAPI,
   equipeAPI,
@@ -214,4 +228,5 @@ export default {
   missionAPI,
   progressionAPI,
   messageAPI,
+  stravaAPI,
 };
