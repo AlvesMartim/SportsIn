@@ -52,7 +52,7 @@ public class TerritoryDecayService {
 
     private boolean isProlongedExtremeWeather(Arene arena) {
         List<WeatherForecastEntry> forecast = weatherClient.getForecast(arena.getLatitude(), arena.getLongitude(), 48);
-        if (forecast.isEmpty()) {
+        if (forecast == null || forecast.isEmpty()) {
             return false;
         }
 
@@ -66,7 +66,8 @@ public class TerritoryDecayService {
             }
         }
 
-        // At least 12 out of 16 forecast slots (~36h over the next 48h).
-        return sampleSize >= 12 && extremeSlots >= 12;
+        // Seuil proportionnel : au moins 50% des créneaux échantillonnés sont extrêmes.
+        // Fonctionne quelle que soit la taille de la prévision retournée.
+        return sampleSize > 0 && extremeSlots * 2 >= sampleSize;
     }
 }

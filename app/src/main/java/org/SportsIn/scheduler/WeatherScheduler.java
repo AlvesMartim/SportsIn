@@ -22,7 +22,8 @@ public class WeatherScheduler {
     /**
      * Every 6 hours, inspect forecasts and generate flash weather missions.
      */
-    @Scheduled(cron = "0 0 */6 * * *", zone = "Europe/Paris")
+    @Scheduled(cron = "${weather.scheduler.flash-missions-cron:0 0 */6 * * *}",
+               zone = "${weather.scheduler.timezone:Europe/Paris}")
     public void generateWeatherFlashMissions() {
         weatherFlashMissionService.generateFlashMissionsForAllTeams();
     }
@@ -30,7 +31,8 @@ public class WeatherScheduler {
     /**
      * Every day at 03:15, apply natural and weather-accelerated territory decay.
      */
-    @Scheduled(cron = "0 15 3 * * *", zone = "Europe/Paris")
+    @Scheduled(cron = "${weather.scheduler.territory-decay-cron:0 15 3 * * *}",
+               zone = "${weather.scheduler.timezone:Europe/Paris}")
     public void applyTerritoryDecay() {
         territoryDecayService.applyDailyDecay();
     }

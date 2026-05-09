@@ -21,6 +21,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.ConcurrentHashMap;
 
 @Component
 public class OpenWeatherClient implements WeatherClient {
@@ -33,26 +34,58 @@ public class OpenWeatherClient implements WeatherClient {
     private final String apiKey;
     private final boolean enabled;
     private final Duration timeout;
+    private final Duration cacheTtl;
+
+    private final ConcurrentHashMap<String, CachedSnapshot> currentCache = new ConcurrentHashMap<>();
+    private final ConcurrentHashMap<String, CachedForecast> forecastCache = new ConcurrentHashMap<>();
 
     public OpenWeatherClient(ObjectMapper objectMapper,
                              @Value("${weather.openweather.base-url:https://api.openweathermap.org}") String baseUrl,
                              @Value("${weather.openweather.api-key:}") String apiKey,
                              @Value("${weather.openweather.enabled:true}") boolean enabled,
-                             @Value("${weather.openweather.timeout-ms:3500}") long timeoutMs) {
+                             @Value("${weather.openweather.timeout-ms:3500}") long timeoutMs,
+                             @Value("${weather.openweather.cache-ttl-seconds:600}") long cacheTtlSeconds) {
         this.objectMapper = objectMapper;
         this.baseUrl = baseUrl;
         this.apiKey = apiKey;
         this.enabled = enabled;
         this.timeout = Duration.ofMillis(timeoutMs);
+        this.cacheTtl = Duration.ofSeconds(Math.max(0, cacheTtlSeconds));
         this.httpClient = HttpClient.newBuilder()
                 .connectTimeout(this.timeout)
                 .build();
+    }
+
+    private static String coordKey(double latitude, double longitude) {
+        // Arrondi à 3 décimales (~111m) pour cumuler les requêtes voisines sans perdre la pertinence.
+        return String.format("%.3f:%.3f", latitude, longitude);
+    }
+
+    private boolean cacheEnabled() {
+        return !cacheTtl.isZero();
+    }
+
+    private record CachedSnapshot(WeatherSnapshot value, Instant expiresAt) {
+        boolean isFresh(Instant now) { return now.isBefore(expiresAt); }
+    }
+
+    private record CachedForecast(List<WeatherForecastEntry> value, Instant expiresAt) {
+        boolean isFresh(Instant now) { return now.isBefore(expiresAt); }
     }
 
     @Override
     public Optional<WeatherSnapshot> getCurrentWeather(double latitude, double longitude) {
         if (!isConfigured()) {
             return Optional.empty();
+        }
+
+        String cacheKey = coordKey(latitude, longitude);
+        Instant nowTs = Instant.now();
+        if (cacheEnabled()) {
+            CachedSnapshot cached = currentCache.get(cacheKey);
+            if (cached != null && cached.isFresh(nowTs)) {
+                return Optional.of(cached.value());
+            }
         }
 
         Map<String, String> params = new LinkedHashMap<>();
@@ -85,6 +118,9 @@ public class OpenWeatherClient implements WeatherClient {
                 at
         );
 
+        if (cacheEnabled()) {
+            currentCache.put(cacheKey, new CachedSnapshot(snapshot, nowTs.plus(cacheTtl)));
+        }
         return Optional.of(snapshot);
     }
 
@@ -92,6 +128,15 @@ public class OpenWeatherClient implements WeatherClient {
     public List<WeatherForecastEntry> getForecast(double latitude, double longitude, int nextHours) {
         if (!isConfigured()) {
             return List.of();
+        }
+
+        String cacheKey = coordKey(latitude, longitude) + ":" + nextHours;
+        Instant nowTs = Instant.now();
+        if (cacheEnabled()) {
+            CachedForecast cached = forecastCache.get(cacheKey);
+            if (cached != null && cached.isFresh(nowTs)) {
+                return cached.value();
+            }
         }
 
         Map<String, String> params = new LinkedHashMap<>();
@@ -138,6 +183,11 @@ public class OpenWeatherClient implements WeatherClient {
             ));
         }
 
+        if (cacheEnabled()) {
+            List<WeatherForecastEntry> snapshot = List.copyOf(entries);
+            forecastCache.put(cacheKey, new CachedForecast(snapshot, nowTs.plus(cacheTtl)));
+            return snapshot;
+        }
         return entries;
     }
 

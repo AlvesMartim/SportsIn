@@ -3,6 +3,7 @@ package org.SportsIn.services;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.SportsIn.model.Arene;
 import org.SportsIn.model.mission.Mission;
+import org.SportsIn.model.mission.MissionPayloadKeys;
 import org.SportsIn.model.mission.MissionPriority;
 import org.SportsIn.model.mission.MissionStatus;
 import org.SportsIn.model.mission.MissionType;
@@ -126,7 +127,7 @@ public class WeatherFlashMissionService {
         Instant now = Instant.now();
 
         Map<String, Object> payload = Map.of(
-                "missionCategory", "WEATHER_FLASH",
+                MissionPayloadKeys.CATEGORY, MissionPayloadKeys.WEATHER_FLASH_CATEGORY,
                 "arenaId", event.arenaId(),
                 "arenaName", event.arenaName(),
                 "eventType", event.eventType(),

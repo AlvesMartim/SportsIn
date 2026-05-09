@@ -234,7 +234,6 @@ public class MissionEvaluationService {
     }
 
     private boolean isWeatherFlashPayload(Map<String, Object> payload) {
-        Object category = payload.get("missionCategory");
-        return category != null && "WEATHER_FLASH".equalsIgnoreCase(category.toString());
+        return MissionPayloadKeys.isWeatherFlashPayload(payload);
     }
 }
