@@ -93,6 +93,7 @@ export const areneAPI = {
   create: async (data) => fetchAPI('/arenes', { method: 'POST', body: JSON.stringify(data) }),
   update: async (id, data) => fetchAPI(`/arenes/${id}`, { method: 'PUT', body: JSON.stringify(data) }),
   delete: async (id) => fetchAPI(`/arenes/${id}`, { method: 'DELETE' }),
+  getInfluence: async (id) => fetchAPI(`/arenes/${id}/influence`),
 };
 
 /**

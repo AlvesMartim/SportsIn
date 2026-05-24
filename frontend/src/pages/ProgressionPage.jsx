@@ -9,6 +9,7 @@ const PERK_ICONS = {
   INFLUENCE_REDUCTION: { icon: "🛡️", className: "perk-icon--shield" },
   INFLUENCE_BOOST: { icon: "⚡", className: "perk-icon--boost" },
   XP_MULTIPLIER: { icon: "✨", className: "perk-icon--xp" },
+  WEATHER_AFFINITY: { icon: "🌦️", className: "perk-icon--weather" },
 };
 
 /** Formate une durée en secondes vers un texte lisible */
@@ -446,6 +447,17 @@ function ProgressionPage() {
             <div className="perk-modal" onClick={(e) => e.stopPropagation()}>
               <h3>Activer : {activatingPerk.name}</h3>
               <p className="perk-modal__desc">{activatingPerk.description}</p>
+
+              {/* WEATHER_AFFINITY info */}
+              {activatingPerk.effectType === "WEATHER_AFFINITY" && (
+                <div className="perk-modal__weather-info">
+                  <span>🌦️</span>
+                  <p>
+                    Ce perk s'active globalement. Il booste vos gains d'influence
+                    lorsque les conditions météo correspondent aux affinités de votre équipe.
+                  </p>
+                </div>
+              )}
 
               {/* For shield & boost, need a target arena */}
               {(activatingPerk.effectType === "INFLUENCE_REDUCTION" ||

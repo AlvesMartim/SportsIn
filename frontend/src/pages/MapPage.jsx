@@ -119,6 +119,7 @@ function MapPage() {
   const [missions, setMissions] = useState([]);
   const [missionsByArena, setMissionsByArena] = useState({});
   const [selectedSportByArena, setSelectedSportByArena] = useState({});
+  const [influenceByArena, setInfluenceByArena] = useState({});
 
   const handleLaunchGame = async (arene, selectedSportCode) => {
     const teamId = sessionStorage.getItem("insport_team_id");
@@ -265,6 +266,20 @@ function MapPage() {
         }
         setMissionsByArena(arenaMap);
 
+        // Load influence levels for all arenas (Feature 7)
+        if (arenesData.length > 0) {
+          const influenceResults = await Promise.allSettled(
+            arenesData.map((a) => areneAPI.getInfluence(a.id))
+          );
+          const influenceMap = {};
+          for (const res of influenceResults) {
+            if (res.status === "fulfilled" && res.value) {
+              influenceMap[res.value.arenaId] = res.value.influenceLevel;
+            }
+          }
+          setInfluenceByArena(influenceMap);
+        }
+
         setError(null);
       } catch (err) {
         setError(`Erreur: ${err.message}`);
@@ -354,6 +369,9 @@ function MapPage() {
               ? arene.sportsDisponibles
               : [];
             const selectedSport = selectedSportByArena[arene.id] || availableSports[0] || "";
+            const influence = influenceByArena[arene.id];
+            const isLowInfluence = influence != null && influence < 30;
+            const isMediumInfluence = influence != null && influence >= 30 && influence < 60;
 
             return (
               <Marker
@@ -387,6 +405,32 @@ function MapPage() {
                     {arene.controllingTeamId && (
                       <p className="map-popup-meta">Contrôlée par Équipe {arene.controllingTeamId}</p>
                     )}
+
+                    {/* Territory influence (Feature 7) */}
+                    {influence != null && (
+                      <div className="map-popup-influence">
+                        <div className="map-popup-influence__header">
+                          <span className="map-popup-influence__label">
+                            {isLowInfluence ? "⚠️" : "🏰"} Influence territoriale
+                          </span>
+                          <span className={`map-popup-influence__value${isLowInfluence ? " map-popup-influence__value--low" : isMediumInfluence ? " map-popup-influence__value--medium" : " map-popup-influence__value--high"}`}>
+                            {influence.toFixed(0)}%
+                          </span>
+                        </div>
+                        <div className="map-popup-influence__bar-bg">
+                          <div
+                            className={`map-popup-influence__bar-fill${isLowInfluence ? " map-popup-influence__bar-fill--low" : isMediumInfluence ? " map-popup-influence__bar-fill--medium" : " map-popup-influence__bar-fill--high"}`}
+                            style={{ width: `${influence}%` }}
+                          />
+                        </div>
+                        {isLowInfluence && (
+                          <p className="map-popup-influence__warning">
+                            Influence critique ! Risque de perte de contrôle.
+                          </p>
+                        )}
+                      </div>
+                    )}
+
                     <button
                       className="map-popup-action"
                       onClick={() => handleLaunchGame(arene, selectedSport)}

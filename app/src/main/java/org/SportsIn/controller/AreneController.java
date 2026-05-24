@@ -2,12 +2,14 @@ package org.SportsIn.controller;
 
 import org.SportsIn.model.Arene;
 import org.SportsIn.services.AreneService;
+import org.SportsIn.services.TerritoryInfluenceStateService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.lang.NonNull;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/arenes")
@@ -15,9 +17,11 @@ import java.util.List;
 public class AreneController {
 
     private final AreneService areneService;
+    private final TerritoryInfluenceStateService influenceStateService;
 
-    public AreneController(AreneService areneService) {
+    public AreneController(AreneService areneService, TerritoryInfluenceStateService influenceStateService) {
         this.areneService = areneService;
+        this.influenceStateService = influenceStateService;
     }
 
     @GetMapping
@@ -61,5 +65,11 @@ public class AreneController {
             return ResponseEntity.noContent().build();
         }
         return ResponseEntity.notFound().build();
+    }
+
+    @GetMapping("/{id}/influence")
+    public ResponseEntity<Map<String, Object>> getInfluenceLevel(@NonNull @PathVariable String id) {
+        double level = influenceStateService.getInfluenceLevel(id);
+        return ResponseEntity.ok(Map.of("arenaId", id, "influenceLevel", level));
     }
 }

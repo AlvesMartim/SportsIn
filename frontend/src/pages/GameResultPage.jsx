@@ -2,6 +2,143 @@ import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { sessionAPI, equipeAPI } from "../api/api.js";
 
+const WEATHER_TAG_ICONS = {
+  RAIN: "🌧️", HEAVY_RAIN: "🌧️", WIND: "💨", HEAT: "🔥",
+  SNOW: "❄️", THUNDERSTORM: "⛈️", EXTREME: "🌪️", COLD: "🥶",
+};
+
+function WeatherCard({ result, cardStyle, statsRowStyle }) {
+  const tags = result.weatherTags
+    ? result.weatherTags.split(",").map((t) => t.trim()).filter(Boolean)
+    : [];
+
+  const windKmh = result.weatherWindSpeedMps != null
+    ? (result.weatherWindSpeedMps * 3.6).toFixed(1)
+    : null;
+
+  return (
+    <div style={{
+      ...cardStyle,
+      background: "linear-gradient(135deg, #0f1f2e 0%, #0c1a26 100%)",
+      border: "1px solid #0891b2",
+    }}>
+      <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "16px" }}>
+        <span style={{ fontSize: "1.3rem" }}>🌦️</span>
+        <h3 style={{ margin: 0, color: "#67e8f9" }}>Conditions météo</h3>
+        {result.weatherSource && (
+          <span style={{
+            fontSize: "0.7rem",
+            background: "rgba(6,182,212,0.15)",
+            border: "1px solid #0891b255",
+            color: "#7dd3fc",
+            padding: "2px 8px",
+            borderRadius: "10px",
+            marginLeft: "auto",
+          }}>
+            {result.weatherSource}
+          </span>
+        )}
+      </div>
+
+      {result.weatherSummary && (
+        <p style={{ fontSize: "0.9rem", color: "#bae6fd", margin: "0 0 14px", fontStyle: "italic" }}>
+          {result.weatherSummary}
+        </p>
+      )}
+
+      {tags.length > 0 && (
+        <div style={{ display: "flex", flexWrap: "wrap", gap: "6px", marginBottom: "14px" }}>
+          {tags.map((tag) => (
+            <span key={tag} style={{
+              fontSize: "0.75rem",
+              fontWeight: "600",
+              padding: "3px 10px",
+              borderRadius: "12px",
+              background: "rgba(6,182,212,0.15)",
+              border: "1px solid #0891b255",
+              color: "#67e8f9",
+            }}>
+              {WEATHER_TAG_ICONS[tag] || "🏷️"} {tag}
+            </span>
+          ))}
+        </div>
+      )}
+
+      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "10px", marginBottom: "14px" }}>
+        {result.weatherTemperatureC != null && (
+          <div style={{ background: "rgba(255,255,255,0.04)", borderRadius: "10px", padding: "12px", textAlign: "center" }}>
+            <div style={{ fontSize: "1.4rem" }}>🌡️</div>
+            <div style={{ fontSize: "1.1rem", fontWeight: "700", color: "#f1f5f9" }}>
+              {result.weatherTemperatureC.toFixed(1)} °C
+            </div>
+            <div style={{ fontSize: "0.7rem", color: "#64748b", marginTop: "2px" }}>Température</div>
+          </div>
+        )}
+        {windKmh != null && (
+          <div style={{ background: "rgba(255,255,255,0.04)", borderRadius: "10px", padding: "12px", textAlign: "center" }}>
+            <div style={{ fontSize: "1.4rem" }}>💨</div>
+            <div style={{ fontSize: "1.1rem", fontWeight: "700", color: "#f1f5f9" }}>
+              {windKmh} km/h
+            </div>
+            <div style={{ fontSize: "0.7rem", color: "#64748b", marginTop: "2px" }}>Vent</div>
+          </div>
+        )}
+        {result.weatherPrecipitationMm != null && (
+          <div style={{ background: "rgba(255,255,255,0.04)", borderRadius: "10px", padding: "12px", textAlign: "center" }}>
+            <div style={{ fontSize: "1.4rem" }}>🌧️</div>
+            <div style={{ fontSize: "1.1rem", fontWeight: "700", color: "#f1f5f9" }}>
+              {result.weatherPrecipitationMm.toFixed(1)} mm
+            </div>
+            <div style={{ fontSize: "0.7rem", color: "#64748b", marginTop: "2px" }}>Précipitations</div>
+          </div>
+        )}
+        {result.weatherHardshipIndex != null && (
+          <div style={{ background: "rgba(255,255,255,0.04)", borderRadius: "10px", padding: "12px", textAlign: "center" }}>
+            <div style={{ fontSize: "1.4rem" }}>⚠️</div>
+            <div style={{ fontSize: "1.1rem", fontWeight: "700", color: "#fb923c" }}>
+              {(result.weatherHardshipIndex * 100).toFixed(0)}%
+            </div>
+            <div style={{ fontSize: "0.7rem", color: "#64748b", marginTop: "2px" }}>Pénibilité</div>
+          </div>
+        )}
+      </div>
+
+      {(result.weatherInfluenceBonus != null || result.weatherAffinityBonus != null) && (
+        <>
+          <div style={{ height: "1px", background: "#0891b233", margin: "12px 0" }} />
+          <div style={{ fontSize: "0.78rem", color: "#64748b", marginBottom: "8px", fontWeight: "600", letterSpacing: "0.05em", textTransform: "uppercase" }}>
+            Impact sur l'influence
+          </div>
+          {result.weatherInfluenceBonus != null && (
+            <div style={{ ...statsRowStyle, borderBottom: result.weatherAffinityBonus != null || result.totalInfluenceModifier != null ? "1px solid #0891b222" : "none" }}>
+              <span style={{ color: "#94a3b8" }}>Bonus météo</span>
+              <span style={{ color: result.weatherInfluenceBonus >= 0 ? "#4ade80" : "#f87171", fontWeight: "600" }}>
+                {result.weatherInfluenceBonus >= 0 ? "+" : ""}{(result.weatherInfluenceBonus * 100).toFixed(0)}%
+              </span>
+            </div>
+          )}
+          {result.weatherAffinityBonus != null && result.weatherAffinityBonus !== 0 && (
+            <div style={{ ...statsRowStyle, borderBottom: result.totalInfluenceModifier != null ? "1px solid #0891b222" : "none" }}>
+              <span style={{ color: "#94a3b8" }}>Bonus affinité d'équipe</span>
+              <span style={{ color: "#a78bfa", fontWeight: "600" }}>
+                +{(result.weatherAffinityBonus * 100).toFixed(0)}%
+              </span>
+            </div>
+          )}
+          {result.totalInfluenceModifier != null && (
+            <div style={{ ...statsRowStyle, borderBottom: "none" }}>
+              <span style={{ color: "#94a3b8" }}>Modificateur total</span>
+              <span style={{ color: "#fbbf24", fontWeight: "700", fontSize: "1rem" }}>
+                ×{result.totalInfluenceModifier.toFixed(2)}
+              </span>
+            </div>
+          )}
+        </>
+      )}
+    </div>
+  );
+}
+
 function GameResultPage() {
   const { sessionId } = useParams();
   const navigate = useNavigate();
@@ -243,6 +380,11 @@ function GameResultPage() {
             </div>
           )}
         </div>
+
+        {/* Météo Feature 7 */}
+        {session?.result?.weatherHardshipIndex != null && (
+          <WeatherCard result={session.result} cardStyle={cardStyle} statsRowStyle={statsRowStyle} />
+        )}
 
         {/* Actions */}
         <div style={{ display: "flex", flexWrap: "wrap", justifyContent: "center" }}>
