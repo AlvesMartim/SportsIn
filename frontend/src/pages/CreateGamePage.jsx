@@ -3,7 +3,9 @@ import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext.jsx";
 import { areneAPI, sportAPI, gameAPI, equipeAPI } from "../api/api.js";
 import Header from "../components/Header.jsx";
+import WeatherWidget from "../components/WeatherWidget.jsx";
 import "../styles/create-game.css";
+import "../styles/weather-widget.css";
 
 function CreateGamePage() {
   const { user } = useAuth();
@@ -267,6 +269,17 @@ function CreateGamePage() {
                     <span className="text-muted">Mode</span>
                     <span className="badge badge-primary">Matchmaking</span>
                   </div>
+                </div>
+
+                {/* Météo de l'arène sélectionnée */}
+                <div style={{ marginTop: "14px" }}>
+                  <p style={{ fontSize: "0.75rem", color: "var(--gray-500)", marginBottom: "6px", textTransform: "uppercase", letterSpacing: "0.05em" }}>
+                    🌦️ Météo sur cette arène
+                  </p>
+                  <WeatherWidget
+                    arenaId={selectedArenaData.id}
+                    sport={selectedSport || undefined}
+                  />
                 </div>
               </div>
             )}

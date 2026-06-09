@@ -1,6 +1,8 @@
 import { useState, useEffect, useRef, useMemo } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { sessionAPI, gameAPI } from "../api/api.js";
+import WeatherWidget from "../components/WeatherWidget.jsx";
+import "../styles/weather-widget.css";
 
 const SPORT_SCORING_PROFILES = {
   FOOTBALL: {
@@ -507,6 +509,19 @@ function ActiveSessionPage() {
                 </p>
               </div>
             </div>
+          </div>
+        )}
+
+        {/* Météo live sur l'arène — impact sur le résultat final */}
+        {(session?.pointId || game?.pointId) && (
+          <div style={{ width: "100%", marginBottom: "4px" }}>
+            <p style={{ margin: "0 0 6px", fontSize: "11px", color: "#64748b", textTransform: "uppercase", letterSpacing: "0.05em" }}>
+              🌦️ Météo en direct — affecte votre score
+            </p>
+            <WeatherWidget
+              arenaId={session?.pointId || game?.pointId}
+              sport={resolvedSportCode}
+            />
           </div>
         )}
 

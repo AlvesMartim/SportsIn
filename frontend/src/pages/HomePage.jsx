@@ -4,7 +4,9 @@ import { useAuth } from "../context/AuthContext.jsx";
 import { equipeAPI, sessionAPI } from "../api/api.js";
 import Header from "../components/Header.jsx";
 import Button from "../components/Button.jsx";
+import WeatherWidget from "../components/WeatherWidget.jsx";
 import "../styles/home.css";
+import "../styles/weather-widget.css";
 
 export default function HomePage() {
   const { user } = useAuth();
@@ -12,9 +14,16 @@ export default function HomePage() {
   const [team, setTeam] = useState(null);
   const [stats, setStats] = useState({ sessions: 0, victories: 0 });
   const [loading, setLoading] = useState(true);
+  const [playerLocation, setPlayerLocation] = useState(null);
 
   useEffect(() => {
     loadUserData();
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        (pos) => setPlayerLocation({ lat: pos.coords.latitude, lng: pos.coords.longitude }),
+        () => {}
+      );
+    }
   }, []);
 
   const loadUserData = async () => {
@@ -64,6 +73,16 @@ export default function HomePage() {
           </h1>
           <p className="home-subtitle">Prêt pour un nouveau défi sportif ?</p>
         </div>
+
+        {/* Widget météo — impact en temps réel */}
+        {playerLocation && (
+          <div style={{ width: "100%", marginBottom: "16px" }}>
+            <p style={{ fontSize: "0.75rem", color: "var(--gray-500)", marginBottom: "6px", textTransform: "uppercase", letterSpacing: "0.05em" }}>
+              🌦️ Météo actuelle — impact sur votre zone
+            </p>
+            <WeatherWidget lat={playerLocation.lat} lng={playerLocation.lng} />
+          </div>
+        )}
 
         {/* Team Badge ou Warning */}
         {team ? (

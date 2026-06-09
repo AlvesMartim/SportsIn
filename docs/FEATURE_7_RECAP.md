@@ -5,7 +5,6 @@ Ce document résume ce qui est réellement codé dans le projet pour la Feature 
 ## Statut global
 
 - BackEnd : implémenté partiellement à fortement, avec moteur météo, missions flash, affinités d'équipe, usure territoriale et scheduling.
-- FrontEnd : aucune modification spécifique détectée pour cette feature dans l'implémentation actuelle.
 
 ## BackEnd (implémenté)
 
@@ -47,7 +46,47 @@ Contrainte actuelle : pour rester compatible avec le schéma SQL existant, les m
 
 ## FrontEnd (implémenté)
 
-- Aucun changement fonctionnel spécifique à la Feature 7 détecté dans la partie FrontEnd.
+### 1) WeatherController (nouveau)
+
+- Endpoint `GET /api/weather/current?lat=X&lng=Y&sport=S` : météo courante à des coordonnées, avec hardshipIndex et influenceBonus calculés par sport.
+- Endpoint `GET /api/weather/arena/{id}?sport=S` : météo à l'arène via ses coordonnées en base.
+
+### 2) WeatherWidget (composant réutilisable)
+
+- Composant React affichant les conditions météo (température, vent, précipitations, tags, bonus d'influence).
+- Mode compact pour les popups de carte.
+- Indicateur visuel rouge animé si conditions extrêmes.
+- Intégré dans 4 pages.
+
+### 3) HomePage
+
+- Géolocalisation du joueur → widget météo local au chargement.
+- Affiche les conditions actuelles et leur impact sur les arènes proches.
+
+### 4) CreateGamePage
+
+- Après sélection d'une arène, appel météo sur cette arène avec le sport choisi.
+- Affiche le bonus d'influence attendu dans le récapitulatif avant de lancer le matchmaking.
+
+### 5) ActiveSessionPage
+
+- Widget météo live pendant la session, lié à l'arène du match.
+- Affiche le multiplicateur d'influence attendu à la fin.
+- Alerte visuelle si conditions extrêmes.
+
+### 6) MapPage
+
+- Widget compact dans chaque popup d'arène.
+- Conditions + bonus d'influence affiché selon le sport sélectionné.
+
+### 7) GameResultPage (existant — données enrichies)
+
+- `WeatherCard` déjà en place : affiche les données météo appliquées lors de la clôture de session (hardshipIndex, tags, influenceBonus, affinityBonus, totalInfluenceModifier).
+
+### 8) MissionsPage (existant)
+
+- Filtre "⚡ Flash météo" pour les missions générées lors d'événements extrêmes.
+- Badge alerte par type d'événement (orage, canicule, vent, etc.).
 
 ## Tests ajoutés
 
@@ -64,5 +103,5 @@ Contrainte actuelle : pour rester compatible avec le schéma SQL existant, les m
 
 ## Conclusion courte
 
-La Feature 7 est principalement implémentée côté BackEnd. La partie FrontEnd dédiée n'a pas été développée dans l'état actuel. Les tests unitaires et d'intégration couvrent désormais les chemins métier essentiels ajoutés.
+ Les tests unitaires et d'intégration couvrent désormais les chemins métier essentiels ajoutés.
 

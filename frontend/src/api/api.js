@@ -201,6 +201,20 @@ export const messageAPI = {
   delete: async (id) => fetchAPI(`/messages/${id}`, { method: 'DELETE' }),
 };
 
+/**
+ * ========== MÉTÉO (Feature 7) ==========
+ */
+export const weatherAPI = {
+  getCurrent: async (lat, lng, sport) => {
+    const sportParam = sport ? `&sport=${encodeURIComponent(sport)}` : '';
+    return fetchAPI(`/weather/current?lat=${lat}&lng=${lng}${sportParam}`);
+  },
+  getForArena: async (arenaId, sport) => {
+    const sportParam = sport ? `?sport=${encodeURIComponent(sport)}` : '';
+    return fetchAPI(`/weather/arena/${arenaId}${sportParam}`);
+  },
+};
+
 export default {
   authAPI,
   equipeAPI,
@@ -215,4 +229,5 @@ export default {
   missionAPI,
   progressionAPI,
   messageAPI,
+  weatherAPI,
 };

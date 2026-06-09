@@ -11,7 +11,9 @@ import markerShadow from "leaflet/dist/images/marker-shadow.png";
 import { areneAPI, routeAPI, zoneAPI, gameAPI, equipeAPI, missionAPI } from "../api/api.js";
 import { useAuth } from "../context/AuthContext.jsx";
 import Header from "../components/Header.jsx";
+import WeatherWidget from "../components/WeatherWidget.jsx";
 import "../styles/map.css";
+import "../styles/weather-widget.css";
 
 // Fix des icônes Leaflet pour Vite
 delete L.Icon.Default.prototype._getIconUrl;
@@ -430,6 +432,15 @@ function MapPage() {
                         )}
                       </div>
                     )}
+
+                    {/* Météo compact sur l'arène */}
+                    <div style={{ margin: "8px 0" }}>
+                      <WeatherWidget
+                        arenaId={arene.id}
+                        sport={selectedSport || undefined}
+                        compact
+                      />
+                    </div>
 
                     <button
                       className="map-popup-action"
