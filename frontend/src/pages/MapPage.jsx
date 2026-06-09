@@ -8,7 +8,7 @@ import markerIcon2x from "leaflet/dist/images/marker-icon-2x.png";
 import markerIcon from "leaflet/dist/images/marker-icon.png";
 import markerShadow from "leaflet/dist/images/marker-shadow.png";
 
-import { areneAPI, routeAPI, zoneAPI, gameAPI, equipeAPI, missionAPI } from "../api/api.js";
+import { areneAPI, routeAPI, zoneAPI, gameAPI, equipeAPI, missionAPI, weatherAPI } from "../api/api.js";
 import { useAuth } from "../context/AuthContext.jsx";
 import Header from "../components/Header.jsx";
 import WeatherWidget from "../components/WeatherWidget.jsx";
@@ -50,6 +50,16 @@ const areneMissionIcon = L.icon({
   popupAnchor: [1, -40],
   shadowSize: [41, 41],
   className: "mission-marker",
+});
+
+const areneAlertIcon = L.icon({
+  iconUrl: "https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-violet.png",
+  shadowUrl: markerShadow,
+  iconSize: [30, 49],
+  iconAnchor: [15, 49],
+  popupAnchor: [1, -40],
+  shadowSize: [41, 41],
+  className: "alert-marker",
 });
 
 const CENTER_FRANCE = [46.2276, 2.2137];
@@ -122,6 +132,7 @@ function MapPage() {
   const [missionsByArena, setMissionsByArena] = useState({});
   const [selectedSportByArena, setSelectedSportByArena] = useState({});
   const [influenceByArena, setInfluenceByArena] = useState({});
+  const [alertArenas, setAlertArenas] = useState(new Set());
 
   const handleLaunchGame = async (arene, selectedSportCode) => {
     const teamId = sessionStorage.getItem("insport_team_id");
@@ -282,6 +293,14 @@ function MapPage() {
           setInfluenceByArena(influenceMap);
         }
 
+        // Feature 2 — arènes sous alerte météo extrême
+        try {
+          const alerts = await weatherAPI.getAlerts();
+          if (Array.isArray(alerts)) {
+            setAlertArenas(new Set(alerts.map((a) => String(a.arenaId))));
+          }
+        } catch (_) {}
+
         setError(null);
       } catch (err) {
         setError(`Erreur: ${err.message}`);
@@ -367,6 +386,7 @@ function MapPage() {
           {showArenas && arenes.map((arene) => {
             const arenaMissions = missionsByArena[String(arene.id)] || [];
             const hasMission = arenaMissions.length > 0;
+            const isAlert = alertArenas.has(String(arene.id));
             const availableSports = Array.isArray(arene.sportsDisponibles)
               ? arene.sportsDisponibles
               : [];
@@ -375,14 +395,22 @@ function MapPage() {
             const isLowInfluence = influence != null && influence < 30;
             const isMediumInfluence = influence != null && influence >= 30 && influence < 60;
 
+            const markerIcon = isAlert ? areneAlertIcon : hasMission ? areneMissionIcon : areneIcon;
+
             return (
               <Marker
                 key={arene.id}
                 position={[arene.latitude, arene.longitude]}
-                icon={hasMission ? areneMissionIcon : areneIcon}
+                icon={markerIcon}
               >
-                <Popup className={`map-popup map-popup--arena${hasMission ? " map-popup--mission" : ""}`} maxWidth={320}>
+                <Popup className={`map-popup map-popup--arena${hasMission ? " map-popup--mission" : ""}${isAlert ? " map-popup--alert" : ""}`} maxWidth={320}>
                   <div className="map-popup-content">
+                    {/* Bannière alerte météo extrême */}
+                    {isAlert && (
+                      <div className="map-popup-weather-alert">
+                        🌪️ ALERTE MÉTÉO — Influence ×2 si victoire !
+                      </div>
+                    )}
                     {/* Section 1 : Infos arène */}
                     <h4>{arene.nom || `Arène ${arene.id}`}</h4>
                     {availableSports.length > 0 && (

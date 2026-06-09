@@ -1,8 +1,10 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { missionAPI } from "../api/api.js";
+import { missionAPI, areneAPI } from "../api/api.js";
 import Header from "../components/Header.jsx";
+import WeatherForecastPanel from "../components/WeatherForecastPanel.jsx";
 import "../styles/missions.css";
+import "../styles/weather-forecast.css";
 
 const MISSION_TYPE_LABELS = {
   RECAPTURE_RECENT_LOSS: "Reconquête",
@@ -78,8 +80,18 @@ export default function MissionsPage() {
   const [filter, setFilter] = useState("ACTIVE");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [firstArenaId, setFirstArenaId] = useState(null);
+  const [showForecast, setShowForecast] = useState(false);
 
   const teamId = sessionStorage.getItem("insport_team_id");
+
+  useEffect(() => {
+    areneAPI.getAll().then(arenas => {
+      if (Array.isArray(arenas) && arenas.length > 0) {
+        setFirstArenaId(arenas[0].id);
+      }
+    }).catch(() => {});
+  }, []);
 
   useEffect(() => {
     if (!teamId) {
@@ -159,6 +171,36 @@ export default function MissionsPage() {
             Complète des missions pour gagner des points et de l'XP
           </p>
         </div>
+
+        {/* Feature 3 — Prévisions météo 24h */}
+        {firstArenaId && (
+          <div style={{ marginBottom: "16px" }}>
+            <button
+              onClick={() => setShowForecast(v => !v)}
+              style={{
+                background: "rgba(99,102,241,0.1)",
+                border: "1px solid rgba(99,102,241,0.3)",
+                color: "#a5b4fc",
+                borderRadius: "10px",
+                padding: "8px 16px",
+                fontSize: "0.82rem",
+                fontWeight: "600",
+                cursor: "pointer",
+                width: "100%",
+                textAlign: "left",
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "center",
+              }}
+            >
+              <span>📅 Prévisions météo 24h — fenêtres de bonus</span>
+              <span>{showForecast ? "▲" : "▼"}</span>
+            </button>
+            {showForecast && (
+              <WeatherForecastPanel arenaId={firstArenaId} />
+            )}
+          </div>
+        )}
 
         {/* Filter tabs */}
         <div className="missions-filters">

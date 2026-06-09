@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext.jsx";
-import { areneAPI, sportAPI, gameAPI, equipeAPI } from "../api/api.js";
+import { areneAPI, sportAPI, gameAPI, equipeAPI, weatherAPI } from "../api/api.js";
 import Header from "../components/Header.jsx";
 import WeatherWidget from "../components/WeatherWidget.jsx";
 import "../styles/create-game.css";
@@ -21,6 +21,7 @@ function CreateGamePage() {
 
   const [selectedArena, setSelectedArena] = useState("");
   const [selectedSport, setSelectedSport] = useState("");
+  const [bestSport, setBestSport] = useState(null);
 
   useEffect(() => {
     loadData();
@@ -109,6 +110,14 @@ function CreateGamePage() {
       setCreating(false);
     }
   };
+
+  useEffect(() => {
+    if (!selectedArena) { setBestSport(null); return; }
+    setBestSport(null);
+    weatherAPI.getBestSport(selectedArena)
+      .then(data => { if (data && data.available) setBestSport(data); })
+      .catch(() => {});
+  }, [selectedArena]);
 
   const selectedArenaData = arenas.find((a) => a.id === selectedArena);
 
@@ -227,6 +236,25 @@ function CreateGamePage() {
             {/* Sport (obligatoire pour le matchmaking) */}
             <div className="create-game-card">
               <span className="create-game-label">Sport</span>
+
+              {/* Feature 8 — Recommandation météo */}
+              {bestSport && bestSport.recommendedBonusPct > 0 && (
+                <div
+                  className="create-game-weather-rec"
+                  onClick={() => setSelectedSport(bestSport.recommended)}
+                  title="Cliquer pour sélectionner"
+                >
+                  <span className="create-game-weather-rec__icon">⭐</span>
+                  <div className="create-game-weather-rec__text">
+                    <span className="create-game-weather-rec__label">Recommandé par la météo</span>
+                    <span className="create-game-weather-rec__sport">{bestSport.recommendedLabel}</span>
+                  </div>
+                  <span className="create-game-weather-rec__bonus">
+                    +{bestSport.recommendedBonusPct}% influence
+                  </span>
+                </div>
+              )}
+
               {sports.length > 0 ? (
                 <select
                   className="select"
@@ -235,11 +263,16 @@ function CreateGamePage() {
                   required
                 >
                   <option value="">-- Choisir un sport --</option>
-                  {sports.map((sport) => (
-                    <option key={sport.id || sport.code} value={sport.code}>
-                      {sport.nom || sport.code}
-                    </option>
-                  ))}
+                  {sports.map((sport) => {
+                    const sportRec = bestSport?.sports?.find(s => s.sport === sport.code);
+                    const bonus = sportRec?.bonusPct || 0;
+                    return (
+                      <option key={sport.id || sport.code} value={sport.code}>
+                        {sport.nom || sport.code}{bonus > 0 ? ` (+${bonus}% influence)` : ""}
+                        {bestSport?.recommended === sport.code ? " ⭐" : ""}
+                      </option>
+                    );
+                  })}
                 </select>
               ) : (
                 <div className="create-game-warning-inline">

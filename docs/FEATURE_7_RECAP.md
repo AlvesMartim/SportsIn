@@ -4,104 +4,156 @@ Ce document résume ce qui est réellement codé dans le projet pour la Feature 
 
 ## Statut global
 
-- BackEnd : implémenté partiellement à fortement, avec moteur météo, missions flash, affinités d'équipe, usure territoriale et scheduling.
+- BackEnd : complet — moteur météo, endpoints dédiés, missions flash, affinités d'équipe, usure territoriale et scheduling.
+- FrontEnd : complet — widget météo réutilisable intégré sur 5 pages, prévisions 24h, badges météo, alertes sur la carte, recommandation de sport.
 
-## BackEnd (implémenté)
+---
 
-### 1) Hard Mode météo sur la fin de session
+## BackEnd
 
-- Intégration d'un client OpenWeather et d'un moteur de pénibilité météo par sport (Strategy Pattern).
+### 1) Moteur météo sur la fin de session
+
+- Intégration d'un client OpenWeatherMap (`WeatherClient`) et d'un moteur de pénibilité par sport (Strategy Pattern — `WeatherHardshipEngine`).
 - Calcul d'un indice de pénibilité, puis conversion en bonus d'influence appliqué à la conquête.
-- Enrichissement de `SessionResult` avec les métadonnées météo calculées (source, tags, résumé, température, vent, pluie, multiplicateurs).
+- Enrichissement de `SessionResult` avec les métadonnées météo (source, tags, résumé, température, vent, pluie, multiplicateurs).
 
-Note technique importante : l'implémentation interroge la météo courante et prévisionnelle; la météo historique n'est pas encore branchée.
+> Note : la météo interrogée est la météo courante au moment de la session. La météo historique n'est pas branchée.
 
 ### 2) Quêtes Flash météo
 
-- Ajout d'un service de génération basé sur les prévisions à 24h.
-- Création automatique de missions de type "alerte" quand un événement extrême approche.
-- Évaluation de réussite implémentée (victoire d'équipe sur l'arène avant l'heure d'événement).
-
-Contrainte actuelle : pour rester compatible avec le schéma SQL existant, les missions flash sont stockées en `DIVERSITY_SPORT` avec `missionCategory=WEATHER_FLASH` dans le payload.
+- Génération automatique de missions "alerte" quand un événement extrême approche (prévu dans les 24h).
+- Évaluation de réussite : victoire d'équipe sur l'arène avant l'heure de l'événement.
+- Stockées en base comme `DIVERSITY_SPORT` avec `missionCategory=WEATHER_FLASH` dans le `payload_json` (contrainte schéma SQL).
 
 ### 3) Affinités d'équipe (perks météo)
 
-- Ajout de l'effet `WEATHER_AFFINITY` côté perks.
-- Service de calcul de bonus d'affinité selon les tags météo (RAIN, HEAT, WIND, etc.).
-- Seeds SQL ajoutés pour des perks météo (AMPHIBIEN, THERMO_RUNNER, AERO_STRIKE).
+- Effet `WEATHER_AFFINITY` côté perks (stratégie `WeatherAffinityEffect`).
+- Bonus d'affinité calculé selon les tags météo actifs (RAIN, HEAT, WIND, COLD, STORM, EXTREME).
+- 3 perks météo définis : `AMPHIBIEN` (pluie, niv.4), `THERMO_RUNNER` (chaleur, niv.5), `AERO_STRIKE` (vent, niv.5).
 
 ### 4) Usure territoriale PvE
 
-- Ajout d'un état d'influence territoriale runtime par arène.
-- Décroissance naturelle quotidienne.
-- Décroissance accélérée si météo extrême prolongée détectée.
+- Décroissance naturelle quotidienne de l'influence par arène.
+- Décroissance accélérée si météo extrême prolongée.
 - Perte automatique du contrôle d'arène si influence épuisée.
 
-### 5) Scheduling et configuration
+### 5) WeatherController — nouveaux endpoints
 
-- Nouveau scheduler météo pour :
-	- génération des missions flash,
-	- application de l'usure territoriale.
-- Nouvelles propriétés de configuration météo dans `application.properties`.
+| Endpoint | Description |
+|---|---|
+| `GET /api/weather/current?lat=X&lng=Y&sport=S` | Météo courante + hardshipIndex + influenceBonus |
+| `GET /api/weather/arena/{id}?sport=S` | Météo de l'arène via ses coordonnées |
+| `GET /api/weather/alerts` | Arènes sous conditions extrêmes (influence ×2) |
+| `GET /api/weather/arena/{id}/forecast` | Prévisions 24h (fenêtres de 3h) |
+| `GET /api/weather/arena/{id}/best-sport` | Classement des sports par bonus météo |
+| `GET /api/weather/teams/{teamId}/badges` | Progression des badges météo d'une équipe |
 
-## FrontEnd (implémenté)
+### 6) Scheduling et configuration
 
-### 1) WeatherController (nouveau)
+- Scheduler météo pour génération des missions flash et application de l'usure territoriale.
+- Propriétés dans `application.properties` : `weather.openweather.*`, `weather.scheduler.*`.
+- **Fix critique** : chargement du `.env` dans `start-dev.sh` (`set -a; source .env; set +a`) — sans ça, la clé API ne remontait pas jusqu'à Spring Boot.
 
-- Endpoint `GET /api/weather/current?lat=X&lng=Y&sport=S` : météo courante à des coordonnées, avec hardshipIndex et influenceBonus calculés par sport.
-- Endpoint `GET /api/weather/arena/{id}?sport=S` : météo à l'arène via ses coordonnées en base.
+---
 
-### 2) WeatherWidget (composant réutilisable)
+## FrontEnd
 
-- Composant React affichant les conditions météo (température, vent, précipitations, tags, bonus d'influence).
-- Mode compact pour les popups de carte.
-- Indicateur visuel rouge animé si conditions extrêmes.
-- Intégré dans 4 pages.
+### 1) WeatherWidget (composant réutilisable)
 
-### 3) HomePage
+- Affiche : température, vent, précipitations, tags météo, bonus d'influence, label dominant.
+- Prop `compact` pour les popups de carte.
+- Bordure rouge animée si conditions extrêmes (`--extreme`).
+- Message explicite si météo indisponible (plutôt que ne rien afficher).
+- Intégré sur : **HomePage**, **CreateGamePage**, **ActiveSessionPage**, **MapPage**, **MissionsPage**.
+
+### 2) WeatherForecastPanel (composant réutilisable)
+
+- Timeline 24h des prévisions par fenêtre de 3h.
+- Chaque fenêtre affiche : heure, température, tags, multiplicateur d'influence.
+- Fenêtres extrêmes : animation rouge pulsée.
+- Fenêtres à bonus : teinte verte.
+
+### 3) Feature 1 — Badges météo (TeamPage)
+
+- Section "🌦️ Badges Météo" dans la page équipe.
+- 6 badges définis : RAIN_WARRIOR, STORM_MASTER, ICE_BREAKER, WIND_RIDER, HEAT_KING, EXTREME_SURVIVOR.
+- Affichage icon + nom + progression + état verrouillé/déverrouillé (or vs grisé).
+- Données issues de `GET /api/weather/teams/{teamId}/badges`.
+
+> ⚠️ Les badges sont calculés sur les sessions jouées **en direct** (SessionRepository in-memory). Ils se réinitialisent au redémarrage du serveur.
+
+### 4) Feature 2 — Alertes météo sur la carte (MapPage)
+
+- Marqueur violet animé sur les arènes en conditions extrêmes.
+- Bannière rouge "🌪️ ALERTE MÉTÉO — Influence ×2 si victoire !" dans la popup.
+- Données issues de `GET /api/weather/alerts` au chargement de la carte.
+
+### 5) Feature 3 — Prévisions 24h (MissionsPage)
+
+- Bouton "📅 Prévisions météo 24h" dépliable dans la page missions.
+- Affiche `WeatherForecastPanel` pour la première arène disponible.
+
+### 6) Feature 8 — Recommandation de sport (CreateGamePage)
+
+- Après sélection d'une arène, appel à `GET /api/weather/arena/{id}/best-sport`.
+- Bannière dorée cliquable "⭐ Recommandé par la météo — {sport} — +X% influence".
+- Clic → sélection automatique du sport recommandé.
+- Options du `<select>` enrichies avec le pourcentage de bonus et l'étoile ⭐.
+- Widget météo affiché dans le récapitulatif avant lancement.
+
+### 7) ActiveSessionPage
+
+- Widget météo live pendant la session, lié à l'arène du match en cours.
+- Affiche le multiplicateur d'influence attendu à la fin.
+
+### 8) HomePage
 
 - Géolocalisation du joueur → widget météo local au chargement.
-- Affiche les conditions actuelles et leur impact sur les arènes proches.
 
-### 4) CreateGamePage
+### 9) GameResultPage (existant — données enrichies)
 
-- Après sélection d'une arène, appel météo sur cette arène avec le sport choisi.
-- Affiche le bonus d'influence attendu dans le récapitulatif avant de lancer le matchmaking.
+- `WeatherCard` affiche les données météo appliquées lors de la clôture de session (hardshipIndex, tags, influenceBonus, affinityBonus, totalInfluenceModifier).
 
-### 5) ActiveSessionPage
+---
 
-- Widget météo live pendant la session, lié à l'arène du match.
-- Affiche le multiplicateur d'influence attendu à la fin.
-- Alerte visuelle si conditions extrêmes.
+## Jeu de données de test
 
-### 6) MapPage
+Fichier : `app/src/main/resources/data.sql`  
+Script de réinitialisation : `reset-testdata.sh` (supprime `sportsin.db`)
 
-- Widget compact dans chaque popup d'arène.
-- Conditions + bonus d'influence affiché selon le sport sélectionné.
+| Catégorie | Contenu |
+|---|---|
+| Équipes | 5 équipes, niveaux 2 à 5, couleurs définies |
+| Joueurs | 20 joueurs avec email + password (`Sportsin1`) |
+| Arènes | 6 stades répartis en France, sports élargis |
+| Sessions | 14 sessions TERMINATED avec scores et vainqueurs |
+| Active perks | 7 perks actifs (AMPHIBIEN, AERO_STRIKE, THERMO_RUNNER, SHIELD×2, XP_BOOST×2) |
+| Missions | 13 missions actives (RECAPTURE, BREAK_ROUTE, DIVERSITY_SPORT, 1 WEATHER_FLASH) |
+| Messages | 17 messages de chat répartis sur les 5 équipes |
 
-### 7) GameResultPage (existant — données enrichies)
+**Comptes de test :**
 
-- `WeatherCard` déjà en place : affiche les données météo appliquées lors de la clôture de session (hardshipIndex, tags, influenceBonus, affinityBonus, totalInfluenceModifier).
+| Pseudo | Email | Équipe | Niveau |
+|---|---|---|---|
+| BenYedder | benyedder@sportsin.test | AS Monaco | 5 |
+| Mbappe | mbappe@sportsin.test | PSG | 5 |
+| Lacazette | lacazette@sportsin.test | OL | 4 |
+| KoloMuani | kolomuani@sportsin.test | FC Nantes | 3 |
+| Camara | camara@sportsin.test | Stade Brest | 2 |
 
-### 8) MissionsPage (existant)
+Mot de passe universel : `Sportsin1`
 
-- Filtre "⚡ Flash météo" pour les missions générées lors d'événements extrêmes.
-- Badge alerte par type d'événement (orage, canicule, vent, etc.).
+---
 
-## Tests ajoutés
+## Tests
 
 ### Tests unitaires
 
-- `SessionServiceWeatherUnitTest` : validation du calcul de gain d'influence intégrant route/perks + météo + affinité.
-- `WeatherAffinityServiceTest`, `WeatherFlashMissionServiceTest`, `WeatherHardshipEngineTest`, `TerritoryDecayServiceTest` : couverture des briques métier météo.
+- `SessionServiceWeatherUnitTest` : calcul gain d'influence avec route/perks + météo + affinité.
+- `WeatherAffinityServiceTest`, `WeatherFlashMissionServiceTest`, `WeatherHardshipEngineTest`, `TerritoryDecayServiceTest`.
 - Extension de `MissionServiceTest` pour le scénario `WEATHER_FLASH`.
 
 ### Tests d'intégration
 
-- `SessionWeatherFlowIntegrationTest` : flux Spring complet de fin de session avec météo mockée, persistance des métadonnées et mise à jour de contrôle d'arène.
-- `WeatherFlashMissionIntegrationTest` : génération de missions flash via service Spring + repository réel avec météo mockée.
-
-## Conclusion courte
-
- Les tests unitaires et d'intégration couvrent désormais les chemins métier essentiels ajoutés.
-
+- `SessionWeatherFlowIntegrationTest` : flux Spring complet de fin de session avec météo mockée.
+- `WeatherFlashMissionIntegrationTest` : génération de missions flash via service Spring.

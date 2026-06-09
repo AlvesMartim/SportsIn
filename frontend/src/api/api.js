@@ -213,6 +213,10 @@ export const weatherAPI = {
     const sportParam = sport ? `?sport=${encodeURIComponent(sport)}` : '';
     return fetchAPI(`/weather/arena/${arenaId}${sportParam}`);
   },
+  getAlerts: async () => fetchAPI('/weather/alerts'),
+  getForecastForArena: async (arenaId) => fetchAPI(`/weather/arena/${arenaId}/forecast`),
+  getBestSport: async (arenaId) => fetchAPI(`/weather/arena/${arenaId}/best-sport`),
+  getTeamBadges: async (teamId) => fetchAPI(`/weather/teams/${teamId}/badges`),
 };
 
 export default {

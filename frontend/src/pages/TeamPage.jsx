@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext.jsx";
-import { equipeAPI, joueurAPI, areneAPI, progressionAPI, messageAPI } from "../api/api.js";
+import { equipeAPI, joueurAPI, areneAPI, progressionAPI, messageAPI, weatherAPI } from "../api/api.js";
 import Header from "../components/Header.jsx";
 import "../styles/team.css";
 
@@ -17,6 +17,7 @@ function TeamPage() {
   const [availableTeams, setAvailableTeams] = useState([]);
 
   const [progression, setProgression] = useState(null);
+  const [weatherBadges, setWeatherBadges] = useState([]);
 
   const [showCreateForm, setShowCreateForm] = useState(false);
   const [newTeamName, setNewTeamName] = useState("");
@@ -71,6 +72,13 @@ function TeamPage() {
             setProgression(prog);
           } catch (e) {
             console.warn('Progression non disponible:', e);
+          }
+
+          try {
+            const badges = await weatherAPI.getTeamBadges(savedTeamId);
+            setWeatherBadges(Array.isArray(badges) ? badges : []);
+          } catch (e) {
+            // badges optionnels
           }
         } catch (e) {
           sessionStorage.removeItem("insport_team_id");
@@ -342,6 +350,38 @@ function TeamPage() {
                     </li>
                   ))}
                 </ul>
+              </div>
+            )}
+
+            {/* Feature 1 — Badges météo */}
+            {weatherBadges.length > 0 && (
+              <div className="team-card">
+                <div className="team-card__header">
+                  <h3>🌦️ Badges Météo</h3>
+                  <span className="badge badge-primary">
+                    {weatherBadges.filter(b => b.unlocked).length}/{weatherBadges.length}
+                  </span>
+                </div>
+                <div className="weather-badges-grid">
+                  {weatherBadges.map((badge) => (
+                    <div
+                      key={badge.id}
+                      className={`weather-badge ${badge.unlocked ? "weather-badge--unlocked" : "weather-badge--locked"}`}
+                      title={badge.description}
+                    >
+                      <span className="weather-badge__icon">{badge.icon}</span>
+                      <span className="weather-badge__name">{badge.name}</span>
+                      {!badge.unlocked && (
+                        <span className="weather-badge__progress">
+                          {badge.progress}/{badge.required}
+                        </span>
+                      )}
+                      {badge.unlocked && (
+                        <span className="weather-badge__check">✓</span>
+                      )}
+                    </div>
+                  ))}
+                </div>
               </div>
             )}
 

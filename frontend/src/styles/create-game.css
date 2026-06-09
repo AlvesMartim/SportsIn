@@ -131,6 +131,58 @@
   font-size: 0.9rem;
 }
 
+/* Feature 8 — Recommandation météo */
+.create-game-weather-rec {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: linear-gradient(135deg, rgba(251,191,36,0.08), rgba(245,158,11,0.04));
+  border: 1px solid rgba(251,191,36,0.35);
+  border-radius: 12px;
+  padding: 12px 14px;
+  margin-bottom: 12px;
+  cursor: pointer;
+  transition: background 0.2s, border-color 0.2s;
+}
+
+.create-game-weather-rec:hover {
+  background: linear-gradient(135deg, rgba(251,191,36,0.15), rgba(245,158,11,0.08));
+  border-color: rgba(251,191,36,0.6);
+}
+
+.create-game-weather-rec__icon {
+  font-size: 1.4rem;
+  flex-shrink: 0;
+}
+
+.create-game-weather-rec__text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  flex: 1;
+}
+
+.create-game-weather-rec__label {
+  font-size: 0.7rem;
+  color: #92400e;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  font-weight: 600;
+}
+
+.create-game-weather-rec__sport {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: #fbbf24;
+}
+
+.create-game-weather-rec__bonus {
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: #4ade80;
+  white-space: nowrap;
+}
+
 /* Hint text */
 .create-game-hint {
   margin: 8px 0 0;
