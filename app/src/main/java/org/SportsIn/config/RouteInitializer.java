@@ -11,11 +11,12 @@ public class RouteInitializer {
     @Bean
     public CommandLineRunner initRoutes(TerritoryService territoryService) {
         return args -> {
-            System.out.println("--- Initialisation des Routes Sportives ---");
-            // Génère des routes en reliant les points distants de max 2.0 km
-            // Une route doit contenir au moins 3 points pour être valide.
+            System.out.println("--- Initialisation des Zones & Routes Sportives ---");
+            // Chaque arène forme sa propre zone (arènes réparties sur toute la France)
+            territoryService.initializeZonesAutomatically(50.0, 1);
+            // Routes entre arènes proches (max 2 km)
             territoryService.initializeRoutesAutomatically(2.0, 3);
-            System.out.println("--- Fin de l'initialisation des Routes ---");
+            System.out.println("--- Fin de l'initialisation ---");
         };
     }
 }

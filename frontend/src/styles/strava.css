@@ -1,0 +1,435 @@
+.strava-page {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 24px 16px;
+}
+
+.strava-title {
+  font-size: 1.8rem;
+  font-weight: 700;
+  margin-bottom: 24px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.strava-logo-icon {
+  font-size: 2rem;
+}
+
+.strava-loading {
+  text-align: center;
+  padding: 48px;
+  color: #888;
+}
+
+/* Alerts */
+.strava-alert {
+  padding: 12px 16px;
+  border-radius: 8px;
+  margin-bottom: 16px;
+  font-weight: 500;
+}
+.strava-alert--success {
+  background: #d1fae5;
+  color: #065f46;
+  border: 1px solid #6ee7b7;
+}
+.strava-alert--error {
+  background: #fee2e2;
+  color: #991b1b;
+  border: 1px solid #fca5a5;
+}
+
+/* Cards */
+.strava-card {
+  background: #1e1e2e;
+  border: 1px solid #2a2a3e;
+  border-radius: 12px;
+  padding: 24px;
+  margin-bottom: 20px;
+}
+
+.strava-card h2 {
+  font-size: 1.2rem;
+  font-weight: 600;
+  margin: 0 0 16px 0;
+  color: #e2e8f0;
+}
+
+.strava-card h3 {
+  font-size: 1rem;
+  color: #94a3b8;
+  margin: 12px 0 8px 0;
+}
+
+/* Status badges */
+.strava-status-badge {
+  display: inline-block;
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  margin-bottom: 12px;
+}
+.strava-status-badge--on {
+  background: #065f46;
+  color: #6ee7b7;
+}
+.strava-status-badge--off {
+  background: #3f1a1a;
+  color: #fca5a5;
+}
+
+.strava-meta {
+  color: #94a3b8;
+  font-size: 0.9rem;
+  margin: 0 0 16px 0;
+}
+
+/* Actions */
+.strava-actions {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.btn-strava-connect {
+  background: #fc4c02;
+  color: #fff;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 8px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+.btn-strava-connect:hover {
+  background: #e84300;
+}
+
+.btn-strava-sync {
+  background: #3b82f6;
+  color: #fff;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+.btn-strava-sync:hover:not(:disabled) {
+  background: #2563eb;
+}
+.btn-strava-sync:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.btn-strava-disconnect {
+  background: transparent;
+  color: #f87171;
+  border: 1px solid #f87171;
+  padding: 10px 20px;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.btn-strava-disconnect:hover {
+  background: #3f1a1a;
+}
+
+/* Sync result */
+.strava-sync-result {
+  margin-top: 16px;
+  background: #0f172a;
+  border: 1px solid #1e293b;
+  border-radius: 8px;
+  padding: 12px 16px;
+  font-size: 0.9rem;
+}
+.strava-sync-result strong {
+  display: block;
+  margin-bottom: 8px;
+  color: #60a5fa;
+}
+.strava-sync-result ul {
+  margin: 0;
+  padding-left: 20px;
+  color: #94a3b8;
+}
+.strava-sync-result li { margin: 2px 0; }
+.strava-sync-result .strava-flag { color: #f87171; }
+
+/* Stats grid */
+.strava-stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 16px;
+}
+
+.strava-stat {
+  background: #0f172a;
+  border-radius: 10px;
+  padding: 16px;
+  text-align: center;
+}
+.strava-stat--highlight {
+  border: 1px solid #3b82f6;
+}
+.strava-stat-value {
+  display: block;
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #e2e8f0;
+}
+.strava-stat-label {
+  display: block;
+  font-size: 0.75rem;
+  color: #94a3b8;
+  margin-top: 4px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+.strava-stat--highlight .strava-stat-value {
+  color: #60a5fa;
+}
+
+/* Sports breakdown */
+.strava-sports-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.strava-sport-chip {
+  background: #1e293b;
+  border: 1px solid #2d3748;
+  color: #cbd5e1;
+  border-radius: 20px;
+  padding: 4px 12px;
+  font-size: 0.85rem;
+}
+
+/* Leaderboard */
+.strava-leaderboard-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+}
+.strava-leaderboard-header h2 { margin: 0; }
+
+.strava-period-toggle {
+  display: flex;
+  gap: 4px;
+}
+.strava-period-toggle button {
+  padding: 6px 14px;
+  border-radius: 6px;
+  border: 1px solid #2d3748;
+  background: transparent;
+  color: #94a3b8;
+  cursor: pointer;
+  font-size: 0.85rem;
+  transition: all 0.2s;
+}
+.strava-period-toggle button.active {
+  background: #3b82f6;
+  border-color: #3b82f6;
+  color: #fff;
+}
+
+.strava-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9rem;
+}
+.strava-table th {
+  text-align: left;
+  padding: 8px 12px;
+  color: #64748b;
+  font-weight: 500;
+  border-bottom: 1px solid #1e293b;
+}
+.strava-table td {
+  padding: 10px 12px;
+  border-bottom: 1px solid #1a2035;
+  color: #cbd5e1;
+}
+.strava-table tr:last-child td { border-bottom: none; }
+.strava-rank-gold td:first-child { color: #f59e0b; font-weight: 700; }
+
+.strava-empty {
+  color: #64748b;
+  text-align: center;
+  padding: 24px 0;
+}
+
+/* Activities list */
+.strava-activities-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.strava-activity-item {
+  display: grid;
+  grid-template-columns: 1fr auto auto;
+  align-items: center;
+  gap: 12px;
+  background: #0f172a;
+  border: 1px solid #1e293b;
+  border-radius: 8px;
+  padding: 12px 16px;
+}
+.strava-activity-item--flagged {
+  opacity: 0.6;
+  border-color: #7f1d1d;
+}
+
+.strava-activity-info {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
+.strava-activity-sport {
+  background: #1e293b;
+  color: #94a3b8;
+  font-size: 0.75rem;
+  padding: 2px 8px;
+  border-radius: 4px;
+  white-space: nowrap;
+}
+.strava-activity-name {
+  color: #e2e8f0;
+  font-size: 0.9rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.strava-flag-badge {
+  background: #7f1d1d;
+  color: #fca5a5;
+  font-size: 0.7rem;
+  padding: 2px 6px;
+  border-radius: 4px;
+}
+
+.strava-activity-metrics {
+  display: flex;
+  gap: 10px;
+  color: #94a3b8;
+  font-size: 0.85rem;
+  white-space: nowrap;
+}
+.strava-influence {
+  color: #60a5fa;
+  font-weight: 600;
+}
+
+.strava-activity-date {
+  color: #64748b;
+  font-size: 0.8rem;
+  white-space: nowrap;
+}
+
+/* Zone filter */
+.strava-zone-filter {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 16px;
+  flex-wrap: wrap;
+}
+
+.strava-zone-label {
+  color: #94a3b8;
+  font-size: 0.9rem;
+  white-space: nowrap;
+}
+
+.strava-zone-select {
+  background: #0f172a;
+  border: 1px solid #2d3748;
+  color: #e2e8f0;
+  border-radius: 6px;
+  padding: 6px 12px;
+  font-size: 0.9rem;
+  cursor: pointer;
+  flex: 1;
+  min-width: 160px;
+}
+
+.strava-zone-select:focus {
+  outline: none;
+  border-color: #3b82f6;
+}
+
+.strava-zone-clear {
+  background: transparent;
+  border: 1px solid #475569;
+  color: #94a3b8;
+  border-radius: 6px;
+  padding: 6px 10px;
+  cursor: pointer;
+  font-size: 0.85rem;
+  transition: all 0.2s;
+}
+.strava-zone-clear:hover {
+  border-color: #f87171;
+  color: #f87171;
+}
+
+/* Sport chips dans le tableau */
+.strava-sport-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+
+.strava-sport-chip--run,
+.strava-sport-chip--trailrun {
+  background: #1a2e1a;
+  color: #4ade80;
+  border-color: #166534;
+}
+
+.strava-sport-chip--ride,
+.strava-sport-chip--mountainbikeride {
+  background: #1a1f2e;
+  color: #60a5fa;
+  border-color: #1e3a5f;
+}
+
+.strava-sport-chip--walk,
+.strava-sport-chip--hike {
+  background: #2e1f1a;
+  color: #fb923c;
+  border-color: #7c2d12;
+}
+
+.strava-sport-chip--swim {
+  background: #1a2a2e;
+  color: #22d3ee;
+  border-color: #164e63;
+}
+
+.strava-sport-chip--weighttraining,
+.strava-sport-chip--workout {
+  background: #2a1a2e;
+  color: #c084fc;
+  border-color: #581c87;
+}
+
+@media (max-width: 600px) {
+  .strava-activity-item {
+    grid-template-columns: 1fr;
+  }
+  .strava-activity-metrics {
+    flex-wrap: wrap;
+  }
+}

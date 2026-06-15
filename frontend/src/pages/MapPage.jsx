@@ -8,7 +8,7 @@ import markerIcon2x from "leaflet/dist/images/marker-icon-2x.png";
 import markerIcon from "leaflet/dist/images/marker-icon.png";
 import markerShadow from "leaflet/dist/images/marker-shadow.png";
 
-import { areneAPI, routeAPI, zoneAPI, gameAPI, equipeAPI, missionAPI } from "../api/api.js";
+import { areneAPI, routeAPI, zoneAPI, gameAPI, equipeAPI, missionAPI, stravaAPI } from "../api/api.js";
 import { useAuth } from "../context/AuthContext.jsx";
 import Header from "../components/Header.jsx";
 import "../styles/map.css";
@@ -51,6 +51,23 @@ const areneMissionIcon = L.icon({
 });
 
 const CENTER_FRANCE = [46.2276, 2.2137];
+
+/** Décode une polyline encodée Google/Strava en tableau de [lat, lng]. */
+function decodePolyline(encoded) {
+  if (!encoded) return [];
+  const points = [];
+  let index = 0, lat = 0, lng = 0;
+  while (index < encoded.length) {
+    let result = 0, shift = 0, b;
+    do { b = encoded.charCodeAt(index++) - 63; result |= (b & 0x1f) << shift; shift += 5; } while (b >= 0x20);
+    lat += (result & 1) ? ~(result >> 1) : (result >> 1);
+    result = 0; shift = 0;
+    do { b = encoded.charCodeAt(index++) - 63; result |= (b & 0x1f) << shift; shift += 5; } while (b >= 0x20);
+    lng += (result & 1) ? ~(result >> 1) : (result >> 1);
+    points.push([lat / 1e5, lng / 1e5]);
+  }
+  return points;
+}
 
 function MapController({ playerLocation, onRecenter }) {
   const map = useMap();
@@ -116,6 +133,8 @@ function MapPage() {
   const [showLegend, setShowLegend] = useState(false);
   const [missions, setMissions] = useState([]);
   const [missionsByArena, setMissionsByArena] = useState({});
+  const [stravaPolylines, setStravaPolylines] = useState([]);
+  const [showStravaTraces, setShowStravaTraces] = useState(true);
 
   const handleLaunchGame = async (arene) => {
     const teamId = sessionStorage.getItem("insport_team_id");
@@ -167,16 +186,29 @@ function MapPage() {
         setLoading(true);
         const teamId = sessionStorage.getItem("insport_team_id");
 
-        const [arenesData, routesData, zonesData, missionsData] = await Promise.all([
+        const [arenesData, routesData, zonesData, missionsData, stravaData] = await Promise.all([
           areneAPI.getAll().catch(() => []),
           routeAPI.getAll().catch(() => []),
           zoneAPI.getAll().catch(() => []),
           teamId ? missionAPI.getByTeam(teamId, "ACTIVE").catch(() => []) : Promise.resolve([]),
+          teamId ? stravaAPI.getTeamActivities(teamId).catch(() => []) : Promise.resolve([]),
         ]);
 
         setArenes(Array.isArray(arenesData) ? arenesData : []);
         setRoutes(Array.isArray(routesData) ? routesData : []);
         setZones(Array.isArray(zonesData) ? zonesData : []);
+
+        // Décoder les polylines Strava (on garde celles ayant une polyline valide)
+        const decoded = (Array.isArray(stravaData) ? stravaData : [])
+          .filter((act) => act.summaryPolyline && !act.antiCheatFlagged)
+          .map((act) => ({
+            id: act.id,
+            name: act.name,
+            sportType: act.sportType,
+            points: decodePolyline(act.summaryPolyline),
+          }))
+          .filter((act) => act.points.length > 1);
+        setStravaPolylines(decoded);
 
         const mList = Array.isArray(missionsData) ? missionsData : [];
         setMissions(mList);
@@ -279,6 +311,21 @@ function MapPage() {
               </Polyline>
             );
           })}
+
+          {showStravaTraces && stravaPolylines.map((act) => (
+            <Polyline
+              key={`strava-${act.id}`}
+              positions={act.points}
+              pathOptions={{ color: "#fc4c02", weight: 2, opacity: 0.65 }}
+            >
+              <Popup className="map-popup">
+                <div className="map-popup-content">
+                  <h4>{act.name}</h4>
+                  <p className="map-popup-meta">{act.sportType}</p>
+                </div>
+              </Popup>
+            </Polyline>
+          ))}
 
           {showArenas && arenes.map((arene) => {
             const arenaMissions = missionsByArena[String(arene.id)] || [];
@@ -397,6 +444,11 @@ function MapPage() {
             <input type="checkbox" checked={showRoutes} onChange={(e) => setShowRoutes(e.target.checked)} />
             <span className="map-layer-icon map-layer-icon--route"></span>
             <span>Routes ({routes.length})</span>
+          </label>
+          <label className="map-layer-item">
+            <input type="checkbox" checked={showStravaTraces} onChange={(e) => setShowStravaTraces(e.target.checked)} />
+            <span style={{ color: "#fc4c02", marginRight: "4px" }}>🏃</span>
+            <span>Strava ({stravaPolylines.length})</span>
           </label>
         </div>
 

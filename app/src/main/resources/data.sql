@@ -46,17 +46,17 @@ INSERT OR IGNORE INTO joueur (id, pseudo, equipe_id) VALUES (20, 'Duverne', 5);
 -- ============================================
 -- ARÈNES (Stades)
 -- ============================================
-INSERT OR IGNORE INTO arene (id, nom, latitude, longitude, equipe_controle) VALUES 
+INSERT OR IGNORE INTO arene (id, nom, latitude, longitude, equipe_controle) VALUES
   ('stade_louis_ii', 'Stade Louis II', 43.7384, 7.4246, 1);
-INSERT OR IGNORE INTO arene (id, nom, latitude, longitude, equipe_controle) VALUES 
+INSERT OR IGNORE INTO arene (id, nom, latitude, longitude, equipe_controle) VALUES
   ('parc_princes', 'Parc des Princes', 48.8432, 2.2527, 2);
-INSERT OR IGNORE INTO arene (id, nom, latitude, longitude, equipe_controle) VALUES 
+INSERT OR IGNORE INTO arene (id, nom, latitude, longitude, equipe_controle) VALUES
   ('groupama_stadium', 'Groupama Stadium', 45.7735, 4.8922, 3);
-INSERT OR IGNORE INTO arene (id, nom, latitude, longitude, equipe_controle) VALUES 
+INSERT OR IGNORE INTO arene (id, nom, latitude, longitude, equipe_controle) VALUES
   ('stade_beaujoire', 'Stade de la Beaujoire', 47.2679, -1.4804, 4);
-INSERT OR IGNORE INTO arene (id, nom, latitude, longitude, equipe_controle) VALUES 
+INSERT OR IGNORE INTO arene (id, nom, latitude, longitude, equipe_controle) VALUES
   ('stade_francis_le_ble', 'Stade Francis Le Blé', 48.3988, -4.4860, 5);
-INSERT OR IGNORE INTO arene (id, nom, latitude, longitude, equipe_controle) VALUES 
+INSERT OR IGNORE INTO arene (id, nom, latitude, longitude, equipe_controle) VALUES
   ('velodrome', 'Stade Vélodrome', 43.2620, 5.3963, NULL);
 
 -- ============================================
@@ -98,42 +98,42 @@ INSERT OR IGNORE INTO sport (id, code, name) VALUES (4, 'MUSCULATION', 'Musculat
 -- ============================================
 -- SESSIONS D'EXEMPLE
 -- ============================================
-INSERT OR IGNORE INTO session (id, sport_id, state, created_at) VALUES 
+INSERT OR IGNORE INTO session (id, sport_id, state, created_at) VALUES
   ('session_001', 1, 'ACTIVE', '2026-01-13T10:00:00+01:00');
-INSERT OR IGNORE INTO session (id, sport_id, state, created_at, ended_at) VALUES 
+INSERT OR IGNORE INTO session (id, sport_id, state, created_at, ended_at) VALUES
   ('session_002', 1, 'TERMINATED', '2026-01-13T09:00:00+01:00', '2026-01-13T11:00:00+01:00');
-INSERT OR IGNORE INTO session (id, sport_id, state, created_at) VALUES 
+INSERT OR IGNORE INTO session (id, sport_id, state, created_at) VALUES
   ('session_003', 2, 'ACTIVE', '2026-01-13T14:00:00+01:00');
 
 -- ============================================
 -- PARTICIPANTS AUX SESSIONS
 -- ============================================
-INSERT OR IGNORE INTO session_participant (session_id, participant_id, participant_type, participant_name) VALUES 
+INSERT OR IGNORE INTO session_participant (session_id, participant_id, participant_type, participant_name) VALUES
   ('session_001', '1', 'TEAM', 'AS Monaco');
-INSERT OR IGNORE INTO session_participant (session_id, participant_id, participant_type, participant_name) VALUES 
+INSERT OR IGNORE INTO session_participant (session_id, participant_id, participant_type, participant_name) VALUES
   ('session_001', '2', 'TEAM', 'Paris Saint-Germain');
 
-INSERT OR IGNORE INTO session_participant (session_id, participant_id, participant_type, participant_name) VALUES 
+INSERT OR IGNORE INTO session_participant (session_id, participant_id, participant_type, participant_name) VALUES
   ('session_002', '1', 'TEAM', 'AS Monaco');
-INSERT OR IGNORE INTO session_participant (session_id, participant_id, participant_type, participant_name) VALUES 
+INSERT OR IGNORE INTO session_participant (session_id, participant_id, participant_type, participant_name) VALUES
   ('session_002', '3', 'TEAM', 'Olympique Lyonnais');
 
-INSERT OR IGNORE INTO session_participant (session_id, participant_id, participant_type, participant_name) VALUES 
+INSERT OR IGNORE INTO session_participant (session_id, participant_id, participant_type, participant_name) VALUES
   ('session_003', '2', 'TEAM', 'Paris Saint-Germain');
-INSERT OR IGNORE INTO session_participant (session_id, participant_id, participant_type, participant_name) VALUES 
+INSERT OR IGNORE INTO session_participant (session_id, participant_id, participant_type, participant_name) VALUES
   ('session_003', '4', 'TEAM', 'FC Nantes');
 
 -- ============================================
 -- VALEURS DE MÉTRIQUES
 -- ============================================
-INSERT OR IGNORE INTO metric_value (id, session_id, participant_id, metric_type, value) VALUES 
+INSERT OR IGNORE INTO metric_value (id, session_id, participant_id, metric_type, value) VALUES
   (1, 'session_001', '1', 'GOALS', 2.0);
-INSERT OR IGNORE INTO metric_value (id, session_id, participant_id, metric_type, value) VALUES 
+INSERT OR IGNORE INTO metric_value (id, session_id, participant_id, metric_type, value) VALUES
   (2, 'session_001', '2', 'GOALS', 1.0);
 
-INSERT OR IGNORE INTO metric_value (id, session_id, participant_id, metric_type, value) VALUES 
+INSERT OR IGNORE INTO metric_value (id, session_id, participant_id, metric_type, value) VALUES
   (3, 'session_002', '1', 'GOALS', 3.0);
-INSERT OR IGNORE INTO metric_value (id, session_id, participant_id, metric_type, value) VALUES 
+INSERT OR IGNORE INTO metric_value (id, session_id, participant_id, metric_type, value) VALUES
   (4, 'session_002', '3', 'GOALS', 2.0);
 
 INSERT OR IGNORE INTO metric_value (id, session_id, participant_id, metric_type, value) VALUES

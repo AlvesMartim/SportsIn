@@ -19,6 +19,7 @@ function Header() {
     { path: "/missions", label: "Missions", icon: "🎯" },
     { path: "/team", label: "Équipe", icon: "👥" },
     { path: "/progression", label: "Progression", icon: "📈" },
+    { path: "/strava", label: "Strava", icon: "🏃" },
     { path: "/history", label: "Historique", icon: "📜" },
   ];
 

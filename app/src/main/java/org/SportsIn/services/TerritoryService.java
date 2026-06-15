@@ -41,6 +41,25 @@ public class TerritoryService {
     }
 
     /**
+     * Génère et initialise les zones automatiquement en regroupant les arènes proches.
+     * @param radiusKm      Rayon de regroupement (ex: 5.0 km).
+     * @param minArenesPerZone Nombre min d'arènes pour former une zone valide.
+     */
+    public void initializeZonesAutomatically(double radiusKm, int minArenesPerZone) {
+        List<Arene> allArenes = areneRepository.findAll();
+        ZoneGeneratorService zoneGenerator = new ZoneGeneratorService();
+        List<org.SportsIn.model.territory.Zone> generatedZones =
+                zoneGenerator.generateZonesFromArenes(allArenes, radiusKm, minArenesPerZone);
+
+        generatedZones.forEach(zoneRepository::save);
+
+        System.out.println(">>> Zones générées automatiquement : " + generatedZones.size());
+        for (org.SportsIn.model.territory.Zone z : generatedZones) {
+            System.out.println("    - " + z.getNom() + " (" + z.getArenes().size() + " arènes)");
+        }
+    }
+
+    /**
      * Génère et initialise les routes automatiquement à partir des arènes existantes.
      * @param maxJumpDistanceKm Distance max entre deux arènes.
      * @param minArenesPerRoute Nombre min d'arènes pour former une route.

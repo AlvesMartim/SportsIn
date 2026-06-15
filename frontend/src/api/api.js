@@ -200,6 +200,23 @@ export const messageAPI = {
   delete: async (id) => fetchAPI(`/messages/${id}`, { method: 'DELETE' }),
 };
 
+/**
+ * ========== STRAVA ==========
+ */
+export const stravaAPI = {
+  getAuthUrl: async (joueurId) => fetchAPI(`/strava/auth/url?joueurId=${joueurId}`),
+  getStatus: async (joueurId) => fetchAPI(`/strava/status?joueurId=${joueurId}`),
+  disconnect: async (joueurId) => fetchAPI(`/strava/disconnect?joueurId=${joueurId}`, { method: 'DELETE' }),
+  syncNow: async (joueurId) => fetchAPI(`/strava/sync?joueurId=${joueurId}`, { method: 'POST' }),
+  getActivities: async (joueurId) => fetchAPI(`/strava/activities?joueurId=${joueurId}`),
+  getTeamActivities: async (equipeId) => fetchAPI(`/strava/activities/team?equipeId=${equipeId}`),
+  getPlayerStats: async (joueurId) => fetchAPI(`/strava/stats/player?joueurId=${joueurId}`),
+  getLeaderboard: async (period = 'weekly', zoneId = null) => {
+    const zoneParam = zoneId ? `&zoneId=${zoneId}` : '';
+    return fetchAPI(`/strava/stats/leaderboard?period=${period}${zoneParam}`);
+  },
+};
+
 export default {
   authAPI,
   equipeAPI,
@@ -214,4 +231,5 @@ export default {
   missionAPI,
   progressionAPI,
   messageAPI,
+  stravaAPI,
 };

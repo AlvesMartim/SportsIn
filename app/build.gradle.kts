@@ -38,6 +38,8 @@ dependencies {
     implementation ("com.fasterxml.jackson.core:jackson-annotations:2.16.1")
     
     testImplementation ("org.springframework.boot:spring-boot-starter-test")
+    // WireMock pour mocker l'API Strava dans les tests
+    testImplementation ("org.wiremock:wiremock-standalone:3.5.4")
 }
 
 

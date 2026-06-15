@@ -15,6 +15,7 @@ import ActivityHistoryPage from "./pages/ActivityHistoryPage.jsx";
 import SessionDetailPage from "./pages/SessionDetailPage.jsx";
 import MissionsPage from "./pages/MissionsPage.jsx";
 import ProgressionPage from "./pages/ProgressionPage.jsx";
+import StravaPage from "./pages/StravaPage.jsx";
 
 import GuardedRoute from "./components/GuardedRoute.jsx";
 import Header from "./components/Header.jsx";
@@ -148,6 +149,16 @@ function App() {
           element={
             <GuardedRoute>
               <ProgressionPage />
+            </GuardedRoute>
+          }
+        />
+
+        {/* Strava */}
+        <Route
+          path="/strava"
+          element={
+            <GuardedRoute>
+              <StravaPage />
             </GuardedRoute>
           }
         />

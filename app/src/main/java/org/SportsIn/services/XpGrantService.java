@@ -46,6 +46,12 @@ public class XpGrantService {
     }
 
     @Transactional
+    public void grantActivityXp(Long teamId, int baseXp) {
+        int amount = applyXpMultiplier(teamId, baseXp);
+        addXp(teamId, amount);
+    }
+
+    @Transactional
     public void grantPointHoldingXp(Long teamId, long holdingHours) {
         int base = (int) (holdingHours * XP_POINT_HOLDING_PER_HOUR);
         int amount = applyXpMultiplier(teamId, base);
