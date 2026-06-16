@@ -20,6 +20,7 @@ function Header() {
     { path: "/team", label: "Équipe", icon: "👥" },
     { path: "/progression", label: "Progression", icon: "📈" },
     { path: "/strava", label: "Strava", icon: "🏃" },
+    { path: "/zones", label: "Zones IDF", icon: "🗾" },
     { path: "/history", label: "Historique", icon: "📜" },
   ];
 

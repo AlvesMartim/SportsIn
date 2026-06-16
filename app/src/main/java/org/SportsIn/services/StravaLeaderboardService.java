@@ -1,8 +1,10 @@
 package org.SportsIn.services;
 
+import org.SportsIn.model.Arene;
 import org.SportsIn.model.strava.StravaActivity;
 import org.SportsIn.model.territory.Zone;
 import org.SportsIn.model.territory.ZoneRepository;
+import org.SportsIn.repository.AreneRepository;
 import org.SportsIn.repository.EquipeRepository;
 import org.SportsIn.repository.StravaActivityRepository;
 import org.springframework.stereotype.Service;
@@ -36,13 +38,16 @@ public class StravaLeaderboardService {
     private final StravaActivityRepository activityRepo;
     private final ZoneRepository zoneRepo;
     private final EquipeRepository equipeRepo;
+    private final AreneRepository areneRepo;
 
     public StravaLeaderboardService(StravaActivityRepository activityRepo,
                                     ZoneRepository zoneRepo,
-                                    EquipeRepository equipeRepo) {
+                                    EquipeRepository equipeRepo,
+                                    AreneRepository areneRepo) {
         this.activityRepo = activityRepo;
         this.zoneRepo = zoneRepo;
         this.equipeRepo = equipeRepo;
+        this.areneRepo = areneRepo;
     }
 
     /**
@@ -53,13 +58,17 @@ public class StravaLeaderboardService {
      * @return liste ordonnée par distance décroissante
      */
     public List<Map<String, Object>> compute(String period, Long zoneId) {
+        return compute(period, zoneId, null);
+    }
+
+    public List<Map<String, Object>> compute(String period, Long zoneId, String departement) {
         String sinceDate = sinceDate(period);
 
-        // Récupérer toutes les activités valides de la période
         List<StravaActivity> activities = activityRepo.findValidSince(sinceDate);
 
-        // Filtrer par zone si demandé
-        if (zoneId != null) {
+        if (departement != null && !departement.isBlank()) {
+            activities = filterByDepartement(activities, departement);
+        } else if (zoneId != null) {
             activities = filterByZone(activities, zoneId);
         }
 
@@ -129,6 +138,17 @@ public class StravaLeaderboardService {
                 .filter(a -> a.getZonesTraversed() != null
                         && areneIds.stream().anyMatch(
                                 id -> a.getZonesTraversed().contains("\"" + id + "\"")))
+                .collect(Collectors.toList());
+    }
+
+    private List<StravaActivity> filterByDepartement(List<StravaActivity> activities, String departement) {
+        Set<String> areneIds = areneRepo.findByDepartement(departement).stream()
+                .map(Arene::getId)
+                .collect(Collectors.toSet());
+        if (areneIds.isEmpty()) return List.of();
+        return activities.stream()
+                .filter(a -> a.getZonesTraversed() != null
+                        && areneIds.stream().anyMatch(id -> a.getZonesTraversed().contains("\"" + id + "\"")))
                 .collect(Collectors.toList());
     }
 

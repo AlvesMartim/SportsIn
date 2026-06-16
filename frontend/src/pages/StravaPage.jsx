@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { useLocation } from "react-router-dom";
 import { useAuth } from "../context/AuthContext.jsx";
-import { stravaAPI, zoneAPI } from "../api/api.js";
+import { stravaAPI } from "../api/api.js";
 import "../styles/strava.css";
 
 const SPORT_ICONS = {
@@ -39,8 +39,18 @@ export default function StravaPage() {
   const [activities, setActivities] = useState([]);
   const [leaderboard, setLeaderboard] = useState([]);
   const [leaderboardPeriod, setLeaderboardPeriod] = useState("weekly");
-  const [zones, setZones] = useState([]);
-  const [selectedZoneId, setSelectedZoneId] = useState(null);
+  const [selectedDept, setSelectedDept] = useState(null);
+
+  const DEPTS = [
+    { code: "75", label: "Paris" },
+    { code: "77", label: "Seine-et-Marne" },
+    { code: "78", label: "Yvelines" },
+    { code: "91", label: "Essonne" },
+    { code: "92", label: "Hauts-de-Seine" },
+    { code: "93", label: "Seine-Saint-Denis" },
+    { code: "94", label: "Val-de-Marne" },
+    { code: "95", label: "Val-d'Oise" },
+  ];
   const [syncing, setSyncing] = useState(false);
   const [syncResult, setSyncResult] = useState(null);
   const [error, setError] = useState(null);
@@ -52,6 +62,7 @@ export default function StravaPage() {
   const searchParams = new URLSearchParams(location.search);
   const oauthConnected = searchParams.get("connected") === "true";
   const oauthError = searchParams.get("error");
+  const oauthDetail = searchParams.get("detail");
 
   const loadStatus = useCallback(async () => {
     if (!joueurId) return;
@@ -79,12 +90,12 @@ export default function StravaPage() {
 
   const loadLeaderboard = useCallback(async () => {
     try {
-      const lb = await stravaAPI.getLeaderboard(leaderboardPeriod, selectedZoneId);
+      const lb = await stravaAPI.getLeaderboard(leaderboardPeriod, selectedDept);
       setLeaderboard(lb);
     } catch {
       setLeaderboard([]);
     }
-  }, [leaderboardPeriod, selectedZoneId]);
+  }, [leaderboardPeriod, selectedDept]);
 
   useEffect(() => {
     setLoading(true);
@@ -92,7 +103,6 @@ export default function StravaPage() {
       loadStatus(),
       loadStats(),
       loadLeaderboard(),
-      zoneAPI.getAll().then(setZones).catch(() => setZones([])),
     ]).finally(() => setLoading(false));
   }, [loadStatus, loadStats, loadLeaderboard]);
 
@@ -168,6 +178,7 @@ export default function StravaPage() {
       {oauthError && (
         <div className="strava-alert strava-alert--error">
           Erreur de connexion Strava : {oauthError}
+          {oauthDetail && <div style={{ fontSize: "0.8rem", marginTop: "0.3rem", opacity: 0.8 }}>{oauthDetail}</div>}
         </div>
       )}
       {error && (
@@ -297,34 +308,26 @@ export default function StravaPage() {
           </div>
         </div>
 
-        {/* Filtre par zone */}
+        {/* Filtre par département IDF */}
         <div className="strava-zone-filter">
-          <label className="strava-zone-label">Zone :</label>
+          <span className="strava-zone-label">Zone :</span>
           <select
             className="strava-zone-select"
-            value={selectedZoneId ?? ""}
-            onChange={(e) => setSelectedZoneId(e.target.value ? Number(e.target.value) : null)}
+            value={selectedDept ?? ""}
+            onChange={(e) => setSelectedDept(e.target.value || null)}
           >
             <option value="">Toutes les zones</option>
-            {zones.map((z) => (
-              <option key={z.id} value={z.id}>
-                {z.nom || `Zone ${z.id}`}
+            {DEPTS.map((d) => (
+              <option key={d.code} value={d.code}>
+                {d.code} · {d.label}
               </option>
             ))}
           </select>
-          {selectedZoneId && (
-            <button
-              className="strava-zone-clear"
-              onClick={() => setSelectedZoneId(null)}
-            >
-              ✕
-            </button>
-          )}
         </div>
 
         {leaderboard.length === 0 ? (
           <p className="strava-empty">
-            Aucune activité enregistrée{selectedZoneId ? " dans cette zone" : ""} sur cette période.
+            Aucune activité enregistrée{selectedDept ? ` dans le département ${selectedDept}` : ""} sur cette période.
           </p>
         ) : (
           <table className="strava-table">

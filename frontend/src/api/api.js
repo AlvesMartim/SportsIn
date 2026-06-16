@@ -211,9 +211,9 @@ export const stravaAPI = {
   getActivities: async (joueurId) => fetchAPI(`/strava/activities?joueurId=${joueurId}`),
   getTeamActivities: async (equipeId) => fetchAPI(`/strava/activities/team?equipeId=${equipeId}`),
   getPlayerStats: async (joueurId) => fetchAPI(`/strava/stats/player?joueurId=${joueurId}`),
-  getLeaderboard: async (period = 'weekly', zoneId = null) => {
-    const zoneParam = zoneId ? `&zoneId=${zoneId}` : '';
-    return fetchAPI(`/strava/stats/leaderboard?period=${period}${zoneParam}`);
+  getLeaderboard: async (period = 'weekly', departement = null) => {
+    const deptParam = departement ? `&departement=${departement}` : '';
+    return fetchAPI(`/strava/stats/leaderboard?period=${period}${deptParam}`);
   },
 };
 

@@ -10,4 +10,6 @@ import java.util.List;
 public interface AreneRepository extends JpaRepository<Arene, String> {
     List<Arene> findByControllingTeam_Id(Long teamId);
     List<Arene> findBySportsDisponiblesContaining(String sport);
+    List<Arene> findByDepartement(String departement);
+    long countByDepartement(String departement);
 }

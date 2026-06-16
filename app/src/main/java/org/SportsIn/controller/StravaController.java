@@ -101,8 +101,10 @@ public class StravaController {
                     .location(URI.create(frontendBase + "?connected=true"))
                     .build();
         } catch (Exception e) {
+            String msg = e.getMessage() != null ? e.getMessage().replaceAll("[^a-zA-Z0-9_\\-]", "_") : "unknown";
+            if (msg.length() > 100) msg = msg.substring(0, 100);
             return ResponseEntity.status(HttpStatus.FOUND)
-                    .location(URI.create(frontendBase + "?error=callback_failed"))
+                    .location(URI.create(frontendBase + "?error=callback_failed&detail=" + msg))
                     .build();
         }
     }
@@ -269,8 +271,9 @@ public class StravaController {
     @GetMapping("/stats/leaderboard")
     public ResponseEntity<?> getLeaderboard(
             @RequestParam(defaultValue = "weekly") String period,
-            @RequestParam(required = false) Long zoneId) {
-        List<Map<String, Object>> leaderboard = leaderboardService.compute(period, zoneId);
+            @RequestParam(required = false) Long zoneId,
+            @RequestParam(required = false) String departement) {
+        List<Map<String, Object>> leaderboard = leaderboardService.compute(period, zoneId, departement);
         return ResponseEntity.ok(leaderboard);
     }
 

@@ -16,6 +16,7 @@ import SessionDetailPage from "./pages/SessionDetailPage.jsx";
 import MissionsPage from "./pages/MissionsPage.jsx";
 import ProgressionPage from "./pages/ProgressionPage.jsx";
 import StravaPage from "./pages/StravaPage.jsx";
+import ZonesPage from "./pages/ZonesPage.jsx";
 
 import GuardedRoute from "./components/GuardedRoute.jsx";
 import Header from "./components/Header.jsx";
@@ -159,6 +160,16 @@ function App() {
           element={
             <GuardedRoute>
               <StravaPage />
+            </GuardedRoute>
+          }
+        />
+
+        {/* Classement Zones IDF */}
+        <Route
+          path="/zones"
+          element={
+            <GuardedRoute>
+              <ZonesPage />
             </GuardedRoute>
           }
         />

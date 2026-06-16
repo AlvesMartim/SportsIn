@@ -44,12 +44,22 @@ INSERT OR IGNORE INTO joueur (id, pseudo, equipe_id) VALUES (19, 'Faivre', 5);
 INSERT OR IGNORE INTO joueur (id, pseudo, equipe_id) VALUES (20, 'Duverne', 5);
 
 -- ============================================
--- ARÈNES (Stades)
+-- ZONES DÉPARTEMENTS IDF
+-- ============================================
+INSERT OR IGNORE INTO zone_departement (code, nom, total_influence) VALUES ('75', 'Paris', 0);
+INSERT OR IGNORE INTO zone_departement (code, nom, total_influence) VALUES ('77', 'Seine-et-Marne', 0);
+INSERT OR IGNORE INTO zone_departement (code, nom, total_influence) VALUES ('78', 'Yvelines', 0);
+INSERT OR IGNORE INTO zone_departement (code, nom, total_influence) VALUES ('91', 'Essonne', 0);
+INSERT OR IGNORE INTO zone_departement (code, nom, total_influence) VALUES ('92', 'Hauts-de-Seine', 0);
+INSERT OR IGNORE INTO zone_departement (code, nom, total_influence) VALUES ('93', 'Seine-Saint-Denis', 0);
+INSERT OR IGNORE INTO zone_departement (code, nom, total_influence) VALUES ('94', 'Val-de-Marne', 0);
+INSERT OR IGNORE INTO zone_departement (code, nom, total_influence) VALUES ('95', "Val-d'Oise", 0);
+
+-- ============================================
+-- ARÈNES (Stades hors IDF - données existantes)
 -- ============================================
 INSERT OR IGNORE INTO arene (id, nom, latitude, longitude, equipe_controle) VALUES
   ('stade_louis_ii', 'Stade Louis II', 43.7384, 7.4246, 1);
-INSERT OR IGNORE INTO arene (id, nom, latitude, longitude, equipe_controle) VALUES
-  ('parc_princes', 'Parc des Princes', 48.8432, 2.2527, 2);
 INSERT OR IGNORE INTO arene (id, nom, latitude, longitude, equipe_controle) VALUES
   ('groupama_stadium', 'Groupama Stadium', 45.7735, 4.8922, 3);
 INSERT OR IGNORE INTO arene (id, nom, latitude, longitude, equipe_controle) VALUES
@@ -58,6 +68,72 @@ INSERT OR IGNORE INTO arene (id, nom, latitude, longitude, equipe_controle) VALU
   ('stade_francis_le_ble', 'Stade Francis Le Blé', 48.3988, -4.4860, 5);
 INSERT OR IGNORE INTO arene (id, nom, latitude, longitude, equipe_controle) VALUES
   ('velodrome', 'Stade Vélodrome', 43.2620, 5.3963, NULL);
+
+-- ============================================
+-- ARÈNES IDF - Paris (75)
+-- ============================================
+INSERT OR IGNORE INTO arene (id, nom, latitude, longitude, equipe_controle, departement) VALUES
+  ('parc_princes', 'Parc des Princes', 48.8432, 2.2527, 2, '75');
+INSERT OR IGNORE INTO arene (id, nom, latitude, longitude, equipe_controle, departement) VALUES
+  ('stade_charlety', 'Stade Charléty', 48.8188, 2.3453, NULL, '75');
+INSERT OR IGNORE INTO arene (id, nom, latitude, longitude, equipe_controle, departement) VALUES
+  ('accor_arena', 'Accor Arena', 48.8382, 2.3783, NULL, '75');
+
+-- ============================================
+-- ARÈNES IDF - Seine-et-Marne (77)
+-- ============================================
+INSERT OR IGNORE INTO arene (id, nom, latitude, longitude, equipe_controle, departement) VALUES
+  ('stade_melun', 'Stade Municipal de Melun', 48.5380, 2.6600, NULL, '77');
+INSERT OR IGNORE INTO arene (id, nom, latitude, longitude, equipe_controle, departement) VALUES
+  ('complexe_fontainebleau', 'Complexe sportif Fontainebleau', 48.4046, 2.7028, NULL, '77');
+
+-- ============================================
+-- ARÈNES IDF - Yvelines (78)
+-- ============================================
+INSERT OR IGNORE INTO arene (id, nom, latitude, longitude, equipe_controle, departement) VALUES
+  ('stade_montbauron', 'Stade Montbauron Versailles', 48.8023, 2.1380, NULL, '78');
+INSERT OR IGNORE INTO arene (id, nom, latitude, longitude, equipe_controle, departement) VALUES
+  ('golf_national', 'Golf National Guyancourt', 48.7449, 2.0714, NULL, '78');
+
+-- ============================================
+-- ARÈNES IDF - Essonne (91)
+-- ============================================
+INSERT OR IGNORE INTO arene (id, nom, latitude, longitude, equipe_controle, departement) VALUES
+  ('stade_corbeil', 'Stade de Corbeil-Essonnes', 48.6143, 2.4778, NULL, '91');
+INSERT OR IGNORE INTO arene (id, nom, latitude, longitude, equipe_controle, departement) VALUES
+  ('complexe_evry', 'Complexe sportif Évry', 48.6325, 2.4218, NULL, '91');
+
+-- ============================================
+-- ARÈNES IDF - Hauts-de-Seine (92)
+-- ============================================
+INSERT OR IGNORE INTO arene (id, nom, latitude, longitude, equipe_controle, departement) VALUES
+  ('paris_la_defense_arena', 'Paris La Défense Arena', 48.8974, 2.2261, NULL, '92');
+INSERT OR IGNORE INTO arene (id, nom, latitude, longitude, equipe_controle, departement) VALUES
+  ('stade_fauvettes', 'Stade des Fauvettes Bagneux', 48.7893, 2.3060, NULL, '92');
+
+-- ============================================
+-- ARÈNES IDF - Seine-Saint-Denis (93)
+-- ============================================
+INSERT OR IGNORE INTO arene (id, nom, latitude, longitude, equipe_controle, departement) VALUES
+  ('stade_de_france', 'Stade de France', 48.9244, 2.3601, NULL, '93');
+INSERT OR IGNORE INTO arene (id, nom, latitude, longitude, equipe_controle, departement) VALUES
+  ('stade_bauer', 'Stade Bauer Saint-Ouen', 48.9104, 2.3291, NULL, '93');
+
+-- ============================================
+-- ARÈNES IDF - Val-de-Marne (94)
+-- ============================================
+INSERT OR IGNORE INTO arene (id, nom, latitude, longitude, equipe_controle, departement) VALUES
+  ('stade_vincennes', 'Stade des Sports de Vincennes', 48.8456, 2.4337, NULL, '94');
+INSERT OR IGNORE INTO arene (id, nom, latitude, longitude, equipe_controle, departement) VALUES
+  ('stade_duvauchelle', 'Stade Duvauchelle Créteil', 48.7847, 2.4583, NULL, '94');
+
+-- ============================================
+-- ARÈNES IDF - Val-d'Oise (95)
+-- ============================================
+INSERT OR IGNORE INTO arene (id, nom, latitude, longitude, equipe_controle, departement) VALUES
+  ('stade_cergy', 'Stade de Cergy', 49.0362, 2.0669, NULL, '95');
+INSERT OR IGNORE INTO arene (id, nom, latitude, longitude, equipe_controle, departement) VALUES
+  ('stade_montmorency', 'Stade de Montmorency', 49.0028, 2.3236, NULL, '95');
 
 -- ============================================
 -- SPORTS DISPONIBLES PAR ARÈNE

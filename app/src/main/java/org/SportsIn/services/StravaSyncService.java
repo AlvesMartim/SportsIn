@@ -7,9 +7,11 @@ import org.SportsIn.model.Arene;
 import org.SportsIn.model.strava.StravaActivity;
 import org.SportsIn.model.territory.Route;
 import org.SportsIn.model.territory.RouteRepository;
+import org.SportsIn.model.territory.ZoneDepartement;
 import org.SportsIn.repository.AreneRepository;
 import org.SportsIn.repository.JoueurRepository;
 import org.SportsIn.repository.StravaActivityRepository;
+import org.SportsIn.repository.ZoneDepartementRepository;
 import org.SportsIn.utils.GeoUtils;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
@@ -66,6 +68,7 @@ public class StravaSyncService {
     private final XpGrantService xpGrantService;
     private final StravaProperties props;
     private final ApplicationEventPublisher eventPublisher;
+    private final ZoneDepartementRepository zoneDeptRepo;
 
     public StravaSyncService(StravaApiClient stravaApiClient,
                              StravaActivityRepository activityRepo,
@@ -75,7 +78,8 @@ public class StravaSyncService {
                              StravaPolylineDecoder polylineDecoder,
                              XpGrantService xpGrantService,
                              StravaProperties props,
-                             ApplicationEventPublisher eventPublisher) {
+                             ApplicationEventPublisher eventPublisher,
+                             ZoneDepartementRepository zoneDeptRepo) {
         this.stravaApiClient = stravaApiClient;
         this.activityRepo = activityRepo;
         this.joueurRepo = joueurRepo;
@@ -85,6 +89,7 @@ public class StravaSyncService {
         this.xpGrantService = xpGrantService;
         this.props = props;
         this.eventPublisher = eventPublisher;
+        this.zoneDeptRepo = zoneDeptRepo;
     }
 
     /**
@@ -151,6 +156,9 @@ public class StravaSyncService {
                 double influence = computeInfluence(dto, routeBonus);
                 activity.setInfluenceGranted(influence);
                 totalInfluence += influence;
+
+                // Influence aux zones (départements IDF)
+                grantInfluenceToZones(traversedAreneIds, influence);
 
                 // XP à l'équipe
                 if (equipeId != null) {
@@ -281,6 +289,31 @@ public class StravaSyncService {
         return joueurRepo.findById(joueurId)
                 .map(j -> j.getEquipe() != null ? j.getEquipe().getId() : null)
                 .orElse(null);
+    }
+
+    /**
+     * Attribue un bonus d'influence aux zones (départements) dont une arène a été traversée.
+     * Chaque zone traversée reçoit 50% de l'influence de l'activité.
+     */
+    private void grantInfluenceToZones(List<String> traversedAreneIds, double activityInfluence) {
+        if (traversedAreneIds.isEmpty()) return;
+
+        Set<String> departements = new HashSet<>();
+        for (String areneId : traversedAreneIds) {
+            areneRepo.findById(areneId).ifPresent(arene -> {
+                if (arene.getDepartement() != null && !arene.getDepartement().isBlank()) {
+                    departements.add(arene.getDepartement());
+                }
+            });
+        }
+
+        double bonusParZone = Math.round((activityInfluence * 0.5) * 10.0) / 10.0;
+        for (String dept : departements) {
+            zoneDeptRepo.findById(dept).ifPresent(zone -> {
+                zone.addInfluence(bonusParZone);
+                zoneDeptRepo.save(zone);
+            });
+        }
     }
 
     /** Sérialise une liste d'IDs en JSON array minimaliste. */

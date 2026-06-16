@@ -26,6 +26,9 @@ public class Arene {
     @JsonBackReference
     private Equipe controllingTeam;
 
+    @Column
+    private String departement;
+
     @ElementCollection(targetClass = String.class, fetch = FetchType.EAGER)
     @CollectionTable(name = "arene_sport", joinColumns = @JoinColumn(name = "arene_id"))
     @Column(name = "sport_type")
@@ -89,6 +92,9 @@ public class Arene {
     public Long getControllingTeamId() {
         return controllingTeam != null ? controllingTeam.getId() : null;
     }
+
+    public String getDepartement() { return departement; }
+    public void setDepartement(String departement) { this.departement = departement; }
 
     public List<String> getSportsDisponibles() {
         return sportsDisponibles;

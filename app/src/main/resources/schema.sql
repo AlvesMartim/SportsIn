@@ -27,8 +27,21 @@ CREATE TABLE IF NOT EXISTS arene (
     latitude REAL NOT NULL,
     longitude REAL NOT NULL,
     equipe_controle INTEGER,
+    departement TEXT,
     FOREIGN KEY (equipe_controle) REFERENCES equipe(id) ON DELETE SET NULL
 );
+
+-- Table ZONE_DEPARTEMENT (classement IDF par département)
+CREATE TABLE IF NOT EXISTS zone_departement (
+    code TEXT PRIMARY KEY,
+    nom TEXT NOT NULL,
+    total_influence REAL NOT NULL DEFAULT 0,
+    controlling_team_id INTEGER,
+    FOREIGN KEY (controlling_team_id) REFERENCES equipe(id) ON DELETE SET NULL
+);
+
+CREATE INDEX IF NOT EXISTS idx_arene_departement ON arene(departement);
+CREATE INDEX IF NOT EXISTS idx_zone_dept_influence ON zone_departement(total_influence);
 
 -- Table de jointure ARENE_SPORT (ManyToMany entre ARENE et SportType)
 CREATE TABLE IF NOT EXISTS arene_sport (
