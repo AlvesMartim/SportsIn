@@ -77,6 +77,7 @@ Le projet respecte une séparation stricte :
 *   **Frontend (React)** : Interface visuelle pour la carte et les interactions joueurs.
 
 ---
+Lien pour la démo Strava :https://youtu.be/Gvm0g2mvCc4
 
 ## 👥 Crédits
 
