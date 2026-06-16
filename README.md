@@ -25,9 +25,28 @@ Le jeu se déroule sur une carte de l’Île-de-France, découpée en points d�
 
 ## 🚀 Démarrage Rapide
 
-### ⭐ Méthode recommandée (une seule commande)
+### 1. Configuration des variables d'environnement
+
+Avant le premier lancement, créez un fichier `.env` à la racine du projet à partir du modèle fourni :
 
 ```bash
+cp .env.example .env
+```
+
+Puis éditez `.env` et renseignez votre clé API OpenWeather (gratuite via [openweathermap.org/api](https://openweathermap.org/api)) :
+
+```
+OPENWEATHER_API_KEY=votre_cle_ici
+```
+
+> ⚠️ **Important** : le fichier `.env` est ignoré par Git (voir `.gitignore`). Ne committez **jamais** vos clés réelles.
+> Sans clé valide, la **Feature 7 (météo active)** — missions flash météo, affinités d'équipe, usure territoriale accélérée — bascule en mode désactivé silencieux ; le reste du projet fonctionne normalement.
+> Une clé OpenWeather fraîchement créée peut nécessiter jusqu'à ~1-2 h avant d'être activée côté serveur.
+
+### 2. ⭐ Méthode recommandée (une seule commande)
+
+```bash
+set -a; source .env; set +a   # charge les variables du .env dans l'environnement
 ./start-dev.sh
 ```
 

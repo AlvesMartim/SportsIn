@@ -12,6 +12,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import java.time.Instant;
+import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
 
@@ -226,6 +227,42 @@ class MissionServiceTest {
 
         Mission evaluated = missionRepository.findById(m1.getId()).orElseThrow();
         assertEquals(MissionStatus.SUCCESS, evaluated.getStatus());
+    }
+
+    @Test
+    @DisplayName("evaluateWeatherFlash: SUCCESS si l'equipe gagne sur l'arene avant l'evenement")
+    void testEvaluateWeatherFlashSuccess() {
+        Instant now = Instant.now();
+        Instant eventStartsAt = now.plus(6, ChronoUnit.HOURS);
+
+        Mission mission = createActiveMission(1L, MissionType.DIVERSITY_SPORT, "Alerte pluie");
+        mission.setTimestampsFromInstant(now.minus(1, ChronoUnit.HOURS), now.minus(1, ChronoUnit.HOURS), eventStartsAt);
+        mission.setPayloadJson(toJson(Map.of(
+                "missionCategory", "WEATHER_FLASH",
+                "arenaId", "arena_flash",
+                "eventType", "PLUIE",
+                "eventStartsAt", eventStartsAt.toString()
+        )));
+        missionRepository.save(mission);
+
+        Sport sport = new Sport();
+        sport.setCode("FOOTBALL");
+
+        Session session = new Session(
+                "S_FLASH",
+                sport,
+                "arena_flash",
+                SessionState.TERMINATED,
+                LocalDateTime.now().minusHours(2),
+                List.of(new Participant("1", "Equipe Alpha", ParticipantType.TEAM))
+        );
+        session.setWinnerParticipantId("1");
+        session.setEndedAt(LocalDateTime.now().minusHours(1));
+        sessionRepository.save(session);
+
+        Mission evaluated = evaluationService.evaluateMission(mission.getId());
+        assertEquals(MissionStatus.SUCCESS, evaluated.getStatus());
+        assertEquals(1, evaluated.getProgressCurrent());
     }
 
     // ========================

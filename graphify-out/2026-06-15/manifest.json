@@ -1,0 +1,1072 @@
+{
+  "app/bin/main/data.sql": {
+    "mtime": 1775133199.803,
+    "ast_hash": "ec75259ec2983c5dba6a7f48ddb98382",
+    "semantic_hash": "ec75259ec2983c5dba6a7f48ddb98382"
+  },
+  "app/bin/main/schema.sql": {
+    "mtime": 1772192671.732,
+    "ast_hash": "d84fd31f5ec2e2c08f1086de80b95282",
+    "semantic_hash": "d84fd31f5ec2e2c08f1086de80b95282"
+  },
+  "app/build.gradle.kts": {
+    "mtime": 1772192873.730729,
+    "ast_hash": "a7055b551f5da97c490360542a09375f",
+    "semantic_hash": "a7055b551f5da97c490360542a09375f"
+  },
+  "app/src/main/java/org/SportsIn/App.java": {
+    "mtime": 1775131799.1697943,
+    "ast_hash": "bf2b80f40eac23fc021127e9edbcae63",
+    "semantic_hash": "bf2b80f40eac23fc021127e9edbcae63"
+  },
+  "app/src/main/java/org/SportsIn/config/CorsConfig.java": {
+    "mtime": 1768223672.6750624,
+    "ast_hash": "c36ec7977972b434109c62c13cff7eee",
+    "semantic_hash": "c36ec7977972b434109c62c13cff7eee"
+  },
+  "app/src/main/java/org/SportsIn/config/RouteInitializer.java": {
+    "mtime": 1768310558.7448297,
+    "ast_hash": "c843b0c042e1e1992a0d7cd69924d7f2",
+    "semantic_hash": "c843b0c042e1e1992a0d7cd69924d7f2"
+  },
+  "app/src/main/java/org/SportsIn/config/WebConfig.java": {
+    "mtime": 1767619369.8061159,
+    "ast_hash": "83e62bdb66a11fc2ede452f7f316d179",
+    "semantic_hash": "83e62bdb66a11fc2ede452f7f316d179"
+  },
+  "app/src/main/java/org/SportsIn/controller/AreneController.java": {
+    "mtime": 1781481963.1040921,
+    "ast_hash": "e7da4d041ba3459a6e9f0b792527d436",
+    "semantic_hash": "e7da4d041ba3459a6e9f0b792527d436"
+  },
+  "app/src/main/java/org/SportsIn/controller/AuthController.java": {
+    "mtime": 1772192671.703009,
+    "ast_hash": "6edae4aee9c238d83a6e256fb29a5321",
+    "semantic_hash": "6edae4aee9c238d83a6e256fb29a5321"
+  },
+  "app/src/main/java/org/SportsIn/controller/EquipeController.java": {
+    "mtime": 1772192671.7072172,
+    "ast_hash": "14063c4d0c99e68773e6f6d59175f475",
+    "semantic_hash": "14063c4d0c99e68773e6f6d59175f475"
+  },
+  "app/src/main/java/org/SportsIn/controller/GameController.java": {
+    "mtime": 1771255975.6566656,
+    "ast_hash": "60ecda0a3afd64df306fdd8d13cdb74c",
+    "semantic_hash": "60ecda0a3afd64df306fdd8d13cdb74c"
+  },
+  "app/src/main/java/org/SportsIn/controller/HealthController.java": {
+    "mtime": 1768318717.2730472,
+    "ast_hash": "409ed1f12c4657d3eeb2f73af9acde6d",
+    "semantic_hash": "409ed1f12c4657d3eeb2f73af9acde6d"
+  },
+  "app/src/main/java/org/SportsIn/controller/JoueurController.java": {
+    "mtime": 1768318717.2730472,
+    "ast_hash": "80f0771abad11e1ad23994ebd7cf26c4",
+    "semantic_hash": "80f0771abad11e1ad23994ebd7cf26c4"
+  },
+  "app/src/main/java/org/SportsIn/controller/MessageController.java": {
+    "mtime": 1772192671.7072172,
+    "ast_hash": "4be822384f4fb2992411f7b6a0b8f64f",
+    "semantic_hash": "4be822384f4fb2992411f7b6a0b8f64f"
+  },
+  "app/src/main/java/org/SportsIn/controller/MissionController.java": {
+    "mtime": 1771255975.6566656,
+    "ast_hash": "d3a63133589b371428f20796f6244325",
+    "semantic_hash": "d3a63133589b371428f20796f6244325"
+  },
+  "app/src/main/java/org/SportsIn/controller/ProgressionController.java": {
+    "mtime": 1771406010.8638105,
+    "ast_hash": "16d084622ca6569a943d2c6bc0a11b0b",
+    "semantic_hash": "16d084622ca6569a943d2c6bc0a11b0b"
+  },
+  "app/src/main/java/org/SportsIn/controller/RouteController.java": {
+    "mtime": 1768310558.7448297,
+    "ast_hash": "fc74db968d9f7d51678417278e1a7ef6",
+    "semantic_hash": "fc74db968d9f7d51678417278e1a7ef6"
+  },
+  "app/src/main/java/org/SportsIn/controller/SessionController.java": {
+    "mtime": 1771255975.6566656,
+    "ast_hash": "1513c91065c9c68648bbec53423779c3",
+    "semantic_hash": "1513c91065c9c68648bbec53423779c3"
+  },
+  "app/src/main/java/org/SportsIn/controller/SportController.java": {
+    "mtime": 1772192671.7072172,
+    "ast_hash": "d4af496d8f4c6f5cbbbb5ae3975b164e",
+    "semantic_hash": "d4af496d8f4c6f5cbbbb5ae3975b164e"
+  },
+  "app/src/main/java/org/SportsIn/controller/ZoneController.java": {
+    "mtime": 1772192671.7072172,
+    "ast_hash": "7f0886b735aa1163c4d6df76e2ced2f1",
+    "semantic_hash": "7f0886b735aa1163c4d6df76e2ced2f1"
+  },
+  "app/src/main/java/org/SportsIn/dto/MissionDetailDTO.java": {
+    "mtime": 1771255975.6566656,
+    "ast_hash": "8443d9c49af075ae4619f24e3a8ae077",
+    "semantic_hash": "8443d9c49af075ae4619f24e3a8ae077"
+  },
+  "app/src/main/java/org/SportsIn/dto/MissionSummaryDTO.java": {
+    "mtime": 1771255975.6566656,
+    "ast_hash": "654eabdc577b7631b907d008b097c849",
+    "semantic_hash": "654eabdc577b7631b907d008b097c849"
+  },
+  "app/src/main/java/org/SportsIn/model/Arene.java": {
+    "mtime": 1772192671.7072172,
+    "ast_hash": "f621722691e82003ee6f1ab5e8fb2474",
+    "semantic_hash": "f621722691e82003ee6f1ab5e8fb2474"
+  },
+  "app/src/main/java/org/SportsIn/model/EvaluationResult.java": {
+    "mtime": 1764886457.3656883,
+    "ast_hash": "c229d930f8c9490c38f32244a19c5e50",
+    "semantic_hash": "c229d930f8c9490c38f32244a19c5e50"
+  },
+  "app/src/main/java/org/SportsIn/model/Game.java": {
+    "mtime": 1771255975.6566656,
+    "ast_hash": "1d7c0b364faa98dcc70c575ff809f3a9",
+    "semantic_hash": "1d7c0b364faa98dcc70c575ff809f3a9"
+  },
+  "app/src/main/java/org/SportsIn/model/GameRepository.java": {
+    "mtime": 1771255975.6566656,
+    "ast_hash": "e89e276201ab0aba874d674e31b58d22",
+    "semantic_hash": "e89e276201ab0aba874d674e31b58d22"
+  },
+  "app/src/main/java/org/SportsIn/model/GameState.java": {
+    "mtime": 1771255975.6566656,
+    "ast_hash": "56026cc5a85761e897bc0d7567a5ee8e",
+    "semantic_hash": "56026cc5a85761e897bc0d7567a5ee8e"
+  },
+  "app/src/main/java/org/SportsIn/model/InMemoryGameRepository.java": {
+    "mtime": 1771255975.6566656,
+    "ast_hash": "12ab8cb106beb16ab2edfc65f48be220",
+    "semantic_hash": "12ab8cb106beb16ab2edfc65f48be220"
+  },
+  "app/src/main/java/org/SportsIn/model/InMemoryRuleRepository.java": {
+    "mtime": 1772192671.7114253,
+    "ast_hash": "aa38fb4723ce0108453857eaaddcbfaa",
+    "semantic_hash": "aa38fb4723ce0108453857eaaddcbfaa"
+  },
+  "app/src/main/java/org/SportsIn/model/InMemorySessionRepository.java": {
+    "mtime": 1771255975.6566656,
+    "ast_hash": "5100e0b81ee29e116e12b044f899b091",
+    "semantic_hash": "5100e0b81ee29e116e12b044f899b091"
+  },
+  "app/src/main/java/org/SportsIn/model/MetricType.java": {
+    "mtime": 1764081752.6587417,
+    "ast_hash": "1de98d7eac0a6be349bc29438b09b6b2",
+    "semantic_hash": "1de98d7eac0a6be349bc29438b09b6b2"
+  },
+  "app/src/main/java/org/SportsIn/model/MetricValue.java": {
+    "mtime": 1764081757.9502447,
+    "ast_hash": "2e582b707548fe61c28ce946e880ed5f",
+    "semantic_hash": "2e582b707548fe61c28ce946e880ed5f"
+  },
+  "app/src/main/java/org/SportsIn/model/Participant.java": {
+    "mtime": 1764886457.3656883,
+    "ast_hash": "7776ad98c7071a75f1d2099ce23c45e9",
+    "semantic_hash": "7776ad98c7071a75f1d2099ce23c45e9"
+  },
+  "app/src/main/java/org/SportsIn/model/ParticipantType.java": {
+    "mtime": 1764081769.5698383,
+    "ast_hash": "32320cd97dfdc3ed073e696838d3d627",
+    "semantic_hash": "32320cd97dfdc3ed073e696838d3d627"
+  },
+  "app/src/main/java/org/SportsIn/model/Rule.java": {
+    "mtime": 1764886457.3656883,
+    "ast_hash": "b967ddd228e259c478f96548a8e1d6b2",
+    "semantic_hash": "b967ddd228e259c478f96548a8e1d6b2"
+  },
+  "app/src/main/java/org/SportsIn/model/RuleRepository.java": {
+    "mtime": 1764886457.3656883,
+    "ast_hash": "8c5a1df10b12a39625252f945ff9a44e",
+    "semantic_hash": "8c5a1df10b12a39625252f945ff9a44e"
+  },
+  "app/src/main/java/org/SportsIn/model/Session.java": {
+    "mtime": 1764886457.3656883,
+    "ast_hash": "fcae558de942e2ad00289713f2cc2db8",
+    "semantic_hash": "fcae558de942e2ad00289713f2cc2db8"
+  },
+  "app/src/main/java/org/SportsIn/model/SessionRepository.java": {
+    "mtime": 1771255975.6606655,
+    "ast_hash": "562b123b9c7321efa1f1637788021e2b",
+    "semantic_hash": "562b123b9c7321efa1f1637788021e2b"
+  },
+  "app/src/main/java/org/SportsIn/model/SessionResult.java": {
+    "mtime": 1775133199.8036056,
+    "ast_hash": "943803b5ffcf562bcb01e532a46104f5",
+    "semantic_hash": "943803b5ffcf562bcb01e532a46104f5"
+  },
+  "app/src/main/java/org/SportsIn/model/SessionState.java": {
+    "mtime": 1764082190.2992733,
+    "ast_hash": "9c2356b04282e1fe4b8a1c40cbea6b69",
+    "semantic_hash": "9c2356b04282e1fe4b8a1c40cbea6b69"
+  },
+  "app/src/main/java/org/SportsIn/model/Sport.java": {
+    "mtime": 1772192671.7114253,
+    "ast_hash": "bd29786de31288470464844d60f06d4c",
+    "semantic_hash": "bd29786de31288470464844d60f06d4c"
+  },
+  "app/src/main/java/org/SportsIn/model/chat/Message.java": {
+    "mtime": 1772192671.7114253,
+    "ast_hash": "264cc9542d6e59ea19d4c4d7b4ac1a35",
+    "semantic_hash": "264cc9542d6e59ea19d4c4d7b4ac1a35"
+  },
+  "app/src/main/java/org/SportsIn/model/mission/Mission.java": {
+    "mtime": 1771255975.6606655,
+    "ast_hash": "d07a6ac98554f084e8e841d08a74312a",
+    "semantic_hash": "d07a6ac98554f084e8e841d08a74312a"
+  },
+  "app/src/main/java/org/SportsIn/model/mission/MissionPayloadKeys.java": {
+    "mtime": 1778370216.8660944,
+    "ast_hash": "01423ebbe6e8e9e7394c933dc5b1f665",
+    "semantic_hash": "01423ebbe6e8e9e7394c933dc5b1f665"
+  },
+  "app/src/main/java/org/SportsIn/model/mission/MissionPriority.java": {
+    "mtime": 1771255975.6606655,
+    "ast_hash": "15ae84c3935818a99dd3d4361683a0d3",
+    "semantic_hash": "15ae84c3935818a99dd3d4361683a0d3"
+  },
+  "app/src/main/java/org/SportsIn/model/mission/MissionStatus.java": {
+    "mtime": 1771255975.6606655,
+    "ast_hash": "a06c8e02ed5ad7b7b0618640387fd28c",
+    "semantic_hash": "a06c8e02ed5ad7b7b0618640387fd28c"
+  },
+  "app/src/main/java/org/SportsIn/model/mission/MissionType.java": {
+    "mtime": 1771255975.6606655,
+    "ast_hash": "cfaff2a86a105f7c7dba79cad4300f6f",
+    "semantic_hash": "cfaff2a86a105f7c7dba79cad4300f6f"
+  },
+  "app/src/main/java/org/SportsIn/model/progression/ActivePerk.java": {
+    "mtime": 1771406010.8638105,
+    "ast_hash": "baa8b96cde0a8496d75655577bee2762",
+    "semantic_hash": "baa8b96cde0a8496d75655577bee2762"
+  },
+  "app/src/main/java/org/SportsIn/model/progression/LevelThreshold.java": {
+    "mtime": 1771406010.8638105,
+    "ast_hash": "8355286f029c7812adcb73f9af9a1f3a",
+    "semantic_hash": "8355286f029c7812adcb73f9af9a1f3a"
+  },
+  "app/src/main/java/org/SportsIn/model/progression/PerkContext.java": {
+    "mtime": 1772192671.7156334,
+    "ast_hash": "0d7db5169ed406b61a71e2b907104926",
+    "semantic_hash": "0d7db5169ed406b61a71e2b907104926"
+  },
+  "app/src/main/java/org/SportsIn/model/progression/PerkDefinition.java": {
+    "mtime": 1771406010.868129,
+    "ast_hash": "a1186fb999ccd3e22b00a7fc224b0048",
+    "semantic_hash": "a1186fb999ccd3e22b00a7fc224b0048"
+  },
+  "app/src/main/java/org/SportsIn/model/progression/effects/BoostEffect.java": {
+    "mtime": 1771406010.868129,
+    "ast_hash": "747db1e3ab2fc0ce4c497eaf7f776674",
+    "semantic_hash": "747db1e3ab2fc0ce4c497eaf7f776674"
+  },
+  "app/src/main/java/org/SportsIn/model/progression/effects/PerkEffectRegistry.java": {
+    "mtime": 1771406010.868129,
+    "ast_hash": "a7e2735a291649444af6fb9951daba27",
+    "semantic_hash": "a7e2735a291649444af6fb9951daba27"
+  },
+  "app/src/main/java/org/SportsIn/model/progression/effects/PerkEffectStrategy.java": {
+    "mtime": 1771406010.868129,
+    "ast_hash": "685ee8b13d1eb70d3e1bf69578c4f9bc",
+    "semantic_hash": "685ee8b13d1eb70d3e1bf69578c4f9bc"
+  },
+  "app/src/main/java/org/SportsIn/model/progression/effects/ShieldEffect.java": {
+    "mtime": 1771406010.868129,
+    "ast_hash": "df56cd8995bc35d5dccc0649643fa14c",
+    "semantic_hash": "df56cd8995bc35d5dccc0649643fa14c"
+  },
+  "app/src/main/java/org/SportsIn/model/progression/effects/WeatherAffinityEffect.java": {
+    "mtime": 1775133199.8036056,
+    "ast_hash": "37edbe4833cd43e41d85c2cd217604ed",
+    "semantic_hash": "37edbe4833cd43e41d85c2cd217604ed"
+  },
+  "app/src/main/java/org/SportsIn/model/progression/effects/XpMultiplierEffect.java": {
+    "mtime": 1771406010.8724477,
+    "ast_hash": "92c8135f8da7e9294969a14405226297",
+    "semantic_hash": "92c8135f8da7e9294969a14405226297"
+  },
+  "app/src/main/java/org/SportsIn/model/rules/FootballVictoryRule.java": {
+    "mtime": 1767552388.2256885,
+    "ast_hash": "a2fcce97b76edfe92578d4196ee30844",
+    "semantic_hash": "a2fcce97b76edfe92578d4196ee30844"
+  },
+  "app/src/main/java/org/SportsIn/model/territory/InMemoryRouteRepository.java": {
+    "mtime": 1768310558.7448297,
+    "ast_hash": "8c013a1ca5135c7a2d728f36e56cdf5e",
+    "semantic_hash": "8c013a1ca5135c7a2d728f36e56cdf5e"
+  },
+  "app/src/main/java/org/SportsIn/model/territory/InMemoryZoneRepository.java": {
+    "mtime": 1772192671.7156334,
+    "ast_hash": "746c99ed0b6c37b2c0a3c83187dc7eae",
+    "semantic_hash": "746c99ed0b6c37b2c0a3c83187dc7eae"
+  },
+  "app/src/main/java/org/SportsIn/model/territory/Route.java": {
+    "mtime": 1772192671.7156334,
+    "ast_hash": "be900ff19491e06cebc49e72f8751c9f",
+    "semantic_hash": "be900ff19491e06cebc49e72f8751c9f"
+  },
+  "app/src/main/java/org/SportsIn/model/territory/RouteBonus.java": {
+    "mtime": 1768310558.7448297,
+    "ast_hash": "785df4c74a1d6e51b4e3bc95db758a6d",
+    "semantic_hash": "785df4c74a1d6e51b4e3bc95db758a6d"
+  },
+  "app/src/main/java/org/SportsIn/model/territory/RouteRepository.java": {
+    "mtime": 1768310558.7448297,
+    "ast_hash": "2b0443c1f8fd677bd6bda128bb2068b0",
+    "semantic_hash": "2b0443c1f8fd677bd6bda128bb2068b0"
+  },
+  "app/src/main/java/org/SportsIn/model/territory/Zone.java": {
+    "mtime": 1772192671.7156334,
+    "ast_hash": "b1f6391e2efc98db7c0d419a709c5bf4",
+    "semantic_hash": "b1f6391e2efc98db7c0d419a709c5bf4"
+  },
+  "app/src/main/java/org/SportsIn/model/territory/ZoneRepository.java": {
+    "mtime": 1772192671.7198417,
+    "ast_hash": "3e59f22c1d310c690a5475df59debc0a",
+    "semantic_hash": "3e59f22c1d310c690a5475df59debc0a"
+  },
+  "app/src/main/java/org/SportsIn/model/user/Equipe.java": {
+    "mtime": 1772192671.7198417,
+    "ast_hash": "42830f9e733160301cf894bf5056ecff",
+    "semantic_hash": "42830f9e733160301cf894bf5056ecff"
+  },
+  "app/src/main/java/org/SportsIn/model/user/Joueur.java": {
+    "mtime": 1771255975.6606655,
+    "ast_hash": "cb3f270e69a624cc6bbbc0cd657754b8",
+    "semantic_hash": "cb3f270e69a624cc6bbbc0cd657754b8"
+  },
+  "app/src/main/java/org/SportsIn/repository/ActivePerkRepository.java": {
+    "mtime": 1771406010.8724477,
+    "ast_hash": "e8a86b2f5e84b7a0150e1a770ad2afdd",
+    "semantic_hash": "e8a86b2f5e84b7a0150e1a770ad2afdd"
+  },
+  "app/src/main/java/org/SportsIn/repository/AreneRepository.java": {
+    "mtime": 1772192671.7198417,
+    "ast_hash": "eb2aff00f7b61c8989b07c4f6417659e",
+    "semantic_hash": "eb2aff00f7b61c8989b07c4f6417659e"
+  },
+  "app/src/main/java/org/SportsIn/repository/EquipeRepository.java": {
+    "mtime": 1768224315.6644049,
+    "ast_hash": "cef546b0799f3290bc719cbe85ac1d7b",
+    "semantic_hash": "cef546b0799f3290bc719cbe85ac1d7b"
+  },
+  "app/src/main/java/org/SportsIn/repository/JoueurRepository.java": {
+    "mtime": 1772192671.7198417,
+    "ast_hash": "c2ccbeb291940d3e8bfd8e0e6a7dfdb2",
+    "semantic_hash": "c2ccbeb291940d3e8bfd8e0e6a7dfdb2"
+  },
+  "app/src/main/java/org/SportsIn/repository/MessageRepository.java": {
+    "mtime": 1772192671.7198417,
+    "ast_hash": "740a12f6b0b564ec0cb9eecd254d5a3d",
+    "semantic_hash": "740a12f6b0b564ec0cb9eecd254d5a3d"
+  },
+  "app/src/main/java/org/SportsIn/repository/MissionRepository.java": {
+    "mtime": 1771255975.6606655,
+    "ast_hash": "3f3f2c00e9bfb2d6bb1b235842cab7e3",
+    "semantic_hash": "3f3f2c00e9bfb2d6bb1b235842cab7e3"
+  },
+  "app/src/main/java/org/SportsIn/repository/PerkDefinitionRepository.java": {
+    "mtime": 1771406010.8724477,
+    "ast_hash": "ec0d7c46b86e57969a8c5660b4899184",
+    "semantic_hash": "ec0d7c46b86e57969a8c5660b4899184"
+  },
+  "app/src/main/java/org/SportsIn/repository/SportRepository.java": {
+    "mtime": 1772192671.7198417,
+    "ast_hash": "e3d36d6fd43f0e616689b936cefdefa6",
+    "semantic_hash": "e3d36d6fd43f0e616689b936cefdefa6"
+  },
+  "app/src/main/java/org/SportsIn/scheduler/MissionScheduler.java": {
+    "mtime": 1771255975.6606655,
+    "ast_hash": "9781ccb25c242c81a48bb24395074925",
+    "semantic_hash": "9781ccb25c242c81a48bb24395074925"
+  },
+  "app/src/main/java/org/SportsIn/scheduler/WeatherScheduler.java": {
+    "mtime": 1778369705.990864,
+    "ast_hash": "65a73e805dde055606a022b64808fbf4",
+    "semantic_hash": "65a73e805dde055606a022b64808fbf4"
+  },
+  "app/src/main/java/org/SportsIn/services/AreneService.java": {
+    "mtime": 1772192671.7240498,
+    "ast_hash": "9270286909381178baadfa8a14ad7fc1",
+    "semantic_hash": "9270286909381178baadfa8a14ad7fc1"
+  },
+  "app/src/main/java/org/SportsIn/services/AuthService.java": {
+    "mtime": 1772192671.7240498,
+    "ast_hash": "7c6a4f26ba2b3e18de8c830f711fdcb4",
+    "semantic_hash": "7c6a4f26ba2b3e18de8c830f711fdcb4"
+  },
+  "app/src/main/java/org/SportsIn/services/EquipeService.java": {
+    "mtime": 1772192671.7240498,
+    "ast_hash": "ea79bf07ba9794ee9e0524c7c38479ee",
+    "semantic_hash": "ea79bf07ba9794ee9e0524c7c38479ee"
+  },
+  "app/src/main/java/org/SportsIn/services/GameService.java": {
+    "mtime": 1771255975.6606655,
+    "ast_hash": "c30fc01f246658b1aee294f80a3d9b4f",
+    "semantic_hash": "c30fc01f246658b1aee294f80a3d9b4f"
+  },
+  "app/src/main/java/org/SportsIn/services/InfluenceCalculator.java": {
+    "mtime": 1772192671.7240498,
+    "ast_hash": "a85ba7a61f221efd9a69af5f7f1ed881",
+    "semantic_hash": "a85ba7a61f221efd9a69af5f7f1ed881"
+  },
+  "app/src/main/java/org/SportsIn/services/InfluenceModifier.java": {
+    "mtime": 1772192671.7240498,
+    "ast_hash": "06478dc9b29bb58b151da70a31e60d77",
+    "semantic_hash": "06478dc9b29bb58b151da70a31e60d77"
+  },
+  "app/src/main/java/org/SportsIn/services/JoueurService.java": {
+    "mtime": 1768318717.2770472,
+    "ast_hash": "430b5996a6d08642cb97ca384070af64",
+    "semantic_hash": "430b5996a6d08642cb97ca384070af64"
+  },
+  "app/src/main/java/org/SportsIn/services/MessageService.java": {
+    "mtime": 1772192671.7282581,
+    "ast_hash": "81470bf455b726618a56ddb1ad8bb716",
+    "semantic_hash": "81470bf455b726618a56ddb1ad8bb716"
+  },
+  "app/src/main/java/org/SportsIn/services/MissionEvaluationService.java": {
+    "mtime": 1778370228.5051196,
+    "ast_hash": "69f8f0b9ad8dfac0df5e8851e82a4cb6",
+    "semantic_hash": "69f8f0b9ad8dfac0df5e8851e82a4cb6"
+  },
+  "app/src/main/java/org/SportsIn/services/MissionGenerationService.java": {
+    "mtime": 1771406031.3733647,
+    "ast_hash": "61fce28f65e3ef31237c568991297bb1",
+    "semantic_hash": "61fce28f65e3ef31237c568991297bb1"
+  },
+  "app/src/main/java/org/SportsIn/services/PerkActivationService.java": {
+    "mtime": 1771406010.8767662,
+    "ast_hash": "59949381b010cb4f7ef80c15a2924abd",
+    "semantic_hash": "59949381b010cb4f7ef80c15a2924abd"
+  },
+  "app/src/main/java/org/SportsIn/services/PerkInfluenceModifier.java": {
+    "mtime": 1772192671.7282581,
+    "ast_hash": "21fd2252815dba8b626a7c7149ee15fd",
+    "semantic_hash": "21fd2252815dba8b626a7c7149ee15fd"
+  },
+  "app/src/main/java/org/SportsIn/services/RouteGeneratorService.java": {
+    "mtime": 1772192671.7282581,
+    "ast_hash": "59096aa5ebdd75d04341fd04b3ac9398",
+    "semantic_hash": "59096aa5ebdd75d04341fd04b3ac9398"
+  },
+  "app/src/main/java/org/SportsIn/services/RouteInfluenceModifier.java": {
+    "mtime": 1772192671.7282581,
+    "ast_hash": "e6f944bbccbf6e5bd45b8325de08e37b",
+    "semantic_hash": "e6f944bbccbf6e5bd45b8325de08e37b"
+  },
+  "app/src/main/java/org/SportsIn/services/RouteService.java": {
+    "mtime": 1772192671.7282581,
+    "ast_hash": "db09ce7212c224126c49869f08d443b6",
+    "semantic_hash": "db09ce7212c224126c49869f08d443b6"
+  },
+  "app/src/main/java/org/SportsIn/services/RuleEvaluationService.java": {
+    "mtime": 1772192671.7282581,
+    "ast_hash": "471c462d021f69f2f70cd8d33c4c6d04",
+    "semantic_hash": "471c462d021f69f2f70cd8d33c4c6d04"
+  },
+  "app/src/main/java/org/SportsIn/services/SessionService.java": {
+    "mtime": 1775133199.8036056,
+    "ast_hash": "a678fc015ff562d4dbddce5e8caa8d65",
+    "semantic_hash": "a678fc015ff562d4dbddce5e8caa8d65"
+  },
+  "app/src/main/java/org/SportsIn/services/TeamProgressionService.java": {
+    "mtime": 1771406010.881085,
+    "ast_hash": "b72f0dc35034dc9c2047130eec55bdae",
+    "semantic_hash": "b72f0dc35034dc9c2047130eec55bdae"
+  },
+  "app/src/main/java/org/SportsIn/services/TerritoryDecayService.java": {
+    "mtime": 1778369598.6908202,
+    "ast_hash": "cc6004dbf9a0e1a18072d03418a08a9c",
+    "semantic_hash": "cc6004dbf9a0e1a18072d03418a08a9c"
+  },
+  "app/src/main/java/org/SportsIn/services/TerritoryInfluenceStateService.java": {
+    "mtime": 1775133199.7305791,
+    "ast_hash": "4fb921e1a4192ea3b09d6b24286791fa",
+    "semantic_hash": "4fb921e1a4192ea3b09d6b24286791fa"
+  },
+  "app/src/main/java/org/SportsIn/services/TerritoryService.java": {
+    "mtime": 1775133199.8036056,
+    "ast_hash": "2db86d1a6b64de1d8dd1807a07273f68",
+    "semantic_hash": "2db86d1a6b64de1d8dd1807a07273f68"
+  },
+  "app/src/main/java/org/SportsIn/services/WeatherAffinityService.java": {
+    "mtime": 1775133199.7305791,
+    "ast_hash": "67a7ee376f088854d797550224d748e0",
+    "semantic_hash": "67a7ee376f088854d797550224d748e0"
+  },
+  "app/src/main/java/org/SportsIn/services/WeatherFlashMissionService.java": {
+    "mtime": 1778370254.0978625,
+    "ast_hash": "130ce3dfd191c2192c0ccf73f9beeb8e",
+    "semantic_hash": "130ce3dfd191c2192c0ccf73f9beeb8e"
+  },
+  "app/src/main/java/org/SportsIn/services/XpGrantService.java": {
+    "mtime": 1771406010.881085,
+    "ast_hash": "5743536db27b725be318ac1872809d64",
+    "semantic_hash": "5743536db27b725be318ac1872809d64"
+  },
+  "app/src/main/java/org/SportsIn/services/ZoneGeneratorService.java": {
+    "mtime": 1772192671.7324662,
+    "ast_hash": "6514db5f0c69e83190c319f7697cc672",
+    "semantic_hash": "6514db5f0c69e83190c319f7697cc672"
+  },
+  "app/src/main/java/org/SportsIn/services/ZoneService.java": {
+    "mtime": 1772192671.7324662,
+    "ast_hash": "1ddde0c8531077894574569cfbad861a",
+    "semantic_hash": "1ddde0c8531077894574569cfbad861a"
+  },
+  "app/src/main/java/org/SportsIn/utils/GeoUtils.java": {
+    "mtime": 1768310558.7448297,
+    "ast_hash": "dd80d81718ae3a800b02fde6f7b7a649",
+    "semantic_hash": "dd80d81718ae3a800b02fde6f7b7a649"
+  },
+  "app/src/main/java/org/SportsIn/weather/BasketWeatherHardshipStrategy.java": {
+    "mtime": 1775133199.7305791,
+    "ast_hash": "909db8fc9b35400225f4043cbe6f8199",
+    "semantic_hash": "909db8fc9b35400225f4043cbe6f8199"
+  },
+  "app/src/main/java/org/SportsIn/weather/DefaultWeatherHardshipStrategy.java": {
+    "mtime": 1775133199.7305791,
+    "ast_hash": "ff453181c2fb21aaaaa10210829fef6c",
+    "semantic_hash": "ff453181c2fb21aaaaa10210829fef6c"
+  },
+  "app/src/main/java/org/SportsIn/weather/FootballWeatherHardshipStrategy.java": {
+    "mtime": 1775133199.7305791,
+    "ast_hash": "793423cd809d5fd1329cd6a2f5fdfcd8",
+    "semantic_hash": "793423cd809d5fd1329cd6a2f5fdfcd8"
+  },
+  "app/src/main/java/org/SportsIn/weather/MusculationWeatherHardshipStrategy.java": {
+    "mtime": 1775133199.7305791,
+    "ast_hash": "3ae3aee789e866190cb819d035d06216",
+    "semantic_hash": "3ae3aee789e866190cb819d035d06216"
+  },
+  "app/src/main/java/org/SportsIn/weather/OpenWeatherClient.java": {
+    "mtime": 1778370197.7671514,
+    "ast_hash": "85938373f470f9a8fa0c6d06b42941b5",
+    "semantic_hash": "85938373f470f9a8fa0c6d06b42941b5"
+  },
+  "app/src/main/java/org/SportsIn/weather/SessionWeatherImpact.java": {
+    "mtime": 1775133199.7305791,
+    "ast_hash": "8d0f0da69f3ace0d5d54bda718e03de2",
+    "semantic_hash": "8d0f0da69f3ace0d5d54bda718e03de2"
+  },
+  "app/src/main/java/org/SportsIn/weather/SessionWeatherService.java": {
+    "mtime": 1775133199.7305791,
+    "ast_hash": "9e67b0bca4a1bb23faa256eeb1c29c78",
+    "semantic_hash": "9e67b0bca4a1bb23faa256eeb1c29c78"
+  },
+  "app/src/main/java/org/SportsIn/weather/TennisWeatherHardshipStrategy.java": {
+    "mtime": 1775133199.7305791,
+    "ast_hash": "a21eca780397a8d0a488501f22b07d6a",
+    "semantic_hash": "a21eca780397a8d0a488501f22b07d6a"
+  },
+  "app/src/main/java/org/SportsIn/weather/WeatherClassifier.java": {
+    "mtime": 1775133199.7305791,
+    "ast_hash": "9690e5cbd765fdebc93b19cc9dde7580",
+    "semantic_hash": "9690e5cbd765fdebc93b19cc9dde7580"
+  },
+  "app/src/main/java/org/SportsIn/weather/WeatherClient.java": {
+    "mtime": 1775133199.7305791,
+    "ast_hash": "c9f483c85f9d42bab156aa5edd08b489",
+    "semantic_hash": "c9f483c85f9d42bab156aa5edd08b489"
+  },
+  "app/src/main/java/org/SportsIn/weather/WeatherConditionTag.java": {
+    "mtime": 1775133199.7305791,
+    "ast_hash": "60296d7d880b6d0363ae5adf136372eb",
+    "semantic_hash": "60296d7d880b6d0363ae5adf136372eb"
+  },
+  "app/src/main/java/org/SportsIn/weather/WeatherForecastEntry.java": {
+    "mtime": 1775133199.7305791,
+    "ast_hash": "f5e77c18a0e65806a0493e7a40700de3",
+    "semantic_hash": "f5e77c18a0e65806a0493e7a40700de3"
+  },
+  "app/src/main/java/org/SportsIn/weather/WeatherHardshipEngine.java": {
+    "mtime": 1775133199.7305791,
+    "ast_hash": "e71b00952616c2f2a8086b9e152d57be",
+    "semantic_hash": "e71b00952616c2f2a8086b9e152d57be"
+  },
+  "app/src/main/java/org/SportsIn/weather/WeatherHardshipStrategy.java": {
+    "mtime": 1775133199.7305791,
+    "ast_hash": "e1e98d13d8209317ffb61a530ddf8fca",
+    "semantic_hash": "e1e98d13d8209317ffb61a530ddf8fca"
+  },
+  "app/src/main/java/org/SportsIn/weather/WeatherSnapshot.java": {
+    "mtime": 1775133199.7305791,
+    "ast_hash": "b5080e0bab1f58be599867f12c05f85f",
+    "semantic_hash": "b5080e0bab1f58be599867f12c05f85f"
+  },
+  "app/src/main/resources/data.sql": {
+    "mtime": 1781481963.1040921,
+    "ast_hash": "10e345292d8cf19e14a30c42e8fa0b8b",
+    "semantic_hash": "10e345292d8cf19e14a30c42e8fa0b8b"
+  },
+  "app/src/main/resources/schema.sql": {
+    "mtime": 1772192671.7324662,
+    "ast_hash": "d84fd31f5ec2e2c08f1086de80b95282",
+    "semantic_hash": "d84fd31f5ec2e2c08f1086de80b95282"
+  },
+  "app/src/test/java/org/SportsIn/integration/SessionWeatherFlowIntegrationTest.java": {
+    "mtime": 1775135141.4357338,
+    "ast_hash": "ad8adb57559805098455eba79bb75218",
+    "semantic_hash": "ad8adb57559805098455eba79bb75218"
+  },
+  "app/src/test/java/org/SportsIn/integration/WeatherFlashMissionIntegrationTest.java": {
+    "mtime": 1775135140.7272265,
+    "ast_hash": "e2aa78a0fc7a4b595f8197c8dec6d212",
+    "semantic_hash": "e2aa78a0fc7a4b595f8197c8dec6d212"
+  },
+  "app/src/test/java/org/SportsIn/model/AreneTest.java": {
+    "mtime": 1772199041.0491922,
+    "ast_hash": "65d4585cd9fa29aff40397123a1fd1aa",
+    "semantic_hash": "65d4585cd9fa29aff40397123a1fd1aa"
+  },
+  "app/src/test/java/org/SportsIn/model/EvaluationResultTest.java": {
+    "mtime": 1772199041.0491922,
+    "ast_hash": "6d05b7947ae18cb7bc51d38a8400efc4",
+    "semantic_hash": "6d05b7947ae18cb7bc51d38a8400efc4"
+  },
+  "app/src/test/java/org/SportsIn/model/GameModelTest.java": {
+    "mtime": 1772199041.0491922,
+    "ast_hash": "4d4a70c2a15c4fe25c137a23acee7ad9",
+    "semantic_hash": "4d4a70c2a15c4fe25c137a23acee7ad9"
+  },
+  "app/src/test/java/org/SportsIn/model/InMemoryGameRepositoryTest.java": {
+    "mtime": 1772199041.0491922,
+    "ast_hash": "3a776a23f8963e4d217a4e3cbf567fc0",
+    "semantic_hash": "3a776a23f8963e4d217a4e3cbf567fc0"
+  },
+  "app/src/test/java/org/SportsIn/model/InMemoryRuleRepositoryTest.java": {
+    "mtime": 1772199041.0491922,
+    "ast_hash": "8cf9806bfb6d8960873783d86964a2c6",
+    "semantic_hash": "8cf9806bfb6d8960873783d86964a2c6"
+  },
+  "app/src/test/java/org/SportsIn/model/InMemorySessionRepositoryTest.java": {
+    "mtime": 1772199041.0534,
+    "ast_hash": "08f8f35a72b9b2002c4b09eef5de9b77",
+    "semantic_hash": "08f8f35a72b9b2002c4b09eef5de9b77"
+  },
+  "app/src/test/java/org/SportsIn/model/MetricValueTest.java": {
+    "mtime": 1772199041.0534,
+    "ast_hash": "105fa69feeb03eada2a600b3582312ad",
+    "semantic_hash": "105fa69feeb03eada2a600b3582312ad"
+  },
+  "app/src/test/java/org/SportsIn/model/ModelCoverageTest.java": {
+    "mtime": 1772199041.0534,
+    "ast_hash": "be0fa15db7b5dc25f8b09e7b3f98aa15",
+    "semantic_hash": "be0fa15db7b5dc25f8b09e7b3f98aa15"
+  },
+  "app/src/test/java/org/SportsIn/model/ParticipantTest.java": {
+    "mtime": 1772199041.0534,
+    "ast_hash": "ac6020146a415870ab67575bfcaf38bd",
+    "semantic_hash": "ac6020146a415870ab67575bfcaf38bd"
+  },
+  "app/src/test/java/org/SportsIn/model/SessionModelTest.java": {
+    "mtime": 1772199041.0534,
+    "ast_hash": "715d2bbed5bd7bc820621643c54d4eff",
+    "semantic_hash": "715d2bbed5bd7bc820621643c54d4eff"
+  },
+  "app/src/test/java/org/SportsIn/model/SessionResultTest.java": {
+    "mtime": 1772199041.0534,
+    "ast_hash": "bacb3e6eadbb0678a538e6706144326a",
+    "semantic_hash": "bacb3e6eadbb0678a538e6706144326a"
+  },
+  "app/src/test/java/org/SportsIn/model/SportTest.java": {
+    "mtime": 1772199041.0534,
+    "ast_hash": "e9a0803c776dfa8531d17c04b40a5fea",
+    "semantic_hash": "e9a0803c776dfa8531d17c04b40a5fea"
+  },
+  "app/src/test/java/org/SportsIn/model/progression/ActivePerkTest.java": {
+    "mtime": 1772199041.0534,
+    "ast_hash": "50d2b7de8479414fee6819768cb61e96",
+    "semantic_hash": "50d2b7de8479414fee6819768cb61e96"
+  },
+  "app/src/test/java/org/SportsIn/model/progression/BoostEffectTest.java": {
+    "mtime": 1772199041.0534,
+    "ast_hash": "e1f8d510878ddb3b87835755e24992d6",
+    "semantic_hash": "e1f8d510878ddb3b87835755e24992d6"
+  },
+  "app/src/test/java/org/SportsIn/model/progression/LevelThresholdTest.java": {
+    "mtime": 1771406010.881085,
+    "ast_hash": "0d519200e30938493cdb4318fef4fdbd",
+    "semantic_hash": "0d519200e30938493cdb4318fef4fdbd"
+  },
+  "app/src/test/java/org/SportsIn/model/progression/PerkEffectRegistryTest.java": {
+    "mtime": 1772199041.0534,
+    "ast_hash": "9231b4abb5423e16fb9004f1532a44ab",
+    "semantic_hash": "9231b4abb5423e16fb9004f1532a44ab"
+  },
+  "app/src/test/java/org/SportsIn/model/progression/ShieldEffectTest.java": {
+    "mtime": 1772192671.7366745,
+    "ast_hash": "a990428a4b0311bcb079778548f18742",
+    "semantic_hash": "a990428a4b0311bcb079778548f18742"
+  },
+  "app/src/test/java/org/SportsIn/model/progression/XpMultiplierEffectTest.java": {
+    "mtime": 1772199041.0534,
+    "ast_hash": "1abc6694e5256de6982fe181f5723bd7",
+    "semantic_hash": "1abc6694e5256de6982fe181f5723bd7"
+  },
+  "app/src/test/java/org/SportsIn/model/rules/FootballVictoryRuleTest.java": {
+    "mtime": 1767552443.0856695,
+    "ast_hash": "d9ed9b33aa2c0a8dc963092700d2b450",
+    "semantic_hash": "d9ed9b33aa2c0a8dc963092700d2b450"
+  },
+  "app/src/test/java/org/SportsIn/model/user/EquipeTest.java": {
+    "mtime": 1772199041.0534,
+    "ast_hash": "26c4364a24da1fb77131e3f61d2b0140",
+    "semantic_hash": "26c4364a24da1fb77131e3f61d2b0140"
+  },
+  "app/src/test/java/org/SportsIn/services/GameServiceTest.java": {
+    "mtime": 1772199041.0534,
+    "ast_hash": "6118848bdecd59a33d4f50d70c2a0043",
+    "semantic_hash": "6118848bdecd59a33d4f50d70c2a0043"
+  },
+  "app/src/test/java/org/SportsIn/services/InfluenceCalculatorTest.java": {
+    "mtime": 1772192671.7366745,
+    "ast_hash": "3cb61c524ac329997abd5212d4711439",
+    "semantic_hash": "3cb61c524ac329997abd5212d4711439"
+  },
+  "app/src/test/java/org/SportsIn/services/MissionServiceTest.java": {
+    "mtime": 1775133199.8036056,
+    "ast_hash": "ad516f9e681e7547113f306ab7bc48e2",
+    "semantic_hash": "ad516f9e681e7547113f306ab7bc48e2"
+  },
+  "app/src/test/java/org/SportsIn/services/RouteGeneratorServiceTest.java": {
+    "mtime": 1772192671.7408826,
+    "ast_hash": "6518317b16fe66782bf619f010e7ae23",
+    "semantic_hash": "6518317b16fe66782bf619f010e7ae23"
+  },
+  "app/src/test/java/org/SportsIn/services/RouteInfluenceModifierTest.java": {
+    "mtime": 1772199041.0534,
+    "ast_hash": "fd4ff5cc445dc7de55bfa273041dc659",
+    "semantic_hash": "fd4ff5cc445dc7de55bfa273041dc659"
+  },
+  "app/src/test/java/org/SportsIn/services/RouteServiceTest.java": {
+    "mtime": 1772192671.7408826,
+    "ast_hash": "7199c73f77cfa6696983105ecb41bc40",
+    "semantic_hash": "7199c73f77cfa6696983105ecb41bc40"
+  },
+  "app/src/test/java/org/SportsIn/services/RuleEvaluationServiceTest.java": {
+    "mtime": 1772199041.0534,
+    "ast_hash": "35555ea4c56c3a0600284e423e287092",
+    "semantic_hash": "35555ea4c56c3a0600284e423e287092"
+  },
+  "app/src/test/java/org/SportsIn/services/SessionServiceTest.java": {
+    "mtime": 1772192671.7408826,
+    "ast_hash": "e2b277882330afbedc327fa75ee836fd",
+    "semantic_hash": "e2b277882330afbedc327fa75ee836fd"
+  },
+  "app/src/test/java/org/SportsIn/services/SessionServiceWeatherUnitTest.java": {
+    "mtime": 1775135139.570812,
+    "ast_hash": "9f0082180647e199d77a8ea9c3a1734f",
+    "semantic_hash": "9f0082180647e199d77a8ea9c3a1734f"
+  },
+  "app/src/test/java/org/SportsIn/services/TeamProgressionServiceTest.java": {
+    "mtime": 1771406010.889722,
+    "ast_hash": "e22ccb83f8aaad9444dbbcada9341df4",
+    "semantic_hash": "e22ccb83f8aaad9444dbbcada9341df4"
+  },
+  "app/src/test/java/org/SportsIn/services/TerritoryDecayServiceTest.java": {
+    "mtime": 1775133199.8036056,
+    "ast_hash": "982d7cd8c499b8c02ce6fb49d23ade84",
+    "semantic_hash": "982d7cd8c499b8c02ce6fb49d23ade84"
+  },
+  "app/src/test/java/org/SportsIn/services/TerritoryServiceTest.java": {
+    "mtime": 1772192671.7408826,
+    "ast_hash": "e6fdab291cff6fb28fd33a28a2788daa",
+    "semantic_hash": "e6fdab291cff6fb28fd33a28a2788daa"
+  },
+  "app/src/test/java/org/SportsIn/services/WeatherAffinityServiceTest.java": {
+    "mtime": 1775133199.8036056,
+    "ast_hash": "e86a4254c10524969fb995ed141e6744",
+    "semantic_hash": "e86a4254c10524969fb995ed141e6744"
+  },
+  "app/src/test/java/org/SportsIn/services/WeatherFlashMissionServiceTest.java": {
+    "mtime": 1775133199.8036056,
+    "ast_hash": "101ea2992941f08c7b727d011cf242e1",
+    "semantic_hash": "101ea2992941f08c7b727d011cf242e1"
+  },
+  "app/src/test/java/org/SportsIn/services/ZoneGeneratorServiceTest.java": {
+    "mtime": 1772192671.745091,
+    "ast_hash": "e43f5de31c47c6fe358736d260e0762e",
+    "semantic_hash": "e43f5de31c47c6fe358736d260e0762e"
+  },
+  "app/src/test/java/org/SportsIn/utils/GeoUtilsTest.java": {
+    "mtime": 1772199041.0534,
+    "ast_hash": "29701ad4671ec1fb8813f697f446cfd8",
+    "semantic_hash": "29701ad4671ec1fb8813f697f446cfd8"
+  },
+  "app/src/test/java/org/SportsIn/weather/WeatherHardshipEngineTest.java": {
+    "mtime": 1775133199.8036056,
+    "ast_hash": "559f1f07140be3aefa3428d35b9bd38f",
+    "semantic_hash": "559f1f07140be3aefa3428d35b9bd38f"
+  },
+  "app/src/test/java/org/example/AppTest.java": {
+    "mtime": 1764082631.1622374,
+    "ast_hash": "1449c7aea9fd6d27a313902543d22d9c",
+    "semantic_hash": "1449c7aea9fd6d27a313902543d22d9c"
+  },
+  "create_database.sh": {
+    "mtime": 1768314333.9158025,
+    "ast_hash": "406be1badef6838aa41ebceeb80698fa",
+    "semantic_hash": "406be1badef6838aa41ebceeb80698fa"
+  },
+  "frontend/eslint.config.js": {
+    "mtime": 1767537402.1836774,
+    "ast_hash": "c15fd0f45c689a8b77c8ff6fe6fada9b",
+    "semantic_hash": "c15fd0f45c689a8b77c8ff6fe6fada9b"
+  },
+  "frontend/package.json": {
+    "mtime": 1767537402.1878364,
+    "ast_hash": "638a4c390f908395bb7aebb2340c9f14",
+    "semantic_hash": "638a4c390f908395bb7aebb2340c9f14"
+  },
+  "frontend/src/App.jsx": {
+    "mtime": 1772192671.7619236,
+    "ast_hash": "dd5b18dde07726531139bedede18722f",
+    "semantic_hash": "dd5b18dde07726531139bedede18722f"
+  },
+  "frontend/src/api/api.js": {
+    "mtime": 1781481963.1124716,
+    "ast_hash": "e03cd71991418051f31b299222c80ed6",
+    "semantic_hash": "e03cd71991418051f31b299222c80ed6"
+  },
+  "frontend/src/components/Button.jsx": {
+    "mtime": 1771255975.6686654,
+    "ast_hash": "58334f4e541e51000ae0c1bfe1b152a2",
+    "semantic_hash": "58334f4e541e51000ae0c1bfe1b152a2"
+  },
+  "frontend/src/components/GuardedRoute.jsx": {
+    "mtime": 1767537402.1919956,
+    "ast_hash": "97ca5e75d7800273f72363b018e5df45",
+    "semantic_hash": "97ca5e75d7800273f72363b018e5df45"
+  },
+  "frontend/src/components/Header.jsx": {
+    "mtime": 1772192671.7619236,
+    "ast_hash": "cf068e068a0e37d8a43d8d6364501098",
+    "semantic_hash": "cf068e068a0e37d8a43d8d6364501098"
+  },
+  "frontend/src/components/Input.jsx": {
+    "mtime": 1767537402.1919956,
+    "ast_hash": "706f2c155da0e59599a9b2974f86392a",
+    "semantic_hash": "706f2c155da0e59599a9b2974f86392a"
+  },
+  "frontend/src/components/PointModal.jsx": {
+    "mtime": 1772192671.7661319,
+    "ast_hash": "a76fd200ead76eaca601040f191a91e7",
+    "semantic_hash": "a76fd200ead76eaca601040f191a91e7"
+  },
+  "frontend/src/context/AuthContext.jsx": {
+    "mtime": 1772192671.7661319,
+    "ast_hash": "a4ffb4e9fe5cec9285a99d0c6f8bca33",
+    "semantic_hash": "a4ffb4e9fe5cec9285a99d0c6f8bca33"
+  },
+  "frontend/src/main.jsx": {
+    "mtime": 1767537402.1919956,
+    "ast_hash": "643d705839cf7930b844a065e5b41c02",
+    "semantic_hash": "643d705839cf7930b844a065e5b41c02"
+  },
+  "frontend/src/pages/ActiveSessionPage.jsx": {
+    "mtime": 1781481963.1124716,
+    "ast_hash": "20cb07ae0fe7c4f61bed36a0ad4d63b5",
+    "semantic_hash": "20cb07ae0fe7c4f61bed36a0ad4d63b5"
+  },
+  "frontend/src/pages/ActivityHistoryPage.jsx": {
+    "mtime": 1771255975.6686654,
+    "ast_hash": "b183cd6613c6da9e577aaf5f0be2772b",
+    "semantic_hash": "b183cd6613c6da9e577aaf5f0be2772b"
+  },
+  "frontend/src/pages/ApiTestPage.jsx": {
+    "mtime": 1768223673.9449997,
+    "ast_hash": "9e57b777fb96d0022b7d835bf2854e76",
+    "semantic_hash": "9e57b777fb96d0022b7d835bf2854e76"
+  },
+  "frontend/src/pages/CreateGamePage.jsx": {
+    "mtime": 1781481963.1124716,
+    "ast_hash": "edad983d01d2c4ee0cad2bebb6a62099",
+    "semantic_hash": "edad983d01d2c4ee0cad2bebb6a62099"
+  },
+  "frontend/src/pages/GameLobbyPage.jsx": {
+    "mtime": 1772192671.77034,
+    "ast_hash": "5a48d43447aadc329547ac396adf18ad",
+    "semantic_hash": "5a48d43447aadc329547ac396adf18ad"
+  },
+  "frontend/src/pages/GameResultPage.jsx": {
+    "mtime": 1781481963.1166615,
+    "ast_hash": "de6c3e19c059e148a4c3e198c4f584f8",
+    "semantic_hash": "de6c3e19c059e148a4c3e198c4f584f8"
+  },
+  "frontend/src/pages/HomePage.jsx": {
+    "mtime": 1781481963.1166615,
+    "ast_hash": "be0b0895dfa98cc9518f246dadc47600",
+    "semantic_hash": "be0b0895dfa98cc9518f246dadc47600"
+  },
+  "frontend/src/pages/LoginPage.jsx": {
+    "mtime": 1772192671.7745483,
+    "ast_hash": "8c0d16556b6a745632f298cd0b49900c",
+    "semantic_hash": "8c0d16556b6a745632f298cd0b49900c"
+  },
+  "frontend/src/pages/MapPage.jsx": {
+    "mtime": 1781481963.1166615,
+    "ast_hash": "4bfe19c221f4d1be5dab15f3a8cf9db7",
+    "semantic_hash": "4bfe19c221f4d1be5dab15f3a8cf9db7"
+  },
+  "frontend/src/pages/MissionsPage.jsx": {
+    "mtime": 1781481963.1208513,
+    "ast_hash": "0a315d5dc4030641ce8ff30b6f9937cd",
+    "semantic_hash": "0a315d5dc4030641ce8ff30b6f9937cd"
+  },
+  "frontend/src/pages/ProfilePage.jsx": {
+    "mtime": 1772192671.7787564,
+    "ast_hash": "6e4dd45e7acd1a70f035cfd43106054f",
+    "semantic_hash": "6e4dd45e7acd1a70f035cfd43106054f"
+  },
+  "frontend/src/pages/ProgressionPage.jsx": {
+    "mtime": 1781481963.1208513,
+    "ast_hash": "20989dd01f436a9fb0c0149668f283b3",
+    "semantic_hash": "20989dd01f436a9fb0c0149668f283b3"
+  },
+  "frontend/src/pages/RegisterPage.jsx": {
+    "mtime": 1771255975.6726654,
+    "ast_hash": "8528f404f1ddbe54902954a4f4f5bb54",
+    "semantic_hash": "8528f404f1ddbe54902954a4f4f5bb54"
+  },
+  "frontend/src/pages/SessionDetailPage.jsx": {
+    "mtime": 1781481963.1208513,
+    "ast_hash": "3773c8bf3fdcfa274fb7c530dfc206fa",
+    "semantic_hash": "3773c8bf3fdcfa274fb7c530dfc206fa"
+  },
+  "frontend/src/pages/TeamPage.jsx": {
+    "mtime": 1781481963.1208513,
+    "ast_hash": "3d45b236b1d4b03738164cbce369b75e",
+    "semantic_hash": "3d45b236b1d4b03738164cbce369b75e"
+  },
+  "frontend/vite.config.js": {
+    "mtime": 1768223672.7339337,
+    "ast_hash": "927741ad89376d2eeb8a8ed1c511a8c0",
+    "semantic_hash": "927741ad89376d2eeb8a8ed1c511a8c0"
+  },
+  "gradlew": {
+    "mtime": 1764080155.808143,
+    "ast_hash": "780b1d3e23a3b82154795f73df943a14",
+    "semantic_hash": "780b1d3e23a3b82154795f73df943a14"
+  },
+  "settings.gradle.kts": {
+    "mtime": 1767538600.4571304,
+    "ast_hash": "ea7368757921f9167a3332fd765ea332",
+    "semantic_hash": "ea7368757921f9167a3332fd765ea332"
+  },
+  "start-dev.sh": {
+    "mtime": 1781481963.125041,
+    "ast_hash": "5bc0a668b3eabe5c910b87cb337871d0",
+    "semantic_hash": "5bc0a668b3eabe5c910b87cb337871d0"
+  },
+  "app/src/main/java/org/SportsIn/controller/WeatherController.java": {
+    "mtime": 1781481963.1040921,
+    "ast_hash": "21a427c3568ac72c3997929f0ad3c3c3",
+    "semantic_hash": "21a427c3568ac72c3997929f0ad3c3c3"
+  },
+  "frontend/src/components/WeatherForecastPanel.jsx": {
+    "mtime": 1781481963.1124716,
+    "ast_hash": "75a487e1023d641a15bc04657093bb2c",
+    "semantic_hash": "75a487e1023d641a15bc04657093bb2c"
+  },
+  "frontend/src/components/WeatherWidget.jsx": {
+    "mtime": 1781481963.1124716,
+    "ast_hash": "eab079cac4d66dc5394befef93c10767",
+    "semantic_hash": "eab079cac4d66dc5394befef93c10767"
+  },
+  "reset-testdata.sh": {
+    "mtime": 1781481963.125041,
+    "ast_hash": "d532e888bd454e8018bc5cd6ba407f60",
+    "semantic_hash": "d532e888bd454e8018bc5cd6ba407f60"
+  },
+  ".github/workflows/ant.yml": {
+    "mtime": 1772192671.6651351,
+    "ast_hash": "520f32af8cb3bead1e19c7c5842c8d61",
+    "semantic_hash": "520f32af8cb3bead1e19c7c5842c8d61"
+  },
+  "README.md": {
+    "mtime": 1778366823.6886554,
+    "ast_hash": "085ef2f78ce8a6e321fbcca80a945a32",
+    "semantic_hash": "085ef2f78ce8a6e321fbcca80a945a32"
+  },
+  "app/src/main/resources/Stockage.txt": {
+    "mtime": 1765481537.9885569,
+    "ast_hash": "313a2aeb80063d130ff92efba71f2dd0",
+    "semantic_hash": "313a2aeb80063d130ff92efba71f2dd0"
+  },
+  "ci.yml": {
+    "mtime": 1772191583.6221442,
+    "ast_hash": "cb734b577e874aab25741d6b267d6f9a",
+    "semantic_hash": "cb734b577e874aab25741d6b267d6f9a"
+  },
+  "docs/ARCHITECTURE.md": {
+    "mtime": 1775633854.0074856,
+    "ast_hash": "49250bb2ebd082cb6bd81dc561d36c59",
+    "semantic_hash": "49250bb2ebd082cb6bd81dc561d36c59"
+  },
+  "docs/CONNECTION_GUIDE.md": {
+    "mtime": 1768318717.305047,
+    "ast_hash": "957cf0b426870fd33c80026de66728fb",
+    "semantic_hash": "957cf0b426870fd33c80026de66728fb"
+  },
+  "docs/DATABASE.md": {
+    "mtime": 1765481684.340745,
+    "ast_hash": "04c66862745a8b776ec66169ffc3acd0",
+    "semantic_hash": "04c66862745a8b776ec66169ffc3acd0"
+  },
+  "docs/FEATURE_3_RECAP.md": {
+    "mtime": 1768310558.7448297,
+    "ast_hash": "e40645d4917a413712dd5e0ee75bef6f",
+    "semantic_hash": "e40645d4917a413712dd5e0ee75bef6f"
+  },
+  "docs/FEATURE_4_RECAP.md": {
+    "mtime": 1768310558.7448297,
+    "ast_hash": "abaf4a1197cf1d3facd52b6b6ecff0ed",
+    "semantic_hash": "abaf4a1197cf1d3facd52b6b6ecff0ed"
+  },
+  "docs/FEATURE_5_RECAP.md": {
+    "mtime": 1771419309.1946,
+    "ast_hash": "975145647e4d0568d5c6ffa5604b4118",
+    "semantic_hash": "975145647e4d0568d5c6ffa5604b4118"
+  },
+  "docs/Feature6_Resume.md": {
+    "mtime": 1771406010.889722,
+    "ast_hash": "6e5c1a7eb6f6b87825be0b0806d7bec2",
+    "semantic_hash": "6e5c1a7eb6f6b87825be0b0806d7bec2"
+  },
+  "docs/GAME_MECHANICS.md": {
+    "mtime": 1772192671.745091,
+    "ast_hash": "f6de161f577c0bd4267e3a6edea3139e",
+    "semantic_hash": "f6de161f577c0bd4267e3a6edea3139e"
+  },
+  "docs/RELEASE_PLAN.md": {
+    "mtime": 1772192671.745091,
+    "ast_hash": "dc2dc5f19276f5c352e8b3a1528bd4dc",
+    "semantic_hash": "dc2dc5f19276f5c352e8b3a1528bd4dc"
+  },
+  "SLIDES_PRESENTATION.pdf": {
+    "mtime": 1774519610.863463,
+    "ast_hash": "c4e12b81cc17ef9498f4b89fd37290a3",
+    "semantic_hash": "c4e12b81cc17ef9498f4b89fd37290a3"
+  },
+  "report.pdf": {
+    "mtime": 1774519610.891463,
+    "ast_hash": "0c2e8f3c31b9dc735c04aa375efb2a2f",
+    "semantic_hash": "0c2e8f3c31b9dc735c04aa375efb2a2f"
+  },
+  "docs/diagrams/class_diagram.png": {
+    "mtime": 1774520092.8193045,
+    "ast_hash": "3063785d27eefe479451f3168afe4c89",
+    "semantic_hash": "3063785d27eefe479451f3168afe4c89"
+  },
+  "docs/diagrams/sequence_conquest.png": {
+    "mtime": 1772192671.7577155,
+    "ast_hash": "2f678859ea081949f88c473037cec5a1",
+    "semantic_hash": "2f678859ea081949f88c473037cec5a1"
+  },
+  "docs/diagrams/use_case.png": {
+    "mtime": 1772192671.7619236,
+    "ast_hash": "43e6b07f956f440ed32a258f40f95390",
+    "semantic_hash": "43e6b07f956f440ed32a258f40f95390"
+  }
+}

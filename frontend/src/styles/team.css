@@ -184,6 +184,58 @@
   color: var(--gray-500);
 }
 
+/* Feature 1 — Badges météo */
+.weather-badges-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  gap: 10px;
+}
+
+.weather-badge {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  padding: 14px 10px;
+  border-radius: 12px;
+  border: 1px solid;
+  text-align: center;
+  transition: transform 0.15s;
+  position: relative;
+}
+
+.weather-badge--unlocked {
+  background: linear-gradient(135deg, rgba(251,191,36,0.1), rgba(245,158,11,0.06));
+  border-color: rgba(251,191,36,0.4);
+}
+
+.weather-badge--locked {
+  background: rgba(255,255,255,0.02);
+  border-color: rgba(255,255,255,0.06);
+  opacity: 0.55;
+  filter: grayscale(0.6);
+}
+
+.weather-badge__icon { font-size: 1.8rem; line-height: 1; }
+
+.weather-badge__name {
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: var(--gray-300, #d1d5db);
+  line-height: 1.2;
+}
+
+.weather-badge__progress { font-size: 0.65rem; color: var(--gray-500, #6b7280); }
+
+.weather-badge__check {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  font-size: 0.7rem;
+  color: #fbbf24;
+  font-weight: 700;
+}
+
 /* Arenas List */
 .team-arenas-list {
   list-style: none;

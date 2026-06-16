@@ -1,0 +1,126 @@
+.forecast-panel {
+  border-radius: 14px;
+  background: linear-gradient(135deg, #0f172a, #1e293b);
+  border: 1px solid rgba(99, 102, 241, 0.25);
+  padding: 16px;
+  margin-top: 8px;
+}
+
+.forecast-panel__header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-bottom: 14px;
+}
+
+.forecast-panel__title {
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: #e2e8f0;
+}
+
+.forecast-panel__arena {
+  font-size: 0.75rem;
+  color: #64748b;
+  flex: 1;
+}
+
+.forecast-panel__extreme-badge {
+  font-size: 0.72rem;
+  font-weight: 700;
+  background: rgba(239, 68, 68, 0.15);
+  border: 1px solid rgba(239, 68, 68, 0.4);
+  color: #f87171;
+  padding: 3px 10px;
+  border-radius: 12px;
+  animation: extremeBadgePulse 1.5s ease-in-out infinite;
+}
+
+@keyframes extremeBadgePulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.6; }
+}
+
+.forecast-panel__timeline {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.forecast-window {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  border-radius: 10px;
+  padding: 10px 14px;
+  transition: opacity 0.2s;
+}
+
+.forecast-window--extreme {
+  animation: extremeWindowPulse 2s ease-in-out infinite;
+}
+
+@keyframes extremeWindowPulse {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(239,68,68,0); }
+  50% { box-shadow: 0 0 6px 1px rgba(239,68,68,0.25); }
+}
+
+.forecast-window__time {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-width: 52px;
+}
+
+.forecast-window__day {
+  font-size: 0.65rem;
+  color: #64748b;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.forecast-window__hour {
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: #cbd5e1;
+}
+
+.forecast-window__info {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.forecast-window__temp {
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: #f1f5f9;
+  min-width: 36px;
+}
+
+.forecast-window__tags {
+  display: flex;
+  gap: 4px;
+  font-size: 1rem;
+}
+
+.forecast-window__bonus {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  min-width: 56px;
+}
+
+.forecast-window__mult {
+  font-size: 0.92rem;
+  font-weight: 800;
+}
+
+.forecast-window__label {
+  font-size: 0.62rem;
+  color: #475569;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}

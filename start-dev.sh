@@ -11,6 +11,15 @@ set -e
 echo "🚀 Démarrage du projet SportsIn..."
 echo ""
 
+# Charger les variables d'environnement depuis .env
+if [ -f ".env" ]; then
+    set -a
+    # shellcheck disable=SC1091
+    source .env
+    set +a
+    echo "✅ Variables d'environnement chargées depuis .env"
+fi
+
 # Couleurs pour l'affichage
 GREEN='\033[0;32m'
 BLUE='\033[0;34m'

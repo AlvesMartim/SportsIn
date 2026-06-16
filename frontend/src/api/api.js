@@ -93,6 +93,7 @@ export const areneAPI = {
   create: async (data) => fetchAPI('/arenes', { method: 'POST', body: JSON.stringify(data) }),
   update: async (id, data) => fetchAPI(`/arenes/${id}`, { method: 'PUT', body: JSON.stringify(data) }),
   delete: async (id) => fetchAPI(`/arenes/${id}`, { method: 'DELETE' }),
+  getInfluence: async (id) => fetchAPI(`/arenes/${id}/influence`),
 };
 
 /**
@@ -201,6 +202,7 @@ export const messageAPI = {
 };
 
 /**
+<<<<<<< HEAD
  * ========== STRAVA ==========
  */
 export const stravaAPI = {
@@ -215,6 +217,23 @@ export const stravaAPI = {
     const deptParam = departement ? `&departement=${departement}` : '';
     return fetchAPI(`/strava/stats/leaderboard?period=${period}${deptParam}`);
   },
+=======
+ * ========== MÉTÉO (Feature 7) ==========
+ */
+export const weatherAPI = {
+  getCurrent: async (lat, lng, sport) => {
+    const sportParam = sport ? `&sport=${encodeURIComponent(sport)}` : '';
+    return fetchAPI(`/weather/current?lat=${lat}&lng=${lng}${sportParam}`);
+  },
+  getForArena: async (arenaId, sport) => {
+    const sportParam = sport ? `?sport=${encodeURIComponent(sport)}` : '';
+    return fetchAPI(`/weather/arena/${arenaId}${sportParam}`);
+  },
+  getAlerts: async () => fetchAPI('/weather/alerts'),
+  getForecastForArena: async (arenaId) => fetchAPI(`/weather/arena/${arenaId}/forecast`),
+  getBestSport: async (arenaId) => fetchAPI(`/weather/arena/${arenaId}/best-sport`),
+  getTeamBadges: async (teamId) => fetchAPI(`/weather/teams/${teamId}/badges`),
+>>>>>>> feature7_meteo
 };
 
 export default {
@@ -231,5 +250,9 @@ export default {
   missionAPI,
   progressionAPI,
   messageAPI,
+<<<<<<< HEAD
   stravaAPI,
+=======
+  weatherAPI,
+>>>>>>> feature7_meteo
 };

@@ -8,10 +8,16 @@ import markerIcon2x from "leaflet/dist/images/marker-icon-2x.png";
 import markerIcon from "leaflet/dist/images/marker-icon.png";
 import markerShadow from "leaflet/dist/images/marker-shadow.png";
 
+<<<<<<< HEAD
 import { areneAPI, routeAPI, zoneAPI, gameAPI, equipeAPI, missionAPI, stravaAPI } from "../api/api.js";
+=======
+import { areneAPI, routeAPI, zoneAPI, gameAPI, equipeAPI, missionAPI, weatherAPI } from "../api/api.js";
+>>>>>>> feature7_meteo
 import { useAuth } from "../context/AuthContext.jsx";
 import Header from "../components/Header.jsx";
+import WeatherWidget from "../components/WeatherWidget.jsx";
 import "../styles/map.css";
+import "../styles/weather-widget.css";
 
 // Fix des icônes Leaflet pour Vite
 delete L.Icon.Default.prototype._getIconUrl;
@@ -48,6 +54,16 @@ const areneMissionIcon = L.icon({
   popupAnchor: [1, -40],
   shadowSize: [41, 41],
   className: "mission-marker",
+});
+
+const areneAlertIcon = L.icon({
+  iconUrl: "https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-violet.png",
+  shadowUrl: markerShadow,
+  iconSize: [30, 49],
+  iconAnchor: [15, 49],
+  popupAnchor: [1, -40],
+  shadowSize: [41, 41],
+  className: "alert-marker",
 });
 
 const CENTER_FRANCE = [46.2276, 2.2137];
@@ -95,6 +111,8 @@ const TEAM_COLORS = {
 };
 
 const getTeamColor = (teamId) => TEAM_COLORS[teamId] || TEAM_COLORS.default;
+const normalizeSportCode = (sportCode) => String(sportCode || "").trim().toUpperCase();
+const formatSportLabel = (sportCode) => String(sportCode || "").replace(/_/g, " ");
 
 const MISSION_TYPE_LABELS = {
   RECAPTURE_RECENT_LOSS: "Reconquête",
@@ -133,10 +151,16 @@ function MapPage() {
   const [showLegend, setShowLegend] = useState(false);
   const [missions, setMissions] = useState([]);
   const [missionsByArena, setMissionsByArena] = useState({});
+<<<<<<< HEAD
   const [stravaPolylines, setStravaPolylines] = useState([]);
   const [showStravaTraces, setShowStravaTraces] = useState(true);
+=======
+  const [selectedSportByArena, setSelectedSportByArena] = useState({});
+  const [influenceByArena, setInfluenceByArena] = useState({});
+  const [alertArenas, setAlertArenas] = useState(new Set());
+>>>>>>> feature7_meteo
 
-  const handleLaunchGame = async (arene) => {
+  const handleLaunchGame = async (arene, selectedSportCode) => {
     const teamId = sessionStorage.getItem("insport_team_id");
 
     if (!teamId) {
@@ -146,22 +170,86 @@ function MapPage() {
 
     try {
       setLaunchingGame(arene.id);
+      setError(null);
+
+      const availableSports = Array.isArray(arene.sportsDisponibles)
+        ? arene.sportsDisponibles
+        : [];
+      const chosenSport = normalizeSportCode(
+        selectedSportCode || selectedSportByArena[arene.id] || availableSports[0]
+      );
+
+      if (!chosenSport) {
+        setError("Cette arène ne propose aucun sport pour le matchmaking.");
+        return;
+      }
+
       const team = await equipeAPI.getById(teamId);
+
+      const waitingGames = await gameAPI.getWaitingAtPoint(arene.id).catch(() => []);
+      const compatibleGame = waitingGames.find(
+        (g) =>
+          normalizeSportCode(g?.sport?.code) === chosenSport &&
+          g?.creatorTeam?.id?.toString() !== team?.id?.toString()
+      );
+
+      if (compatibleGame) {
+        await gameAPI.join(compatibleGame.id, Number(team.id));
+        navigate(`/game/lobby/${compatibleGame.id}`);
+        return;
+      }
 
       const gameData = {
         pointId: arene.id,
-        sport: arene.sportsDisponibles?.[0] ? { code: arene.sportsDisponibles[0] } : null,
+        sport: { code: chosenSport },
         creatorTeam: team,
       };
 
       const game = await gameAPI.create(gameData);
       navigate(`/game/lobby/${game.id}`);
     } catch (err) {
+      setError("Erreur lors du lancement du matchmaking.");
       console.error("Erreur lors de la création du jeu:", err);
     } finally {
       setLaunchingGame(null);
     }
   };
+
+  const handleSelectArenaSport = (arenaId, sportCode, event) => {
+    if (event) {
+      event.preventDefault();
+      event.stopPropagation();
+    }
+
+    setSelectedSportByArena((previous) => ({
+      ...previous,
+      [arenaId]: sportCode,
+    }));
+  };
+
+  useEffect(() => {
+    setSelectedSportByArena((previous) => {
+      const next = { ...previous };
+
+      for (const arena of arenes) {
+        const availableSports = Array.isArray(arena.sportsDisponibles)
+          ? arena.sportsDisponibles
+          : [];
+        if (availableSports.length === 0) continue;
+
+        const selected = normalizeSportCode(next[arena.id]);
+        const exists = availableSports.some(
+          (sport) => normalizeSportCode(sport) === selected
+        );
+
+        if (!exists) {
+          next[arena.id] = availableSports[0];
+        }
+      }
+
+      return next;
+    });
+  }, [arenes]);
 
   useEffect(() => {
     if (navigator.geolocation) {
@@ -229,6 +317,28 @@ function MapPage() {
           }
         }
         setMissionsByArena(arenaMap);
+
+        // Load influence levels for all arenas (Feature 7)
+        if (arenesData.length > 0) {
+          const influenceResults = await Promise.allSettled(
+            arenesData.map((a) => areneAPI.getInfluence(a.id))
+          );
+          const influenceMap = {};
+          for (const res of influenceResults) {
+            if (res.status === "fulfilled" && res.value) {
+              influenceMap[res.value.arenaId] = res.value.influenceLevel;
+            }
+          }
+          setInfluenceByArena(influenceMap);
+        }
+
+        // Feature 2 — arènes sous alerte météo extrême
+        try {
+          const alerts = await weatherAPI.getAlerts();
+          if (Array.isArray(alerts)) {
+            setAlertArenas(new Set(alerts.map((a) => String(a.arenaId))));
+          }
+        } catch (_) {}
 
         setError(null);
       } catch (err) {
@@ -330,33 +440,98 @@ function MapPage() {
           {showArenas && arenes.map((arene) => {
             const arenaMissions = missionsByArena[String(arene.id)] || [];
             const hasMission = arenaMissions.length > 0;
+            const isAlert = alertArenas.has(String(arene.id));
+            const availableSports = Array.isArray(arene.sportsDisponibles)
+              ? arene.sportsDisponibles
+              : [];
+            const selectedSport = selectedSportByArena[arene.id] || availableSports[0] || "";
+            const influence = influenceByArena[arene.id];
+            const isLowInfluence = influence != null && influence < 30;
+            const isMediumInfluence = influence != null && influence >= 30 && influence < 60;
+
+            const markerIcon = isAlert ? areneAlertIcon : hasMission ? areneMissionIcon : areneIcon;
 
             return (
               <Marker
                 key={arene.id}
                 position={[arene.latitude, arene.longitude]}
-                icon={hasMission ? areneMissionIcon : areneIcon}
+                icon={markerIcon}
               >
-                <Popup className={`map-popup map-popup--arena${hasMission ? " map-popup--mission" : ""}`} maxWidth={320}>
+                <Popup className={`map-popup map-popup--arena${hasMission ? " map-popup--mission" : ""}${isAlert ? " map-popup--alert" : ""}`} maxWidth={320}>
                   <div className="map-popup-content">
+                    {/* Bannière alerte météo extrême */}
+                    {isAlert && (
+                      <div className="map-popup-weather-alert">
+                        🌪️ ALERTE MÉTÉO — Influence ×2 si victoire !
+                      </div>
+                    )}
                     {/* Section 1 : Infos arène */}
                     <h4>{arene.nom || `Arène ${arene.id}`}</h4>
-                    {arene.sportsDisponibles?.length > 0 && (
-                      <div className="map-popup-sports">
-                        {arene.sportsDisponibles.map((sport) => (
-                          <span key={sport} className="map-popup-sport">{sport}</span>
-                        ))}
+                    {availableSports.length > 0 && (
+                      <div className="map-popup-sports map-popup-sports--selectable">
+                        {availableSports.map((sport) => {
+                          const isSelected =
+                            normalizeSportCode(sport) === normalizeSportCode(selectedSport);
+
+                          return (
+                            <button
+                              key={sport}
+                              type="button"
+                              className={`map-popup-sport-btn${isSelected ? " is-active" : ""}`}
+                              onClick={(event) => handleSelectArenaSport(arene.id, sport, event)}
+                            >
+                              {formatSportLabel(sport)}
+                            </button>
+                          );
+                        })}
                       </div>
                     )}
                     {arene.controllingTeamId && (
                       <p className="map-popup-meta">Contrôlée par Équipe {arene.controllingTeamId}</p>
                     )}
+
+                    {/* Territory influence (Feature 7) */}
+                    {influence != null && (
+                      <div className="map-popup-influence">
+                        <div className="map-popup-influence__header">
+                          <span className="map-popup-influence__label">
+                            {isLowInfluence ? "⚠️" : "🏰"} Influence territoriale
+                          </span>
+                          <span className={`map-popup-influence__value${isLowInfluence ? " map-popup-influence__value--low" : isMediumInfluence ? " map-popup-influence__value--medium" : " map-popup-influence__value--high"}`}>
+                            {influence.toFixed(0)}%
+                          </span>
+                        </div>
+                        <div className="map-popup-influence__bar-bg">
+                          <div
+                            className={`map-popup-influence__bar-fill${isLowInfluence ? " map-popup-influence__bar-fill--low" : isMediumInfluence ? " map-popup-influence__bar-fill--medium" : " map-popup-influence__bar-fill--high"}`}
+                            style={{ width: `${influence}%` }}
+                          />
+                        </div>
+                        {isLowInfluence && (
+                          <p className="map-popup-influence__warning">
+                            Influence critique ! Risque de perte de contrôle.
+                          </p>
+                        )}
+                      </div>
+                    )}
+
+                    {/* Météo compact sur l'arène */}
+                    <div style={{ margin: "8px 0" }}>
+                      <WeatherWidget
+                        arenaId={arene.id}
+                        sport={selectedSport || undefined}
+                        compact
+                      />
+                    </div>
+
                     <button
                       className="map-popup-action"
-                      onClick={() => handleLaunchGame(arene)}
+                      onClick={() => handleLaunchGame(arene, selectedSport)}
                       disabled={launchingGame === arene.id}
                     >
-                      {launchingGame === arene.id ? "Création..." : "⚔️ Lancer un jeu"}
+                      {launchingGame === arene.id
+                        ? "Matchmaking..."
+                        : `⚔️ Lancer un jeu${selectedSport ? ` (${formatSportLabel(selectedSport)})` : ""}`}
                     </button>
 
                     {/* Section 2 : Missions actives sur cette arène */}

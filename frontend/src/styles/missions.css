@@ -262,6 +262,13 @@
   border: 1px solid #22c55e44;
 }
 
+.mission-card__type--WEATHER_FLASH {
+  background: #0891b233;
+  color: #67e8f9;
+  border: 1px solid #0891b255;
+  animation: weatherTypePulse 2s ease-in-out infinite;
+}
+
 .mission-card__title {
   font-size: 1.05rem;
   font-weight: 600;
@@ -426,6 +433,84 @@
   margin-bottom: 24px;
 }
 
+/* Weather flash mission card */
+.mission-card--weather-flash {
+  border-left: 4px solid #06b6d4;
+  background: linear-gradient(135deg, #0f1f2e 0%, #0c1a26 100%);
+  box-shadow: 0 0 20px rgba(6, 182, 212, 0.12);
+}
+
+.mission-card--weather-flash:hover {
+  border-color: #06b6d4;
+  box-shadow: 0 8px 28px rgba(6, 182, 212, 0.25);
+}
+
+/* Weather flash banner */
+.weather-flash-banner {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: linear-gradient(135deg, #0c4a6e 0%, #075985 100%);
+  border: 1px solid #0891b2;
+  border-radius: 8px;
+  padding: 8px 12px;
+  margin-bottom: 12px;
+  font-size: 0.82rem;
+  font-weight: 700;
+  flex-wrap: wrap;
+}
+
+.weather-flash-banner__icon {
+  font-size: 1.2rem;
+  flex-shrink: 0;
+}
+
+.weather-flash-banner__label {
+  color: #67e8f9;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  flex: 1;
+  min-width: 0;
+}
+
+.weather-flash-banner__countdown {
+  color: #bae6fd;
+  font-size: 0.78rem;
+  font-weight: 600;
+  white-space: nowrap;
+  background: rgba(6, 182, 212, 0.15);
+  padding: 2px 8px;
+  border-radius: 6px;
+}
+
+/* Weather flash arena info */
+.weather-flash-arena {
+  font-size: 0.82rem;
+  color: #7dd3fc;
+  margin-bottom: 12px;
+  padding: 6px 10px;
+  background: rgba(6, 182, 212, 0.08);
+  border-radius: 6px;
+  border: 1px solid rgba(6, 182, 212, 0.2);
+}
+
+/* Weather flash filter button */
+.missions-filter-btn--weather {
+  border-color: #0891b244;
+  color: #67e8f9;
+}
+
+.missions-filter-btn--weather:hover {
+  border-color: #06b6d4;
+  color: #22d3ee;
+}
+
+.missions-filter-btn--active.missions-filter-btn--weather {
+  background: linear-gradient(135deg, #0891b2 0%, #0e7490 100%);
+  border-color: #0891b2;
+  color: #fff;
+}
+
 /* Animations */
 @keyframes missionSlideUp {
   from { opacity: 0; transform: translateY(20px); }
@@ -439,6 +524,11 @@
 @keyframes timerPulse {
   0%, 100% { opacity: 1; }
   50% { opacity: 0.7; }
+}
+
+@keyframes weatherTypePulse {
+  0%, 100% { opacity: 1; box-shadow: 0 0 0 rgba(6, 182, 212, 0); }
+  50% { opacity: 0.85; box-shadow: 0 0 6px rgba(6, 182, 212, 0.4); }
 }
 
 /* Responsive */
