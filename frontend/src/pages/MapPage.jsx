@@ -8,11 +8,7 @@ import markerIcon2x from "leaflet/dist/images/marker-icon-2x.png";
 import markerIcon from "leaflet/dist/images/marker-icon.png";
 import markerShadow from "leaflet/dist/images/marker-shadow.png";
 
-<<<<<<< HEAD
-import { areneAPI, routeAPI, zoneAPI, gameAPI, equipeAPI, missionAPI, stravaAPI } from "../api/api.js";
-=======
-import { areneAPI, routeAPI, zoneAPI, gameAPI, equipeAPI, missionAPI, weatherAPI } from "../api/api.js";
->>>>>>> feature7_meteo
+import { areneAPI, routeAPI, zoneAPI, gameAPI, equipeAPI, missionAPI, stravaAPI, weatherAPI } from "../api/api.js";
 import { useAuth } from "../context/AuthContext.jsx";
 import Header from "../components/Header.jsx";
 import WeatherWidget from "../components/WeatherWidget.jsx";
@@ -151,14 +147,11 @@ function MapPage() {
   const [showLegend, setShowLegend] = useState(false);
   const [missions, setMissions] = useState([]);
   const [missionsByArena, setMissionsByArena] = useState({});
-<<<<<<< HEAD
   const [stravaPolylines, setStravaPolylines] = useState([]);
   const [showStravaTraces, setShowStravaTraces] = useState(true);
-=======
   const [selectedSportByArena, setSelectedSportByArena] = useState({});
   const [influenceByArena, setInfluenceByArena] = useState({});
   const [alertArenas, setAlertArenas] = useState(new Set());
->>>>>>> feature7_meteo
 
   const handleLaunchGame = async (arene, selectedSportCode) => {
     const teamId = sessionStorage.getItem("insport_team_id");

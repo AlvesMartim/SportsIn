@@ -202,7 +202,6 @@ export const messageAPI = {
 };
 
 /**
-<<<<<<< HEAD
  * ========== STRAVA ==========
  */
 export const stravaAPI = {
@@ -217,7 +216,9 @@ export const stravaAPI = {
     const deptParam = departement ? `&departement=${departement}` : '';
     return fetchAPI(`/strava/stats/leaderboard?period=${period}${deptParam}`);
   },
-=======
+};
+
+/**
  * ========== MÉTÉO (Feature 7) ==========
  */
 export const weatherAPI = {
@@ -233,7 +234,6 @@ export const weatherAPI = {
   getForecastForArena: async (arenaId) => fetchAPI(`/weather/arena/${arenaId}/forecast`),
   getBestSport: async (arenaId) => fetchAPI(`/weather/arena/${arenaId}/best-sport`),
   getTeamBadges: async (teamId) => fetchAPI(`/weather/teams/${teamId}/badges`),
->>>>>>> feature7_meteo
 };
 
 export default {
@@ -250,9 +250,6 @@ export default {
   missionAPI,
   progressionAPI,
   messageAPI,
-<<<<<<< HEAD
   stravaAPI,
-=======
   weatherAPI,
->>>>>>> feature7_meteo
 };
